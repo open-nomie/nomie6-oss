@@ -4,6 +4,7 @@ import { useRegisterSW } from 'virtual:pwa-register/svelte'
 
 const intervalMS = 60 * 60 * 1000
 
+/* It's registering a service worker and then updating it every hour. */
 useRegisterSW({
   onRegistered(r) {
     if (r) r.update()
@@ -13,7 +14,10 @@ useRegisterSW({
       }, intervalMS)
   },
 })
-// Vendors
+
+/**
+ * Setup Day JS
+ */
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)

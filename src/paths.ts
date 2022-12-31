@@ -1,38 +1,9 @@
 import config from './config/appConfig'
 
 const NPaths = {
-  firestoreRoot() {
-    return `env/${import.meta.env.VITE_APP_FIRESTORE_ROOT}`
-  },
-  firestore(path: string) {
-    return `env/${import.meta.env.VITE_APP_FIRESTORE_ROOT}/${path}`
-  },
-  firestoreUserKeys(uid: string) {
-    return `customers/${uid}/keys`
-  },
-  firestoreUserKey(uid: string, key: string) {
-    return `customers/${uid}/keys/${key}`
-  },
-  apiFresh(uid: string) {
-    return `/customers/${uid}/api-fresh`
-  },
-  firestoreUserSubscriptions(uid: string) {
-    return `/customers/${uid}/subscriptions`
-  },
-  localSubscriptions(uid: string) {
-    return `/customers/${uid}/subscriptions_local`
-  },
-  blueBox(uid: string): string {
-    return `env/${import.meta.env.VITE_APP_FIRESTORE_ROOT}/${uid}/bluebox`
-  },
+
   awardChainDoc(uid: string = 'local') {
     return `awards.json`
-  },
-  virgilCard(userId: string) {
-    return `customers/${userId}/virgil/card`
-  },
-  approvedTrackers() {
-    return `trackable-library/trackables/approved`
   },
   routes: {
     board(id) {

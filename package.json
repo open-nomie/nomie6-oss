@@ -16,7 +16,7 @@
     "url": "https://github.com/open-nomie/nomie-ossnp"
   },
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite --host 0.0.0.0 --port 5001",
     "vbuild": "vite build",
     "vserve": "vite preview --host 0.0.0.0 --port 5000",
     "serve": "vite serve",
@@ -141,6 +141,7 @@
     "math-expression-evaluator": "^1.3.13",
     "muuri": "^0.9.5",
     "papaparse": "^5.3.0",
+    "pocketbase": "^0.9.1",
     "postcss": "^8.4.5",
     "rangeslider-pure": "^0.4.11",
     "svelte-markdown": "^0.2.1",

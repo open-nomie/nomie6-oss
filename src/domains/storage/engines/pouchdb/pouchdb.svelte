@@ -1,18 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import ListItem from '../../../components/list-item/list-item.svelte'
-  import Input from '../../../components/input/input.svelte'
-  import NSpinner from '../../../components/spinner/spinner.svelte'
-  import ToggleSwitch from '../../../components/toggle-switch/toggle-switch.svelte'
+  import ListItem from '../../../../components/list-item/list-item.svelte'
+  import Input from '../../../../components/input/input.svelte'
+  import NSpinner from '../../../../components/spinner/spinner.svelte'
+  import ToggleSwitch from '../../../../components/toggle-switch/toggle-switch.svelte'
 
-  import { Lang } from '../../../store/lang'
-  import { Interact } from '../../../store/interact'
-  import Storage from '../../../domains/storage/storage'
-  import Remote from '../../../modules/remote/remote'
-  import URLParser from '../../../utils/url-parser/url-parser' // Get URL Parser
-  import Button from '../../../components/button/button.svelte'
+  import { Lang } from '../../../../store/lang'
+  import { Interact } from '../../../../store/interact'
+  import Storage from '../../storage'
+  import Remote from '../../../../modules/remote/remote'
+  import URLParser from '../../../../utils/url-parser/url-parser' // Get URL Parser
+  import Button from '../../../../components/button/button.svelte'
 
-  import Divider from '../../../components/divider/divider.svelte'
+  import Divider from '../../../../components/divider/divider.svelte'
 
   import PouchDB from 'pouchdb'
 
@@ -21,7 +21,7 @@
 
   let isOpen = false
 
-  let state = {
+  let state: any = {
     engine: null,
     isValidSyncURL: false,
     form: {

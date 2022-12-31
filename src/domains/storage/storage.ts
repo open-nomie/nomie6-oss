@@ -19,7 +19,7 @@ import { SideStore } from './side-storage'
 
 const STORAGE_TYPE_PATH = 'n6/storage-type'
 
-export type StorageTypes = 'local' | 'firebase' | 'dumb' | 'pouchdb' | any
+export type StorageTypes = 'local' | 'dumb' | 'pouchdb' | any
 
 export function setStorage(type: StorageTypes) {
   localStorage.setItem(STORAGE_TYPE_PATH, type)
@@ -55,26 +55,7 @@ export const StorageEngines: Array<StorageEngineType> = [
     multipleDevices: false,
     engine: PouchDBEngine,
     advanced: true
-  },
-  // {
-  //   id: 's3',
-  //   name: 'S3 Compliant Storage',
-  //   shortName: 'S3 Storage',
-  //   description: '(Coming Soon) Sync to any S3 Compliant Storage engine',
-  //   price: 'FREE',
-  //   multipleDevices: true,
-  //   engine: S3Engine,
-  //   advanced: true
-  // },
-  // {
-  //   id: 'firebase',
-  //   name: 'Encrypted Cloud',
-  //   shortName: 'Encrypted Cloud',
-  //   description: `(Coming soon) Multiple devices with end-to-end encryption in the cloud.`,
-  //   multipleDevices: true,
-  //   price: 'PAID Upgrade',
-  //   engine: FirebaseEngine,
-  // },
+  }
 ]
 
 export const getStorageEngineDetails = (id: string): StorageEngineType => {

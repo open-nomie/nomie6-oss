@@ -21,14 +21,13 @@ import { WritingPromptStore } from './domains/writing-prompts/useWritingPrompts'
 
 export const BootLog = writable<Array<{ message: string; date: Date }>>([])
 
-// const pushLog = (message: string, date: Date = new Date()) => {
-//   BootLog.update((s) => {
-//     s.push({ message, date })
-//     console.log(`🥾 BootStore: ${message}`)
-//     return s
-//   })
-// }
 
+/**
+ * It opens a modal with a pin lock, and if the pin is correct, it closes the modal and resolves the
+ * promise with true
+ * @param  - The Prefs object.
+ * @returns A promise that resolves to a boolean.
+ */
 const presentLockScreen = async ($Prefs): Promise<boolean> => {
   return new Promise((resolve) => {
     openPinLock({
@@ -49,6 +48,11 @@ const presentLockScreen = async ($Prefs): Promise<boolean> => {
   })
 }
 
+/**
+ * It initializes the core components of the app
+ * @param {ITrackables} trackables - ITrackables
+ * @returns True
+ */
 export const bootCoreComponents = async (trackables: ITrackables) => {
   loadToday({ knownTrackables: trackables, date: new Date() })
   initUniboardStore(trackables)
@@ -59,14 +63,16 @@ export const bootCoreComponents = async (trackables: ITrackables) => {
   GoalStore.init()
   SearchStore.init()
   WritingPromptStore.init();
-
-
-  // initAwardStore()
-
-
+  initAwardStore()
   return true
 }
 
+/**
+ * > Boot Nomie, if the user has a pin, present the lock screen, then initialize the LedgerStore and
+ * TrackableStore, then boot the core components
+ * @param {PreferencesStateType}  - PreferencesStateType
+ * @returns A promise that resolves to true.
+ */
 export const bootNomie = async ($Prefs: PreferencesStateType) => {
   let locked = $Prefs.usePin ? true : false
 
@@ -82,11 +88,6 @@ export const bootNomie = async ($Prefs: PreferencesStateType) => {
         bootCoreComponents(trackables)
         // If not ready, we don't have an account firing 
         // the ready state - we will manually do it here.
-
-        setTimeout(() => {
-
-          // MessageStore.loadMessages()
-        }, 2000)
 
         resolve(true)
       })

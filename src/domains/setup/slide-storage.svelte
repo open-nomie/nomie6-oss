@@ -4,7 +4,6 @@
   import Menu from '../../components/menu/menu.svelte'
   import type { PopMenuButton } from '../../components/pop-menu/usePopmenu'
 
-  import LoginRegisterView from '../firebase/login-register-view.svelte'
   import { Prefs } from '../preferences/Preferences'
 
   import { StorageEngines, StorageTypes } from '../storage/storage'

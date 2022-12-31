@@ -17,16 +17,16 @@
   import Divider from '../../components/divider/divider.svelte'
 
   import { TrackableStore } from '../trackable/TrackableStore'
-  import { generateBackup } from '../backup/BackupStore'
+
   import { updateAllLastUsed } from '../usage/UsageStore'
-  import PouchdbSettings from '../storage/views/pouchdb.svelte'
+  import PouchdbSettings from '../storage/engines/pouchdb/pouchdb.svelte'
   import { getStorageEngineDetails, StorageEngineType } from '../storage/storage'
 
   import { showImportModal } from '../import-export/ImporterStore'
   import { showToast } from '../../components/toast/ToastStore'
-  import Title from '../../components/title/title.svelte'
+
   import S3Options from '../storage/views/s3-options.svelte'
-import BackupListItems from '../../components/backup-message/backup-list-items.svelte'
+  import BackupListItems from '../../components/backup-message/backup-list-items.svelte'
 
   // let fileInputF
   // let showImporter = false
@@ -107,7 +107,7 @@ import BackupListItems from '../../components/backup-message/backup-list-items.s
   </p>
 {/if} -->
 
-<BackupListItems  />
+<BackupListItems />
 
 <List solo className="mb-3 mt-4" outside>
   <ListItem
