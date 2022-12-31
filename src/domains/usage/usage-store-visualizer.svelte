@@ -8,7 +8,7 @@
 <div class="usage-store-vis bg-pink-500 text-white p-4 rounded-lg">
   {#each Object.keys($UsageStore).map((k) => {
     return { key: k, usage: $UsageStore[k] }
-  }) as item, index}
+  }) as item}
     <div class="py-2 flex items-center space-x-4">
       <span>{item.key}</span>
       <div>

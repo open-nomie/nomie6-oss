@@ -12,8 +12,8 @@ import { switchToLocal } from '../settings/settings-functions'
 
 // import DumbStorage from './engines/storage.dumb'
 
-import { LocalForageEngine } from './engines/engine.localforage'
-import { PouchDBEngine } from './engines/engine.pouchdb'
+import { LocalForageEngine } from './engines/localforage/engine.localforage'
+import { PouchDBEngine } from './engines/pouchdb/engine.pouchdb'
 import { SideStore } from './side-storage'
 // import { S3Engine } from "./engines/engine.s3";
 

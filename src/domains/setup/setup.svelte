@@ -9,7 +9,6 @@
   import WelcomeSlide from './slide-welcome.svelte'
   import PWASlide from './slide-pwa-install.svelte'
   import TimeFormatSlide from './slide-time-format.svelte'
-
   import StorageSlide from './slide-storage.svelte'
 
   // Local components

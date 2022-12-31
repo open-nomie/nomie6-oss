@@ -12,7 +12,6 @@ import rollupPluginsSvelte from 'rollup-plugin-svelte-svg'
 import { string } from 'rollup-plugin-string'
 
 export default defineConfig({
-
   optimizeDeps: {
     allowNodeBuiltins: ['pouchdb-browser', 'pouchdb-utils'],
     exclude: ['canvas-confetti', 'tributejs', 'svelte-navigator'],

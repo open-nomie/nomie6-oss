@@ -1,5 +1,7 @@
 import appConfig from '../../config/appConfig'
 
+/* SideStore is a class that allows you to store data in the browser's localStorage, and it's a lot
+easier to use than localStorage directly. */
 export class SideStore {
   dbPath: string
   data: any
@@ -7,7 +9,7 @@ export class SideStore {
     this.dbPath = `${appConfig.data_root}/localDB/${path}`
     try {
       this.data = JSON.parse(localStorage.getItem(this.dbPath) || '{}')
-    } catch(e) {
+    } catch (e) {
       console.error("SideStorage could not parse the JSON data");
     }
   }

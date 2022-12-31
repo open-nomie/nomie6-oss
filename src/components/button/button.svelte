@@ -5,7 +5,6 @@
   import './button.css'
   import { md5 } from '../../modules/nid/nid'
 
-
   const dispatch = createEventDispatcher()
   export let id = undefined
   export let size = 'md'
@@ -29,7 +28,6 @@
   export let autofocus = false
   export let primary = false
   export let clear = false
-
 
   let confirming = false
   let confirmTimeout
@@ -90,7 +88,7 @@
     }
   }}
 >
-  <div class="hit-mark"></div>
+  <div class="hit-mark" />
   {#if confirming}
     <div
       class="flex items-center justify-center"

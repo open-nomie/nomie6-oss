@@ -1,5 +1,5 @@
 import localforage from 'localforage'
-import type { IStorage } from '../storage'
+import type { IStorage } from '../../storage'
 
 let listeners = []
 
@@ -25,7 +25,7 @@ export const LocalForageEngine: IStorage = {
      */
     if (navigator.storage && navigator.storage.persist) {
       const isPersisted = await navigator.storage.persisted();
-      if(!isPersisted) {
+      if (!isPersisted) {
         await navigator.storage.persist();
       }
     }

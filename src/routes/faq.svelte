@@ -25,7 +25,7 @@
   </div>
 
   <div class="min-h-full bg-gray-200 dark:bg-gray-800">
-    {#each faq as q, index}
+    {#each faq as q}
       <div class="my-3">
         <NItem className="solo py-3 bg-white dark:bg-gray-900">
           <div class="mb-1 font-bold leading-tight">{q.question}</div>

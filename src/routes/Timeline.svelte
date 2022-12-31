@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Prefs } from './../domains/preferences/Preferences'
-
   /**
    * Timeline Page
    * Mon Feb 21 2022 - Brandon
@@ -58,7 +56,6 @@
 
   $: if (date && date !== hashDate && $TrackableStore.ready) {
     hashDate = date
-    // loadLogs(false, 'date reaction')
   }
 
   /**
@@ -75,18 +72,8 @@
       } else {
         inPast = false
       }
-      // filters.startingDate = date.toDate();
-      // loadLogs()
     }
   }
-
-  /**
-   * Clear Logs and Reload
-   */
-  // const clearAndLoad = async () => {
-  //   logs = []
-  //   loadLogs(true, 'clearAndLoad')
-  // }
 
   /**
    * View Base Filters
@@ -123,15 +110,6 @@
           TimelineOptionsStore.setItem('filters', clearFilterSearch(filters))
         },
       },
-      // {
-      //   title: 'Maps',
-      //   checked: filters.maps,
-      //   icon: MapOutline,
-      //   click() {
-      //     filters.maps = !filters.maps
-      //     TimelineOptionsStore.setItem('filters', filters)
-      //   },
-      // },
       {
         title: 'Trackables',
         checked: filters.trackables,
@@ -166,8 +144,6 @@
 
   onMount(async () => {
     mounted = true
-    // Device.scrollToTop()
-    // filters = $TimelineOptionsStore.filters || baseFilters
   })
 </script>
 
@@ -194,20 +170,9 @@
 
       <div class="max-w-xl w-full mt-1 mx-auto items-center stiff">
         <PositivityGrid className="h-3" logs={topItem?.logs || []} />
-        <!-- <PositivityScorebar className="h-4" logs={topItem?.logs || []} /> -->
       </div>
     </div>
     <div class="space-x-2 flex-nowrap flex">
-      <!-- <Button
-        block
-        icon
-        on:click={(evt) => {
-          showFilterMenu(evt.detail)
-        }}
-      >
-        <IonIcon className="text-primary-500" icon={FilterCircleOutline} size={28} />
-      </Button> -->
-
       <Button className={`${inPast ? 'bg-red-500 ' : ''}`} icon on:click={() => jumpTo()}>
         <IonIcon className={inPast ? 'text-white' : 'text-primary'} icon={CalendarOutline} size={28} />
       </Button>

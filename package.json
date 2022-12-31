@@ -1,24 +1,25 @@
 {
   "name": "nomie",
   "version": "6.0.20-pre",
-  "homepage": "https://nomie.app",
+  "homepage": "https://github.com/open-nomie/nomie-oss",
   "bugs": {
-    "url": "https://github.com/open-nomie/nomie/issues",
+    "url": "https://github.com/open-nomie/nomie-oss/issues",
     "email": "support@happydata.org"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-nomie/nomie.git"
+    "url": "https://github.com/open-nomie/nomie-oss.git"
   },
   "author": {
     "name": "Brandon Corbin",
     "email": "support@happydata.org",
-    "url": "https://nomie.app"
+    "url": "https://github.com/open-nomie/nomie-ossnp"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "vbuild": "vite build",
-    "vserve": "vite preview",
+    "vserve": "vite preview --host 0.0.0.0 --port 5000",
+    "serve": "vite serve",
     "generate-whatsnew": "node build-tools/generate-whats-new.js && git add . && git commit -m 'build: whats new'",
     "commit": "git cz",
     "pre:run": "node build-tools/move-resources.js && node build-tools/bundle-vendors.js",
@@ -83,7 +84,6 @@
     "esri-leaflet-geocoder": "^2.3.4",
     "events": "^3.3.0",
     "find-in-files": "^0.5.0",
-    "firebase": "^9.6.8",
     "git-cz": "^4.6.2",
     "git-release-notes": "^5.0.0",
     "gitlog": "^4.0.4",
@@ -114,14 +114,6 @@
     "vite": "^3.2.5",
     "vitest": "^0.6.3",
     "workbox-window": "^6.4.1"
-  },
-  "old": {
-    "ts-jest": "^26.5.6",
-    "vite-jest": "^0.1.4",
-    "vite-plugin-pwa": "^0.11.13",
-    "vite-plugin-svelte-svg": "^1.0.0",
-    "vite-plugin-package-version": "^1.0.2",
-    "vite-svelte-jsx": "^1.1.0"
   },
   "supporting": {
     "cypress": "^4.11.0"

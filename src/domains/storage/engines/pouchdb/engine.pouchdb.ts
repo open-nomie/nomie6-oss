@@ -1,8 +1,8 @@
-import type { IStorage } from '../storage'
-import { Interact } from '../../../store/interact'
-import { Lang } from '../../../store/lang'
+import type { IStorage } from '../../storage'
+import { Interact } from '../../../../store/interact'
+import { Lang } from '../../../../store/lang'
 import PouchDB from 'pouchdb'
-import Remote from '../../../modules/remote/remote'
+import Remote from '../../../../modules/remote/remote'
 /**
  * Svelte is throwing errors when importing pouch
  * instead i've moved those packages into the build_tools/move-resources
@@ -11,8 +11,7 @@ import Remote from '../../../modules/remote/remote'
  * Not idea, but I can get svelte to compile with them.
  */
 // import pouchdb from "pouchdb";
-import Storage from '../storage'
-import { strToColor } from '../../../modules/colors/string-to-color'
+import Storage from '../../storage'
 
 // import * as PouchDB from 'pouchdb';
 
@@ -193,7 +192,7 @@ export const PouchDBEngine: IStorage = {
     let doc = null
     try {
       doc = await this.db.get(path)
-    } catch (e) {}
+    } catch (e) { }
     return doc
   },
   async get(path, onChange) {
@@ -205,7 +204,7 @@ export const PouchDBEngine: IStorage = {
     try {
       let fullDoc = await this.getFullDoc(path)
       doc = fullDoc ? fullDoc.data : null
-    } catch (e) {}
+    } catch (e) { }
     return doc
   },
   async list() {
