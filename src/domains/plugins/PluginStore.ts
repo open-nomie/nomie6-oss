@@ -3,7 +3,7 @@ import { closeModal, openModal } from "../../components/backdrop/BackdropStore2"
 import appConfig from "../../config/appConfig";
 import NPaths from "../../paths";
 import { createArrayStore } from "../../store/ArrayStore";
-import { getRawPermissions, PermissionsState, PermissionsStore } from "../my-account/PermissionsStore";
+
 import type { PluginType, PluginUseTypes } from "./plugin-helpers";
 import { PluginClass } from "./plugin-helpers";
 import PluginInstallerModal from "./plugin-installer-modal.svelte";
@@ -47,7 +47,7 @@ export const openPluginModal = (plugin: PluginClass) => {
     id: plugin.id,
     component: pluginModalSvelte,
     componentProps: {
-      plugin 
+      plugin
     }
   })
   // openIFrameModal(plugin.urlWithParams, plugin.name, {
@@ -60,17 +60,17 @@ export const closePluginModal = () => {
 
 }
 
-export const openPluginInstaller = (url?:string) => {
+export const openPluginInstaller = (url?: string) => {
   openModal({
-    id:'plugin-installer',
+    id: 'plugin-installer',
     component: PluginInstallerModal,
     componentProps: {
-      url 
+      url
     }
   })
 }
 
-export const closePluginInstaller = ()=>{
+export const closePluginInstaller = () => {
   closeModal('plugin-installer');
 }
 
@@ -83,38 +83,14 @@ export const PluginStore = createArrayStore(NPaths.storage.plugins(), {
   key: 'id',
   onInitalized(items, perms) {
 
-    
+
 
     // Perms comes from the data passed
     // into the PluginStore.init(data)
 
     // Limit number of plugins if not canAPI
-    if(!perms.canAPI) {
-      //&& items.length > appConfig.max_free_plugins
-      /**
-       * The User Cannot API - so they are limited to appConfig.max_free_plugins
-       * We will lock all plugins after the appConfig.max_free_plugins is hit
-       */
-      let locked = items.map((plugin:PluginClass,index)=>{
-        if(index >= appConfig.max_free_plugins) {
-          plugin.locked = true;
-          plugin.active = false;
-        } else {
-          plugin.locked = false;
-        }
-        return plugin;
-      })  
-      // Update the locks
-      PluginStore.upsertMany(locked);
-    } else if(perms.canAPI && items.find(p=>p.locked)) {
 
-      // We have an API, so we will remove any unlocked plugins
-      let unlocked = items.map((plugin:PluginClass)=>{
-        plugin.locked = false;
-        return plugin;
-      })  
-      PluginStore.upsertMany(unlocked);
-    }
+    PluginStore.upsertMany(items);
   },
   itemInitializer: (item: PluginType) => {
     return new PluginClass(item)
@@ -132,14 +108,14 @@ export type PluginMessageType = {
 export const securedActions = ["selectTrackables", "onNote", "createNote", "searchNotes"]
 
 export const broadcastPluginMessage = (message: PluginMessageType, pluginId?: string, lid?: string) => {
-  
+
   let plugins: Array<PluginClass> = PluginStore.rawState();
   let action = typeof message == 'object' ? message.action : undefined;
   // Target a specific plugin
 
   // Loop over plugins
   if (action) {
-    
+
     // Target Specific Plugin by Id
     if (pluginId) {
       plugins = plugins.filter(p => p.id == pluginId);
@@ -148,8 +124,8 @@ export const broadcastPluginMessage = (message: PluginMessageType, pluginId?: st
     plugins.forEach((plugin) => {
       // Determin if it's allowed to run this action
       let allowed = (securedActions.includes(message.action) && plugin.uses.includes(message.action)) || (!securedActions.includes(message.action))
-      if(action == 'onNote' && !lid) lid = 'auto';
-      
+      if (action == 'onNote' && !lid) lid = 'auto';
+
       // Get the Iframe
       const iframeId = `plugin-${lid}-${plugin.id}`;
       let iframe: HTMLIFrameElement = document.getElementById(iframeId) as HTMLIFrameElement;

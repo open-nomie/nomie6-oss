@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { PermissionsStore } from './../domains/my-account/PermissionsStore'
   import Toolbar from '../components/toolbar/toolbar.svelte'
   import Button from '../components/button/button.svelte'
   import BoardTabs from '../components/board-tabs/board-tabs.svelte'
@@ -291,20 +290,15 @@
       {/if}
     </div>
   {/if} -->
-  {#if !$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
-    <UpgradeMessage />
-  {:else if $TrackableStore.ready && $CombinedBoards.length}
-    <!-- {#key $UniboardStore.hash} -->
-    <Uniboard
-      searching={searchFor}
-      on:editted={(evt) => {
-        edittedUniboard = evt.detail
-      }}
-      bind:sort={trackableSort}
-      bind:filter={trackableFilter}
-    />
-    <!-- {/key} -->
-  {/if}
+  <!-- {#key $UniboardStore.hash} -->
+  <Uniboard
+    searching={searchFor}
+    on:editted={(evt) => {
+      edittedUniboard = evt.detail
+    }}
+    bind:sort={trackableSort}
+    bind:filter={trackableFilter}
+  />
 
   <!-- <UsageStoreVisualizer /> -->
 

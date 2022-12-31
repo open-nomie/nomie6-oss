@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Prefs } from './../domains/preferences/Preferences.ts';
-	import { PermissionsStore } from './../domains/my-account/PermissionsStore.ts';
+  import { Prefs } from './../domains/preferences/Preferences'
+
   /**
    * Timeline Page
    * Mon Feb 21 2022 - Brandon
@@ -45,10 +45,6 @@
   import PositivityGrid from '../components/positivity-bar/positivity-grid.svelte'
 
   import TimelineLoader from '../domains/timeline/timeline-loader.svelte'
-  import MapOutline from '../n-icons/MapOutline.svelte'
-import Empty from '../components/empty/empty.svelte';
-import { openSubscriptionModal } from '../domains/my-account/useMyAccountModal';
-import UpgradeMessage from '../components/upgrade-message/upgrade-message.svelte';
 
   let startingDate: Date = new Date()
   let date: Dayjs = dayjs(startingDate)
@@ -227,22 +223,19 @@ import UpgradeMessage from '../components/upgrade-message/upgrade-message.svelte
     </Container>
   {/if}
 
-  {#if !$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
-    <UpgradeMessage />
-  {:else}
-    <TimelineLoader
-      on:xfilters={(evt) => {
-        filters = { ...filters, ...evt.detail }
-        TimelineOptionsStore.setItem('filters', filters)
-      }}
-      bind:startingDate
-      on:topItem={(evt) => {
-        topItem = evt.detail
-        displayDate = topItem.time
-      }}
-      bind:filters
-    />
-  {/if}
+  <TimelineLoader
+    on:xfilters={(evt) => {
+      filters = { ...filters, ...evt.detail }
+      TimelineOptionsStore.setItem('filters', filters)
+    }}
+    bind:startingDate
+    on:topItem={(evt) => {
+      topItem = evt.detail
+      displayDate = topItem.time
+    }}
+    bind:filters
+  />
+  <div class="h-14" />
 </Layout>
 
 <style lang="postcss" global>

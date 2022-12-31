@@ -39,7 +39,7 @@ import type { Trackable } from '../trackable/Trackable.class'
 import { TrackableUsage } from '../usage/trackable-usage.class'
 import type { TrackableUsageMap } from '../usage/trackable-usage.class'
 import { getBookIdFromDate } from './ledger-books-to-get'
-import { getRawPermissions } from '../my-account/PermissionsStore'
+
 import { loadToday } from '../usage/today/TodayStore'
 import { logAppendLocationIfNeeded } from './ledger-add-location'
 // Nomie log is the base Log item that is saved in a ledger
@@ -49,7 +49,7 @@ import { showToast } from '../../components/toast/ToastStore'
 import textUtils from '../../utils/text/text'
 
 import { writable } from 'svelte/store'
-import { openSubscriptionModal } from '../my-account/useMyAccountModal'
+
 
 // Get the Geo Location module
 // Utils
@@ -715,9 +715,7 @@ export const getTrackableUsage = async (
  * @returns A function that returns a boolean
  */
 export const checkIfBlocked = (): boolean => {
-  const permissions = getRawPermissions()
-  const isBlocked = Storage._storageType() == 'firebase' && !permissions.canWrite
-  return isBlocked
+  return false
 }
 
 /**
@@ -729,9 +727,7 @@ export const promptForUpgrade = async () => {
     'You need to have a valid subscription to write to the Nomie encrypted cloud',
     'Upgrade'
   )
-  if (doUpgrade) {
-    openSubscriptionModal()
-  }
+
 }
 
 /**

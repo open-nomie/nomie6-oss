@@ -26,7 +26,6 @@
   import type TrackerClass from '../../modules/tracker/TrackerClass'
   import { wait } from '../../utils/tick/tick'
   import { showToast } from '../../components/toast/ToastStore'
-  import { PermissionsStore } from '../my-account/PermissionsStore'
 
   // Prosp
   export let tracker: TrackerClass | undefined = undefined
@@ -104,7 +103,7 @@
       let saved = await saveTrackable({
         trackable: tracker.toTrackable(),
         known: $TrackableStore.trackables,
-        permissions: $PermissionsStore,
+        permissions: {},
       })
       if (saved) {
         dispatch('save', tracker)

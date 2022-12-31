@@ -14,8 +14,6 @@
 
   import SocialShare from '../../modules/share/share'
 
-  import { MessageStore } from '../messages/MessageStore'
-
   // Components
   import ListItem from '../../components/list-item/list-item.svelte'
   import Spacer from '../../components/spacer/spacer.svelte'
@@ -115,7 +113,7 @@
   <div slot="header" class="z-40">
     <Container>
       <ToolbarGrid>
-        <Button
+        <!-- <Button
           slot="left"
           clear
           icon
@@ -129,7 +127,7 @@
             icon={$MessageStore.unseen ? MailUnreadOutline : MailOutline}
             className={$MessageStore.unseen ? 'text-red-500 animate-pulse' : 'text-gray-500'}
           />
-        </Button>
+        </Button> -->
 
         <!-- <Logo size={22} /> -->
 

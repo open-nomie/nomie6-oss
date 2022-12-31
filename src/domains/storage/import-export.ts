@@ -11,7 +11,7 @@ import { hideImportModal, showCSVImportModal, showImportModal } from '../import-
 import { wait } from '../../utils/tick/tick'
 import TrackerClass from '../../modules/tracker/TrackerClass'
 import { MasterTrackables, saveTrackable } from '../trackable/TrackableStore'
-import { getRawPermissions } from '../my-account/PermissionsStore'
+
 import { smartMerge } from './smart-merge'
 import { TemplateToImport } from './storage-export.helper'
 type exportPropsType = {
@@ -64,10 +64,10 @@ export const exportStorage = async (props?: exportPropsType) => {
  */
 export const importStorage = async (merge: boolean = true): Promise<Boolean> => {
   const fileUpload = await selectFile('.json,.csv')
-  
+
   if (`${fileUpload.file.name}`.toLowerCase().endsWith('.csv')) {
     hideImportModal()
-    
+
     showCSVImportModal(fileUpload);
 
   } else {
@@ -76,8 +76,8 @@ export const importStorage = async (merge: boolean = true): Promise<Boolean> => 
     /**
      * Is this a version 6 Archive, or the older format?
      */
-    if(archive && archive.type && archive.type == 'template') {
-      const importerFormat:any = TemplateToImport(archive);
+    if (archive && archive.type && archive.type == 'template') {
+      const importerFormat: any = TemplateToImport(archive);
       return await importStorageArchive(importerFormat);
     } else if (archive.files && archive.version.substring(0, 1) === '6') {
       // Newer Importer imports it all - no longer lets you select parts
@@ -89,7 +89,7 @@ export const importStorage = async (merge: boolean = true): Promise<Boolean> => 
         saveTrackable({
           trackable: tracker.toTrackable(),
           known: MasterTrackables,
-          permissions: getRawPermissions(),
+          permissions: {},
           prompt: true,
         })
         //tracker.toTrackable()
@@ -114,15 +114,15 @@ type ImportProps = {
  * @param mergeData Should we merge this with existing, or overrite?
  * @returns
  */
-export const importStorageArchive = async (archive: N6StorageExport, props:ImportProps={}): Promise<Boolean> => {
+export const importStorageArchive = async (archive: N6StorageExport, props: ImportProps = {}): Promise<Boolean> => {
   const files = Object.keys(archive.files).map((path) => {
     return {
       path,
       content: archive.files[path],
     }
   })
-  
-  let confirmed = props.silent ? true :  await Interact.confirm(
+
+  let confirmed = props.silent ? true : await Interact.confirm(
     `Import?`,
     `This ${archive.version} archive contains ${Object.keys(archive.files).length} files. This action cannot be undone.`
   )
@@ -173,7 +173,7 @@ export const importStorageArchive = async (archive: N6StorageExport, props:Impor
     /**
      * Check if we have errors
      */
-    if(!props.silent) {
+    if (!props.silent) {
       if (!errors.length) {
         await Interact.alert(`Successfully imported ${files.length} files`)
         window.location.reload()

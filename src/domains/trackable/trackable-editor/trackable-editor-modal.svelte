@@ -1,6 +1,5 @@
 <script lang="ts">
   import ScanOutline from './../../../n-icons/ScanOutline.svelte'
-  import { CloudAPIStore } from './../../cloud-api/CloudApiStore'
   import TrackableAvatar from '../../../components/avatar/trackable-avatar.svelte'
   import BackdropModal from '../../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../../components/backdrop/BackdropStore2'
@@ -9,7 +8,6 @@
   import IonIcon from '../../../components/icon/ion-icon.svelte'
   import Input from '../../../components/input/input.svelte'
   import ListItem from '../../../components/list-item/list-item.svelte'
-  import { openIFrameModal } from '../../../components/modal/iframe-modal-helper'
 
   import Spinner from '../../../components/spinner/spinner.svelte'
   import { showToast } from '../../../components/toast/ToastStore'
@@ -29,8 +27,6 @@
   import { getAwardChain, giveAward } from '../../awards/AwardsStore'
   import { removeTrackableFromNomie } from '../../board/boardActions'
 
-  import { PermissionsStore } from '../../my-account/PermissionsStore'
-  import { openSubscriptionModal } from '../../my-account/useMyAccountModal'
   import { randomEmoji } from '../../tracker/editor/TrackerEditorStore'
 
   import { downloadTrackables, strToTagSafe } from '../trackable-utils'
@@ -41,8 +37,7 @@
 
   import { openTrackableVisuals } from './TrackableVisualStore'
   import TrackableEditorTracker from './tracker/trackable-editor-tracker.svelte'
-  import { getTrackerInputAsString } from '../../tracker/input/TrackerInputStore'
-  import appConfig from '../../../config/appConfig'
+
   import { Prefs } from '../../preferences/Preferences'
   import { Device } from '../../../store/device-store'
   import CopyOutline from '../../../n-icons/CopyOutline.svelte'
@@ -112,7 +107,6 @@
       let saved = await saveTrackable({
         trackable: workingTrackable,
         known: $TrackableStore.trackables,
-        permissions: $PermissionsStore,
       })
       // Toast the Place!
       close()

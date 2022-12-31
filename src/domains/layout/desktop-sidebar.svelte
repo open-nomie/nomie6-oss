@@ -21,7 +21,7 @@
   import SearchIcon from '../../n-icons/SearchIcon.svelte'
   import Dot from '../../components/dot/dot.svelte'
   import { RunningTimers } from '../tracker/TrackerStore'
-  import { MessageStore } from '../messages/MessageStore'
+
   import { Prefs } from '../preferences/Preferences'
 
   import { GoalScoreStore } from '../goals/GoalStore'
@@ -123,7 +123,7 @@
   </div>
 
   {#if loggedIn}
-    {#each navigation as item, index}
+    {#each navigation as item}
       <a
         role="menuitem"
         href={item.path}

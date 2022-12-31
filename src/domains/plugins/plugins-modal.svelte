@@ -22,17 +22,15 @@
   import type { PluginClass } from './plugin-helpers'
   import PluginInstaller from './plugin-installer.svelte'
   import { closePluginsModal, openPluginInstaller, PluginStore } from './PluginStore'
-  import { PermissionsStore } from '../my-account/PermissionsStore'
+
   import Badge from '../../components/badge/badge.svelte'
-  import appConfig from '../../config/appConfig'
-  import { getCollectionDocs } from '../firebase/FirebaseStore'
 
   export let tab: 'installed' | 'avail' = 'installed'
   export let showAdd: boolean = false
 
   let officialPlugins = []
   onMount(async () => {
-    officialPlugins = await getCollectionDocs('/plugins')
+    officialPlugins = []
   })
 
   let editMode: boolean = false
@@ -40,12 +38,6 @@
 
   const toggleEditMode = () => {
     editMode = !editMode
-  }
-
-  $: {
-    hasLocked = $PluginStore.find((p) => p.locked)
-      ? true
-      : false || (!$PermissionsStore.canAPI && $PluginStore.length >= appConfig.max_free_plugins)
   }
 
   const togglePlugin = (plugin: PluginClass) => {
@@ -93,7 +85,7 @@
         {/if}
       </div>
     </ToolbarGrid>
-    <Toolbar>
+    <!-- <Toolbar>
       <ButtonGroup
         buttons={[
           {
@@ -112,7 +104,7 @@
           },
         ]}
       />
-    </Toolbar>
+    </Toolbar> -->
   </header>
   <section class="px-2 lg:px-4 py-4">
     {#if showAdd}

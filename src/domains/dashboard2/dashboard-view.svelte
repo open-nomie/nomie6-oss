@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Prefs } from './../preferences/Preferences';
-	import { PermissionsStore } from './../my-account/PermissionsStore';
+  import { Prefs } from './../preferences/Preferences'
   import Button from '../../components/button/button.svelte'
 
   import Container from '../../components/container/container.svelte'
@@ -45,10 +44,10 @@
   import { toBlob } from 'html-to-image'
   import shareOptions from '../../modules/share/share'
   import { wait } from '../../utils/tick/tick'
-import TrashOutline from '../../n-icons/TrashOutline.svelte';
-import PencilOutline from '../../n-icons/PencilOutline.svelte';
-import ShareOutline from '../../n-icons/ShareOutline.svelte';
-import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte';
+  import TrashOutline from '../../n-icons/TrashOutline.svelte'
+  import PencilOutline from '../../n-icons/PencilOutline.svelte'
+  import ShareOutline from '../../n-icons/ShareOutline.svelte'
+  import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
 
   $: if (Object.keys($TrackableStore.trackables)) {
     initializeDashStore()
@@ -92,7 +91,7 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     if (confirmed) {
       try {
         const deleted = await deleteDashboard($DashStore.activeDashboard)
-        
+
         selectDashboardByIndex(0)
         $DashStore.editMode = false
       } catch (e) {
@@ -105,44 +104,45 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
   let showDate: boolean = false
   // let screenshotImage:File | undefined;
 
-  const getSharedImageFile = async ():Promise<File | undefined> => {
+  const getSharedImageFile = async (): Promise<File | undefined> => {
     Interact.blocker('Generating...')
     showDate = true
     try {
       await wait(600)
       const node = document.getElementById('widgets-frame')
       let blob = await toBlob(node, {
-        pixelRatio: 1
+        pixelRatio: 1,
       })
       blob = await toBlob(node, {
-        pixelRatio: 1
+        pixelRatio: 1,
       })
-      const screenshotImage = new File([blob], `${$DashStore.activeDashboard.id.substring(0,5)}-dashboard.png`, { type: 'image/png' })
+      const screenshotImage = new File([blob], `${$DashStore.activeDashboard.id.substring(0, 5)}-dashboard.png`, {
+        type: 'image/png',
+      })
       showDate = false
       Interact.stopBlocker()
 
       Interact.popmenu({
-        title:'Dashboard Report Generated',
-        description:'You can now share this as an image',
-        id:'share-dashboard',
-        buttons:[
+        title: 'Dashboard Report Generated',
+        description: 'You can now share this as an image',
+        id: 'share-dashboard',
+        buttons: [
           {
-            title: (navigator.share ? 'Share...' : 'Download...'),
+            title: navigator.share ? 'Share...' : 'Download...',
             click() {
               shareOptions($DashStore.activeDashboard.label, undefined, screenshotImage)
-            }
-          }
-        ]
+            },
+          },
+        ],
       })
 
-      return screenshotImage;
+      return screenshotImage
     } catch (e) {
       Interact.error(e.message)
       showDate = false
       Interact.stopBlocker()
-      return undefined;
+      return undefined
     }
-
   }
 
   const saveChanges = (edittedDashboard: DashboardClass, silent: boolean = false) => {
@@ -178,9 +178,7 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     {/if}
   </Toolbar>
 
-  {#if !$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
-   <UpgradeMessage />
-  {:else if $DashStore.activeDashboard}
+  {#if $DashStore.activeDashboard}
     <Container size="xl">
       {#if $DashStore.activeDashboard.widgets.length === 0}
         <DashboardEmptyView />
@@ -200,41 +198,42 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     </Container>
     <hr class="mt-4 mb-6 border-gray-500 dark:border-opacity-20 dark:border-gray-200 border-opacity-20" />
     <Container size="md">
-      
-        <ListItem clickable on:click={() => createNewWidget()} bottomLine={24}>
-          <IonIcon icon={AddCircleOutline} slot="left" />
-          <span class="">Add Widget</span></ListItem
-        >
+      <ListItem clickable on:click={() => createNewWidget()} bottomLine={24}>
+        <IonIcon icon={AddCircleOutline} slot="left" />
+        <span class="">Add Widget</span></ListItem
+      >
 
-        {#if $DashStore.activeDashboard?.widgets?.length > 0}
-          <ListItem clickable on:click={async() => {
-            await getSharedImageFile();
-            
-          }} bottomLine={24}>
-            <IonIcon icon={ShareOutline} slot="left" />
-            Share Dashboard View</ListItem
-          >
-          <ListItem
-            bottomLine={24}
-            clickable
-            on:click={() => {
-              toggleDashboardEditMode()
-            }}
-          >
-            <IonIcon icon={PencilOutline} slot="left" />
-            <span>Edit Dashboard</span></ListItem
-          >
-        {/if}
+      {#if $DashStore.activeDashboard?.widgets?.length > 0}
         <ListItem
           clickable
+          on:click={async () => {
+            await getSharedImageFile()
+          }}
+          bottomLine={24}
+        >
+          <IonIcon icon={ShareOutline} slot="left" />
+          Share Dashboard View</ListItem
+        >
+        <ListItem
+          bottomLine={24}
+          clickable
           on:click={() => {
-            confirmDashboardDelete()
+            toggleDashboardEditMode()
           }}
         >
-          <IonIcon icon={TrashOutline} slot="left" />
-          <span class="text-danger">Delete Dashboard</span></ListItem
+          <IonIcon icon={PencilOutline} slot="left" />
+          <span>Edit Dashboard</span></ListItem
         >
-
+      {/if}
+      <ListItem
+        clickable
+        on:click={() => {
+          confirmDashboardDelete()
+        }}
+      >
+        <IonIcon icon={TrashOutline} slot="left" />
+        <span class="text-danger">Delete Dashboard</span></ListItem
+      >
     </Container>
   {:else}
     <Empty

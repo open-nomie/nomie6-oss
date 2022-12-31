@@ -189,12 +189,8 @@
     await boot()
 
     // Initialize the Plugins
-    PermissionsStore.subscribe((perms) => {
-      if (perms.ready && !pluginsInitizlied) {
-        PluginStore.init(perms)
-        pluginsInitizlied = true
-      }
-    })
+    PluginStore.init({})
+    pluginsInitizlied = true
 
     LedgerStore.hook('onLogSaved', (res) => {
       setTimeout(() => {

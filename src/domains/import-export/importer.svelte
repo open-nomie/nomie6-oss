@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Prefs } from './../preferences/Preferences';
-	import { PermissionsStore } from './../my-account/PermissionsStore';
+  import { Prefs } from './../preferences/Preferences'
+
   import { wait } from '../../utils/tick/tick'
 
   // Modules
@@ -24,7 +24,6 @@
   import { showToast } from '../../components/toast/ToastStore'
   import { importStorage } from '../storage/import-export'
   import DownloadOutline from '../../n-icons/DownloadOutline.svelte'
-import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
 
   export let id: string
   export let fileData: any = undefined
@@ -292,198 +291,192 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     </div>
   </ToolbarGrid>
 
-
-
-  {#if !$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
-    <UpgradeMessage />
-  {:else}
-    {#if !fileData}
-      <Empty
-        className="my-5 text-center leading-tight"
-        icon={DownloadOutline}
-        description="Supports CSV files, Nomie backup files (all versions), and tracker packs."
-        title={`Import a file`}
-        buttonLabel={Lang.t('settings.select-nomie-file', 'Select File...')}
-        buttonClick={() => {
-          importStorage()
-        }}
-      >
-        <!-- <input
+  {#if !fileData}
+    <Empty
+      className="my-5 text-center leading-tight"
+      icon={DownloadOutline}
+      description="Supports CSV files, Nomie backup files (all versions), and tracker packs."
+      title={`Import a file`}
+      buttonLabel={Lang.t('settings.select-nomie-file', 'Select File...')}
+      buttonClick={() => {
+        importStorage()
+      }}
+    >
+      <!-- <input
           class="hidden"
           accept=".json,.nomiebk"
           type="file"
           bind:this={fileInput}
           on:change={methods.onImportFile}
         /> -->
-      </Empty>
-    {/if}
-    <div class="n-list">
-      {#if fileData && !version}
-        <NItem
-          title="Unknown/Invalid File"
-          on:click={() => {
-            fileData = null
+    </Empty>
+  {/if}
+  <div class="n-list">
+    {#if fileData && !version}
+      <NItem
+        title="Unknown/Invalid File"
+        on:click={() => {
+          fileData = null
+        }}
+      />
+    {:else if fileData}
+      <NItem className="item-divider compact bg-faded">
+        From Nomie {fileData.nomie.number}
+      </NItem>
+
+      {#if (importLoader.normalized.logs || []).length > 0}
+        <ImporterItem
+          emoji="⏰"
+          title="Logs"
+          count={(importLoader.normalized.logs || []).length.toLocaleString()}
+          bind:status={importing.logs}
+          on:import={() => {
+            methods.importLogs(true)
+          }}
+        >
+          {#if importing.logs.running}
+            <ProgressBar percentage={importing.logs.progress} className="mt-2 mr-2 h-2" />
+          {/if}
+        </ImporterItem>
+      {:else}
+        <ListItem bottomLine={48} title="Notes">
+          <div slot="left">⏰</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+
+      <!-- Importable Items -->
+      {#if Object.keys(importLoader.normalized.trackers).length > 0}
+        <ImporterItem
+          emoji="🤪"
+          title="Trackers"
+          count={Object.keys(importLoader.normalized.trackers).length.toLocaleString()}
+          bind:status={importing.trackers}
+          on:import={() => {
+            methods.importTrackers(true)
           }}
         />
-      {:else if fileData}
-        <NItem className="item-divider compact bg-faded">
-          From Nomie {fileData.nomie.number}
-        </NItem>
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.trackers')}>
+          <div slot="left">🤪</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
 
-        {#if (importLoader.normalized.logs || []).length > 0}
-          <ImporterItem
-            emoji="⏰"
-            title="Logs"
-            count={(importLoader.normalized.logs || []).length.toLocaleString()}
-            bind:status={importing.logs}
-            on:import={() => {
-              methods.importLogs(true)
-            }}
-          >
-            {#if importing.logs.running}
-              <ProgressBar percentage={importing.logs.progress} className="mt-2 mr-2 h-2" />
-            {/if}
-          </ImporterItem>
-        {:else}
-          <ListItem bottomLine={48} title="Notes">
-            <div slot="left">⏰</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
+      <!-- Importable Items -->
+      {#if importLoader.normalized.goals?.length > 0}
+        <ImporterItem
+          emoji="🤪"
+          title="Goals"
+          count={importLoader.normalized.goals?.length.toLocaleString()}
+          bind:status={importing.goals}
+          on:import={() => {
+            // methods.importTrackers(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.goals', 'Goals')}>
+          <div slot="left">🏆</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
 
-        <!-- Importable Items -->
-        {#if Object.keys(importLoader.normalized.trackers).length > 0}
-          <ImporterItem
-            emoji="🤪"
-            title="Trackers"
-            count={Object.keys(importLoader.normalized.trackers).length.toLocaleString()}
-            bind:status={importing.trackers}
-            on:import={() => {
-              methods.importTrackers(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.trackers')}>
-            <div slot="left">🤪</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- Importable Items -->
-        {#if importLoader.normalized.goals?.length > 0}
-          <ImporterItem
-            emoji="🤪"
-            title="Goals"
-            count={importLoader.normalized.goals?.length.toLocaleString()}
-            bind:status={importing.goals}
-            on:import={() => {
-              // methods.importTrackers(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.goals', 'Goals')}>
-            <div slot="left">🏆</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- <ListItem bottomLine={48} title={Lang.t('general.goals', 'Goals')}>
+      <!-- <ListItem bottomLine={48} title={Lang.t('general.goals', 'Goals')}>
           <div slot="left">🏆</div>
           <div slot="right" class="text-gray-500 pr-4">No Data</div>
         </ListItem> -->
 
-        <!-- Locations -->
-        {#if (importLoader.normalized.locations || []).length > 0}
-          <ImporterItem
-            emoji="🗺"
-            title="Locations"
-            count={(importLoader.normalized.locations || []).length.toLocaleString()}
-            bind:status={importing.locations}
-            on:import={() => {
-              methods.importLocations(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.locations', 'Locations')}>
-            <div slot="left">🗺</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- Board -->
-        {#if (importLoader.normalized.boards || []).length > 0}
-          <ImporterItem
-            emoji="🗂"
-            title={Lang.t('general.boards', 'Boards')}
-            count={(importLoader.normalized.boards || []).length.toLocaleString()}
-            bind:status={importing.boards}
-            on:import={() => {
-              methods.importBoards(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.boards', 'Boards')}>
-            <div slot="left">🗂</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- People -->
-        {#if (Object.keys(importLoader.normalized.people) || []).length > 0}
-          <ImporterItem
-            emoji="👩🏽‍💼"
-            title={Lang.t('general.people', 'People')}
-            count={(Object.keys(importLoader.normalized.people) || []).length.toLocaleString()}
-            bind:status={importing.people}
-            on:import={() => {
-              methods.importPeople(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.people', 'People')}>
-            <div slot="left">👩🏽‍💼</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- People -->
-        {#if (importLoader.normalized.context || []).length > 0}
-          <ImporterItem
-            emoji="💭"
-            title={Lang.t('general.context', 'Context')}
-            count={(importLoader.normalized.context || []).length.toLocaleString()}
-            bind:status={importing.context}
-            on:import={() => {
-              methods.importContext(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.context', 'Context')}>
-            <div slot="left">💭</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- Dashboards -->
-        {#if (importLoader.normalized.dashboards || []).length > 0}
-          <ImporterItem
-            emoji="📊"
-            title={Lang.t('general.dashboards', 'Dashboards')}
-            count={(importLoader.normalized.dashboards || []).length.toLocaleString()}
-            bind:status={importing.dashboards}
-            on:import={() => {
-              methods.importDashboards(true)
-            }}
-          />
-        {:else}
-          <ListItem bottomLine={48} title={Lang.t('general.dashboards', 'Dashboards')}>
-            <div slot="left">📊</div>
-            <div slot="right" class="text-gray-500 pr-4">No Data</div>
-          </ListItem>
-        {/if}
-
-        <!-- logs -->
+      <!-- Locations -->
+      {#if (importLoader.normalized.locations || []).length > 0}
+        <ImporterItem
+          emoji="🗺"
+          title="Locations"
+          count={(importLoader.normalized.locations || []).length.toLocaleString()}
+          bind:status={importing.locations}
+          on:import={() => {
+            methods.importLocations(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.locations', 'Locations')}>
+          <div slot="left">🗺</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
       {/if}
-    </div>
-  {/if}
+
+      <!-- Board -->
+      {#if (importLoader.normalized.boards || []).length > 0}
+        <ImporterItem
+          emoji="🗂"
+          title={Lang.t('general.boards', 'Boards')}
+          count={(importLoader.normalized.boards || []).length.toLocaleString()}
+          bind:status={importing.boards}
+          on:import={() => {
+            methods.importBoards(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.boards', 'Boards')}>
+          <div slot="left">🗂</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+
+      <!-- People -->
+      {#if (Object.keys(importLoader.normalized.people) || []).length > 0}
+        <ImporterItem
+          emoji="👩🏽‍💼"
+          title={Lang.t('general.people', 'People')}
+          count={(Object.keys(importLoader.normalized.people) || []).length.toLocaleString()}
+          bind:status={importing.people}
+          on:import={() => {
+            methods.importPeople(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.people', 'People')}>
+          <div slot="left">👩🏽‍💼</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+
+      <!-- People -->
+      {#if (importLoader.normalized.context || []).length > 0}
+        <ImporterItem
+          emoji="💭"
+          title={Lang.t('general.context', 'Context')}
+          count={(importLoader.normalized.context || []).length.toLocaleString()}
+          bind:status={importing.context}
+          on:import={() => {
+            methods.importContext(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.context', 'Context')}>
+          <div slot="left">💭</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+
+      <!-- Dashboards -->
+      {#if (importLoader.normalized.dashboards || []).length > 0}
+        <ImporterItem
+          emoji="📊"
+          title={Lang.t('general.dashboards', 'Dashboards')}
+          count={(importLoader.normalized.dashboards || []).length.toLocaleString()}
+          bind:status={importing.dashboards}
+          on:import={() => {
+            methods.importDashboards(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.dashboards', 'Dashboards')}>
+          <div slot="left">📊</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+
+      <!-- logs -->
+    {/if}
+  </div>
 </BackdropModal>

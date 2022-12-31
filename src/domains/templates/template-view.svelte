@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { PermissionsStore } from './../my-account/PermissionsStore';
-	import { Prefs } from './../preferences/Preferences';
+  import { Prefs } from './../preferences/Preferences'
   import Title from './../../components/title/title.svelte'
   import Button from '../../components/button/button.svelte'
 
@@ -10,8 +9,6 @@
   import { useTemplate } from './templates-svelte-helpers'
 
   export let template: Template
-
-  
 </script>
 
 <div class="template-view">
@@ -25,10 +22,8 @@
       <span>{template.description}</span>
     </p>
   {/if}
-  
-  
+
   <Button
-    disabled={!$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
     on:click={() => useTemplate(template)}
     shape="rounded"
     color="primary"

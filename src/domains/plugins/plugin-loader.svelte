@@ -17,7 +17,7 @@
   import { openIFrameModal } from '../../components/modal/iframe-modal-helper'
 
   import type { PluginClass, PluginType, PluginUseTypes } from './plugin-helpers'
-  import { strToTagSafe, toTrackableArray } from '../trackable/trackable-utils'
+  import { strToTagSafe } from '../trackable/trackable-utils'
   import { strToToken } from '../../modules/tokenizer/lite'
   import { Trackable } from '../trackable/Trackable.class'
   import { getTrackerInputAsString } from '../tracker/input/TrackerInputStore'

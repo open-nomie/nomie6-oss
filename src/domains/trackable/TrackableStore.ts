@@ -122,7 +122,7 @@ export const InitTrackableStore = async (): Promise<ITrackables> => {
 export type SaveTrackableProps = {
   trackable: Trackable
   known: ITrackables
-  permissions: PermissionsState
+  permissions: any
   prompt?: boolean
   saveToActiveBoard?: boolean
 }

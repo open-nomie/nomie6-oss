@@ -4,7 +4,7 @@
   import Container from '../../components/container/container.svelte'
 
   // Vendors
-  import { MessageStore } from '../messages/MessageStore'
+
   import { onMount } from 'svelte'
 
   // Components
@@ -14,7 +14,6 @@
 
   import NPaths from '../../paths'
 
-  import { CloudAPIStore } from '../../domains/cloud-api/CloudApiStore'
   import {
     AppsOutline,
     AppsSolid,
@@ -24,8 +23,6 @@
     EaselSolid,
     RibbonOutline,
     RibbonSolid,
-    SettingsOutline,
-    SettingsSolid,
   } from '../../components/icon/nicons'
   import { Prefs } from '../../domains/preferences/Preferences'
   import { Device } from '../../store/device-store'
@@ -33,7 +30,7 @@
   import { GoalScoreStore } from '../../domains/goals/GoalStore'
   import MenuOutline from '../../n-icons/MenuOutline.svelte'
 
-  export let className:string = "";
+  export let className: string = ''
 
   const state = {
     mounted: false,
@@ -71,7 +68,7 @@
 </script>
 
 {#if state.mounted && $Device.width < 900}
-  <nav id="app-tabs" class="{className}">
+  <nav id="app-tabs" class={className}>
     <Container size="sm">
       <div class="flex items-center w-full justify-items-stretch">
         <!-- <AppTab link={NPaths.routes.history()}  label={Lang.t('tabs.history', 'History')}>
@@ -103,7 +100,6 @@
           id="track"
           className={page == 'track' ? 'start-page' : ''}
           link="/track"
-          
           label={Lang.t('tabs.track', 'Track')}
         >
           <IonIcon className="inactive" icon={AppsOutline} />
@@ -134,12 +130,6 @@
         <AppTab id="settings" link={NPaths.routes.settings()} label={Lang.t('general.more', 'More')}>
           <IonIcon className="inactive" icon={MenuOutline} />
           <IonIcon className="active" icon={MenuOutline} />
-          {#if $MessageStore.unseen}
-            <Dot size={8} className="absolute top-1 bg-red-500 ml-2" />
-          {/if}
-          {#if $CloudAPIStore.fresh.length}
-            <Dot size={8} className="absolute top-1 bg-red-500 ml-2" />
-          {/if}
         </AppTab>
       </div>
     </Container>
@@ -157,7 +147,6 @@
     @apply z-50;
     @apply pt-1;
     flex-shrink: 0;
-    
   }
 
   .tab-wrap a {

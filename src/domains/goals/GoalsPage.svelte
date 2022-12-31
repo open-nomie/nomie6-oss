@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { Prefs } from './../preferences/Preferences';
-	import { PermissionsStore } from './../my-account/PermissionsStore';
   import Button from '../../components/button/button.svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import { AddIcon, CheckmarkCircle, ChevronForwardOutline, RibbonOutline } from '../../components/icon/nicons'
@@ -42,8 +40,8 @@
   // import Toolbar from '../../components/toolbar/toolbar.svelte'
   // import DateRangeController from '../../components/date-range-controller/date-range-controller.svelte'
   import dayjs from 'dayjs'
-import { LedgerStore } from '../ledger/LedgerStore';
-import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
+  import { LedgerStore } from '../ledger/LedgerStore'
+  import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
 
   let view: GoalDurationType = 'day'
   let goals: Array<GoalClass> = []
@@ -59,8 +57,6 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
       allowOpen = true
     }, 500)
   }
-
-
 
   const initialzeGoalPage = debounce(() => {
     try {
@@ -85,7 +81,7 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     initialzeGoalPage()
   }
 
-  $: if($GoalStore) {
+  $: if ($GoalStore) {
     initialzeGoalPage()
   }
 
@@ -109,17 +105,17 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
 
   let editMode: boolean = false
 
-  let newPostListener;
+  let newPostListener
 
   onMount(() => {
     mounted = true
     newPostListener = LedgerStore.hook('onLogSaved', (res) => {
-    initialzeGoalPage();
-  })
+      initialzeGoalPage()
+    })
   })
 
-  onDestroy(()=>{
-    if(newPostListener) newPostListener();
+  onDestroy(() => {
+    if (newPostListener) newPostListener()
   })
 </script>
 
@@ -179,132 +175,129 @@ import UpgradeMessage from '../../components/upgrade-message/upgrade-message.sve
     </Toolbar> -->
   </header>
   <main class="py-4 relative z-10 px-2 lg:px-4">
-    {#if !$PermissionsStore.canWrite && $PermissionsStore.loggedIn && $Prefs.storageType == 'firebase'}
-    <UpgradeMessage />
-    {:else}
-      {#if goals.length}
-        <List solo className="max-w-screen-lg mx-auto">
-          {#each goalUsages as item, index (item.id)}
-            <ListItem clickable
-              bottomLine={72}
-              className="relative transition-all duration-200"
-              on:click={(evt) => {
-                usageClicked(item)
-              }}
-            >
-              <div slot="left" class="flex items-center space-x-2 stiff">
-                <button
-                  on:click|preventDefault|stopPropagation|capture={(evt) => {
-                    blockOpen()
-                    showTrackablePopmenu($TrackableStore.trackables[item.goal.tag])
-                  }}
-                >
-                  <TrackableAvatar
-                    className=" my-2"
-                    trackable={$TrackableStore.trackables[item.goal.tag]}
-                    size={48}
-                  /></button
-                >
-              </div>
+    {#if goals.length}
+      <List solo className="max-w-screen-lg mx-auto">
+        {#each goalUsages as item, index (item.id)}
+          <ListItem
+            clickable
+            bottomLine={72}
+            className="relative transition-all duration-200"
+            on:click={(evt) => {
+              usageClicked(item)
+            }}
+          >
+            <div slot="left" class="flex items-center space-x-2 stiff">
+              <button
+                on:click|preventDefault|stopPropagation|capture={(evt) => {
+                  blockOpen()
+                  showTrackablePopmenu($TrackableStore.trackables[item.goal.tag])
+                }}
+              >
+                <TrackableAvatar
+                  className=" my-2"
+                  trackable={$TrackableStore.trackables[item.goal.tag]}
+                  size={48}
+                /></button
+              >
+            </div>
 
-              <div class="title-progress filler">
-                <div class="flex items-center justify-between mb-2">
-                  <h1 class="font-semibold flex items-center space-x-2">
-                    <div class="line-clamp-1">{$TrackableStore.trackables[item.goal.tag]?.label}</div>
-                    {#if (item.scores && item.scores[0]?.success) || (item.goal.isDontDoIt && !item.scores.length)}
-                      <IonIcon icon={CheckmarkCircle} className="text-green-500" />
-                    {/if}
-                  </h1>
-                  {#if !editMode}
-                    <div class="filler whitespace-nowrap text-right">
-                      <span>
-                        <span class="usage-value font-semibold ">
-                          {#if !item.trackableUsage}
-                            0
-                          {:else}
-                            {item.trackableUsage.totalOnly}
-                          {/if}
-                        </span>
-                        <span class="opacity-40">/</span>
-                        <span class="target-value opacity-70">
-                          {$TrackableStore.trackables[item.goal.tag]?.formatValue(item.goal.target)}
-                        </span>
+            <div class="title-progress filler">
+              <div class="flex items-center justify-between mb-2">
+                <h1 class="font-semibold flex items-center space-x-2">
+                  <div class="line-clamp-1">{$TrackableStore.trackables[item.goal.tag]?.label}</div>
+                  {#if (item.scores && item.scores[0]?.success) || (item.goal.isDontDoIt && !item.scores.length)}
+                    <IonIcon icon={CheckmarkCircle} className="text-green-500" />
+                  {/if}
+                </h1>
+                {#if !editMode}
+                  <div class="filler whitespace-nowrap text-right">
+                    <span>
+                      <span class="usage-value font-semibold ">
+                        {#if !item.trackableUsage}
+                          0
+                        {:else}
+                          {item.trackableUsage.totalOnly}
+                        {/if}
                       </span>
-                      <IonIcon icon={ChevronForwardOutline} size={14} className="opacity-50" />
-                    </div>
-                  {/if}
-                </div>
-                <div class="progress pb-2">
-                  {#if !item.scores.length}
-                    <ProgressBar percentage={0} />
-                  {/if}
-                  {#each item.scores || [] as score}
-                    {#if score.failure}
-                      <ProgressBar barClass="bg-red-500" r2l={item.goal.isDontDoIt} percentage={score.percent || 0} />
-                    {:else if item.goal.isDontDoIt && score.percent > 80}
-                      <ProgressBar r2l={item.goal.isDontDoIt} barClass="bg-yellow-500" percentage={score.percent || 0} />
-                    {:else if score.success}
-                      <ProgressBar percentage={score.percent || 0} r2l={item.goal.isDontDoIt} barClass="bg-green-500" />
-                    {:else}
-                      <ProgressBar r2l={item.goal.isDontDoIt} percentage={score.percent || 0} />
-                    {/if}
-                  {/each}
-                </div>
-              </div>
-              <div slot="right" class=" flex items-center">
-                {#if editMode}
-                  <div class="w-4 stiff" />
-                  <div class="flex items-center space-x-1" >
-                    <Button
-                      clear
-                      icon
-                      on:click={(evt) => {
-                        evt.detail.preventDefault()
-                        evt.detail.stopPropagation()
-                        openGoalEditor(item.goal)
-                      }}
-                    >
-                      <IonIcon icon={CreateOutline} size={28} className="text-black dark:text-white" />
-                    </Button>
-                    <Button
-                      clear
-                      icon
-                      on:click={(evt) => {
-                        evt.detail.preventDefault()
-                        evt.detail.stopPropagation()
-                        deleteGoal(item.goal)
-                      }}
-                    >
-                      <IonIcon icon={RemoveCircle} size={28} className="text-red-500" />
-                    </Button>
+                      <span class="opacity-40">/</span>
+                      <span class="target-value opacity-70">
+                        {$TrackableStore.trackables[item.goal.tag]?.formatValue(item.goal.target)}
+                      </span>
+                    </span>
+                    <IonIcon icon={ChevronForwardOutline} size={14} className="opacity-50" />
                   </div>
                 {/if}
               </div>
-            </ListItem>
-          {/each}
-          <ListItem on:click={createGoal}>
-            <div class="text-center text-primary">Add Goal</div>
+              <div class="progress pb-2">
+                {#if !item.scores.length}
+                  <ProgressBar percentage={0} />
+                {/if}
+                {#each item.scores || [] as score}
+                  {#if score.failure}
+                    <ProgressBar barClass="bg-red-500" r2l={item.goal.isDontDoIt} percentage={score.percent || 0} />
+                  {:else if item.goal.isDontDoIt && score.percent > 80}
+                    <ProgressBar r2l={item.goal.isDontDoIt} barClass="bg-yellow-500" percentage={score.percent || 0} />
+                  {:else if score.success}
+                    <ProgressBar percentage={score.percent || 0} r2l={item.goal.isDontDoIt} barClass="bg-green-500" />
+                  {:else}
+                    <ProgressBar r2l={item.goal.isDontDoIt} percentage={score.percent || 0} />
+                  {/if}
+                {/each}
+              </div>
+            </div>
+            <div slot="right" class=" flex items-center">
+              {#if editMode}
+                <div class="w-4 stiff" />
+                <div class="flex items-center space-x-1">
+                  <Button
+                    clear
+                    icon
+                    on:click={(evt) => {
+                      evt.detail.preventDefault()
+                      evt.detail.stopPropagation()
+                      openGoalEditor(item.goal)
+                    }}
+                  >
+                    <IonIcon icon={CreateOutline} size={28} className="text-black dark:text-white" />
+                  </Button>
+                  <Button
+                    clear
+                    icon
+                    on:click={(evt) => {
+                      evt.detail.preventDefault()
+                      evt.detail.stopPropagation()
+                      deleteGoal(item.goal)
+                    }}
+                  >
+                    <IonIcon icon={RemoveCircle} size={28} className="text-red-500" />
+                  </Button>
+                </div>
+              {/if}
+            </div>
           </ListItem>
-        </List>
-      {/if}
-
-      <List transparent className="max-w-md mx-auto">
-        {#if goals.length === 0 && !loading}
-          <Empty icon={RibbonOutline} title="No goals found">
-            {#if view === 'day'}
-              <Button on:click={createGoal} className="mt-2" clear primary>Create a Daily Goal →</Button>
-            {:else if view === 'week'}
-              <Button on:click={createGoal} className="mt-2" clear primary>Create a Weekly Goal →</Button>
-            {:else if view === 'month'}
-              <Button on:click={createGoal} className="mt-2" clear primary>Create a Monthly Goal →</Button>
-            {/if}
-          </Empty>
-        {:else if loading}
-          <Empty>
-            <Spinner size={32} />
-          </Empty>
-        {/if}
+        {/each}
+        <ListItem on:click={createGoal}>
+          <div class="text-center text-primary">Add Goal</div>
+        </ListItem>
       </List>
     {/if}
+
+    <List transparent className="max-w-md mx-auto">
+      {#if goals.length === 0 && !loading}
+        <Empty icon={RibbonOutline} title="No goals found">
+          {#if view === 'day'}
+            <Button on:click={createGoal} className="mt-2" clear primary>Create a Daily Goal →</Button>
+          {:else if view === 'week'}
+            <Button on:click={createGoal} className="mt-2" clear primary>Create a Weekly Goal →</Button>
+          {:else if view === 'month'}
+            <Button on:click={createGoal} className="mt-2" clear primary>Create a Monthly Goal →</Button>
+          {/if}
+        </Empty>
+      {:else if loading}
+        <Empty>
+          <Spinner size={32} />
+        </Empty>
+      {/if}
+    </List>
   </main>
 </Layout>

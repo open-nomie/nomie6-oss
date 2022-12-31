@@ -30,7 +30,7 @@
   //       saveTrackable({
   //         trackable: tracker.toTrackable(),
   //         known: $TrackableStore.trackables,
-  //         permissions: $PermissionsStore,
+  //         permissions: {},
   //         prompt: false,
   //         saveToActiveBoard: false,
   //       })

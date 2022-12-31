@@ -7,7 +7,7 @@ import { Lang } from '../../store/lang'
 
 import { wait } from '../../utils/tick/tick'
 import { deleteAllFromCache } from '../ledger/ledger-cache'
-import { getRawPermissions } from '../my-account/PermissionsStore'
+
 import { getRawPrefs, Prefs, saveStorageType } from '../preferences/Preferences'
 import { trackEvent } from '../usage/stat-ping'
 
@@ -55,20 +55,13 @@ export const switchStorage = async (type, ignoreConfirm: boolean = false) => {
  */
 export const useStorageSelectMenu = async (props: selectNewStorageProps) => {
   const prefs = getRawPrefs()
-  const permissions = getRawPermissions()
+  const permissions = {}
 
   // perfs.betaFeatures
-  const canUseCloudStorage = permissions.canWrite || prefs.betaFeatures;
- 
+
   let buttons = StorageEngines.map((storageEngine) => {
     let disabled: boolean = false;
-    if(['firebase','s3'].indexOf(storageEngine.id) > -1) {
-      if(!canUseCloudStorage && storageEngine.id == 'firebase') {
-        disabled = true
-      } else if(storageEngine.id == 's3' && !prefs.betaFeatures) {
-        disabled = true;
-      }
-    }
+
 
     return {
       title: storageEngine.name,

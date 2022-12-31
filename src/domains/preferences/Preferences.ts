@@ -1,7 +1,7 @@
 import { SideStore } from '../../domains/storage/side-storage'
 import type { StorageTypes } from '../../domains/storage/storage'
 import { writable } from 'svelte/store'
-import { resetPermissionStore } from '../my-account/PermissionsStore'
+
 import { showToast } from '../../components/toast/ToastStore'
 
 export type ThemeTypes = 'dark' | 'light' | 'auto'
@@ -50,7 +50,7 @@ const InitialState: PreferencesStateType = sideStorage.get('state') || {
   weekStarts: 'sunday',
   compactTrackers: false,
   lastBackup: undefined,
-  backupDays: 7, 
+  backupDays: 7,
   hideBackupMessage: false,
   hideMessages: false,
   allowFileEdit: false,
@@ -151,7 +151,6 @@ export const getStorageType = (): StorageTypes => {
 }
 
 export const saveStorageType = (type: StorageTypes) => {
-  resetPermissionStore()
   Prefs.update((s) => {
     s.storageType = type
     return s

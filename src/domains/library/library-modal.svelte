@@ -33,8 +33,6 @@
   import type { Trackable } from '../trackable/Trackable.class'
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
 
-  import { PermissionsStore } from '../my-account/PermissionsStore'
-
   import AvailableTemplatesList from '../templates/available-templates-list.svelte'
 
   export let id: string
@@ -112,7 +110,7 @@
         trackable,
         known: $TrackableStore.trackables,
         saveToActiveBoard: false,
-        permissions: $PermissionsStore,
+        permissions: {},
         prompt: false,
       })
       if (saved) {

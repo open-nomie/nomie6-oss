@@ -71,7 +71,6 @@
         <LetterTicker text={`${tempValue}`} className="font-bold text-gray-800 dark:text-white" />
       {/if}
     </div>
-    
   </div>
 </div>
 
