@@ -1,66 +1,18 @@
-## Nomie 6
+# Nomie 6 Open Source
 
-Welcome to the next chapter in Nomie.
+Since Closing down nomie (https://nomie.app), I wanted to provide it as an open source project.
 
 ## Open Source Life Tracker / Mood Tracker / Data Journal
 
-![Nomie 6 Github](https://shareking.s3.amazonaws.com/pb-l3LHnDdC5H-1586728691.png)
+![Nomie 6 Github](https://shareking.s3.amazonaws.com/Screen-Shot-2022-12-31-11-20-09.31-w0qBQwGRkANjPuv5Xtl1xFHYFIg0GgJSYluiKMI5v69Ak7Lgbk5g0mR9bx9QrdiRlUVQrmXGb4T1AwIA02oApD3YfL97thUL0Kl3.png)
 
-## Try it out
-
-- [https://v5.nomie.app](https://v6.nomie.app) **Production** (v6-prod)
-
-If you like to live dangerously you can run the dev branch
-
-- [https://v6-dev.nomie.app](https://v6-dev.nomie.app) **Development** (v6-dev)
-
----
-
-Version 5 will main accessible at [https://v5.nomie.app](https://v5.nomie.app)
-
-
----
-
-## The Story
-
-I started [building Nomie in 2014](https://nomie.app/blog/original-nomie-blog-post) and over the next handful of years I release 3 major versions in 3 different JS technologies (VanilaJS -> Ionic -> ReactNative). The Nomie user base grew to ~100,000 users spread over multiple versions and multiple platforms.
-
-In March 2019 I decided to remove the apps from Google Play and the App Store and step away from the "native app world" has it's too exhausting.
-
-While the native apps will continue to run for those who installed it before, I wanted to take the best parts of Nomie 1, 2 and 3 and release it as an open source solution that could be run in the browser. This project is that result.
-
-Wanna know more about the Nomie story? [Here are a handful of podcasts talking about each release](https://soundcloud.com/nomiepodcast).
-
-## Want to contribute?
-
-1. Create feature branches from the `v6-dev` branch. All pull requests should be for `v5-dev`.
-2. Keep dependencies to an absolute minimum.
-3. Reuse code when possible.
-
-
-## [Svelte](https://svelte.dev)
-
-This rewrite/port uses [SvelteJS](https://svelte.dev) - a great tool for building fast / reactive single page apps (like Vue, React) without the framework.
-
-## Nomie Cloud
-
-Nomie Cloud uses Firebase to offer multidevice syncing, and stores your data fully encrypted in the cloud. Not just encrypted, but end-to-end encrypted - meaning no one, other than yourself, can decrypt your data. This is done using [Virgil Security's E3Kit](https://virgilsecurity.com/e3kit/)
-## Nomie Local
-
-You'll need Node >= 12 and NPM. I have not tested running this on Windows.
+You'll need Node >= 16 and NPM. I have not tested running this on Windows.
 
 ```bash
-git clone git@github.com:open-nomie/nomie.git
-cd nomie
-git checkout v6-dev
+git clone git@github.com:happydata/nomie6-oss.git
+cd nomie6-oss
 npm install
 npm run dev
-```
-
-## Running tests
-
-```bash
-npm run cypress
 ```
 
 ## How Nomie Works
@@ -114,11 +66,9 @@ The Nomie Jingle was written and produced by soldilil - [see more work](https://
 - [SvelteJS](https://svelte.dev/)
 - [Leaflet](https://leafletjs.com)
 - [OpenStreetMap](https://openstreetmap.org)
-- [Blockstack](https://blockstack.org)
 - [Cypress](https://cypress.io)
 - [PouchDB](https://pouchdb.com)
 - [LocalForage](https://localforage.github.io/localForage/)
-- [Carbon Design System](https://www.carbondesignsystem.com)
 - [svelte-emoji-picker](https://github.com/joeattardi/svelte-emoji-selector)
 
 ## Trademark License
