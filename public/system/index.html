@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nomie System</title>
+    <script src="https://unpkg.com/vue@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div id="app">
+      <header class="flex px-4 items-center justify-between shadow-md h-10">
+        <h1>Nomie System</h1>
+        <button class="text-blue-500" @click="restart">Back to App</button>
+      </header>
+      <main class="flex flex-col space-y-6 p-4">
+        <section class="text-sm text-gray-500">
+           Nomie System Control. When something goes wrong with Nomie. This will hopefully help.
+        </section>
+
+        <section class="flex items-center space-x-4">
+          <div>
+            <h1 class="font-bold">Clear Caches</h1>
+            <p class="leading-tight text-gray-500">Removes previous cached versions of Nomie</p>
+          </div>
+          <button @click="clearCaches" class="px-2 py-1 rounded-md bg-red-500 text-red-50">Clear</button>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      new Vue({
+        data: () => ({ message: 'Row' }),
+        methods: {
+          restart() {
+            window.location.href = "/";
+          },
+          clearCaches() {
+            console.log("going to list all caches");
+            let total = 0;
+            caches.keys().then(function (names) {
+              for (let name of names) {
+                caches.delete(name)
+                console.log("deleteing", name);
+                total = total+1;
+              }
+            })
+            alert("Deleted "+total+" Caches");
+          },
+        },
+      }).$mount('#app')
+    </script>
+  </body>
+</html>

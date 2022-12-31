@@ -1,0 +1,6 @@
+/assets/*
+  cache-control: max-age=31536000
+  cache-control: immutable
+/*
+  Access-Control-Allow-Origin: https://browser.blockstack.org
+  

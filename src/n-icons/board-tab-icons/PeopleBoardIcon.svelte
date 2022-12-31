@@ -1,0 +1,38 @@
+<script lang="ts">
+  export let size: number = 24
+</script>
+
+<svg height="{size}px" width="{size}px" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 196 196">
+  <path
+    d="M98.1333 105.765C122.33 105.765 142.016 86.079 142.016 61.8825C142.016 37.6861 122.33 18 98.1333 18C73.9369 18 54.2508 37.6861 54.2508 61.8825C54.2508 86.079 73.9369 105.765 98.1333 105.765Z"
+    fill="url(#paint0_linear_1350_1980)"
+  />
+  <path
+    d="M163.957 177C166.986 177 169.442 174.547 169.442 171.515C169.442 142.872 152.416 122.655 126.069 111.416C124.628 110.795 122.997 110.827 121.591 111.497C106.736 118.45 89.5304 118.45 74.6761 111.497C73.2646 110.827 71.6335 110.795 70.1979 111.416C43.8507 122.655 26.8242 142.872 26.8242 171.515C26.8242 174.547 29.2803 177 32.3096 177H163.957Z"
+    fill="url(#paint1_linear_1350_1980)"
+  />
+  <defs>
+    <linearGradient
+      id="paint0_linear_1350_1980"
+      x1="54.2508"
+      y1="18"
+      x2="142.016"
+      y2="105.765"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#FF7AF5" />
+      <stop offset="1" stop-color="#513162" />
+    </linearGradient>
+    <linearGradient
+      id="paint1_linear_1350_1980"
+      x1="26.8242"
+      y1="110.972"
+      x2="77.1714"
+      y2="219.719"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#FF6FD8" />
+      <stop offset="1" stop-color="#3813C2" />
+    </linearGradient>
+  </defs>
+</svg>

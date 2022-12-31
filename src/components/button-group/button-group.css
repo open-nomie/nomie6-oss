@@ -1,0 +1,108 @@
+
+.nbtn-group {
+  @apply shadow-sm;
+  @apply w-full;  
+  @apply flex-grow;
+  @apply flex;
+  @apply items-center;
+  @apply rounded-lg;
+  @apply bg-gray-300 bg-opacity-70 dark:bg-gray-500 dark:bg-opacity-20;
+  padding:2px;
+}
+
+.nbtn-group button.active {
+  @apply bg-gradient-to-tr from-primary-400 via-primary-500 to-primary-600;
+  text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.24);
+  @apply focus:ring-2 ring-primary-800;
+  @apply focus:outline-none;
+}
+
+.nbtn-group button {
+  @apply text-base;
+  @apply font-medium;
+  @apply flex-grow flex-shrink;
+  /* min-width:50px; */
+  @apply px-3;
+  @apply text-center;
+  box-shadow: none;
+  @apply rounded-lg;
+  @apply text-black dark:text-white;
+  @apply h-full;
+  @apply bg-transparent;
+  @apply transform transition-all duration-200;
+  @apply outline-none;
+}
+
+.nbtn-group button:focus {
+  @apply outline-none ring-4 ring-inset ring-primary-500 ring-opacity-20;
+}
+.nbtn-group button:active {
+  @apply scale-95;
+}
+
+
+
+.nbtn-group.size-sm button {
+  @apply text-sm;
+  @apply py-1;
+}
+
+.nbtn-group button .button-wrapper {
+  @apply justify-center;
+}
+
+.nbtn-group button.active {
+  @apply text-white;
+  @apply rounded-lg;
+}
+
+.nbtn-group.scrollable {
+  @apply overflow-x-auto;
+  @apply flex-shrink-0;
+}
+
+/* 
+
+
+
+.nbtn-group.compact .nbtn {
+  @apply h-7;
+}
+
+
+
+.nbtn-group.size-xs {
+  @apply h-7;
+  @apply bg-transparent;
+}
+
+
+.nbtn-group.size-xs .nbtn {
+  @apply h-6;
+  @apply text-xs;
+  @apply p-1;
+  @apply leading-none;
+}
+
+.nbtn-group .nbtn.active {
+  border-radius: 8px !important;
+  z-index: 10;
+  @apply shadow-md;
+  @apply bg-white dark:bg-gray-600;
+  @apply font-bold;
+  @apply text-black dark:text-white;
+  @apply text-primary-500;
+  @apply rounded-full;
+}
+.nbtn-group .nbtn:first-child {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.nbtn-group .nbtn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+} */

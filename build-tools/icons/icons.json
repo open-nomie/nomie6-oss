@@ -1,0 +1,422 @@
+[
+  {
+    "path": "node_modules/ionicons/dist/svg/arrow-back-outline.svg",
+    "name": "ArrowBack"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/arrow-forward-outline.svg",
+    "name": "ArrowForard"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/create-outline.svg",
+    "name": "CreateOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/repeat-outline.svg",
+    "name": "RepeatOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/lock-closed.svg",
+    "name": "LockClosedSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/magnet-outline.svg",
+    "name": "MagnetOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/magnet.svg",
+    "name": "MagnetSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/filter-circle-outline.svg",
+    "name": "FilterCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bookmarks-outline.svg",
+    "name": "BookmarksOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/scan-outline.svg",
+    "name": "ScanOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bulb-outline.svg",
+    "name": "BulbOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bulb.svg",
+    "name": "BulbSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/close-circle-outline.svg",
+    "name": "CloseCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/caret-down-circle-outline.svg",
+    "name": "CaretDownCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/checkmark-circle.svg",
+    "name": "CheckmarkCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/checkmark-circle-outline.svg",
+    "name": "CheckmarkCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/checkmark-outline.svg",
+    "name": "CheckmarkOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/pricetag-outline.svg",
+    "name": "TagOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/mail-unread-outline.svg",
+    "name": "MailUnreadOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/mail-outline.svg",
+    "name": "MailOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/text-outline.svg",
+    "name": "TextOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/accessibility-outline.svg",
+    "name": "AccessibilityOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/pie-chart-outline.svg",
+    "name": "PieChartOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/arrow-redo-outline.svg",
+    "name": "ReplyOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/git-compare-outline.svg",
+    "name": "HighLowIcon"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/git-compare-outline.svg",
+    "name": "Git"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/sparkles-outline.svg",
+    "name": "SparklesOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bar-chart.svg",
+    "name": "BarChart"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/layers-outline.svg",
+    "name": "Layers"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/thermometer-outline.svg",
+    "name": "ThermometerIcon"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/people-circle.svg",
+    "name": "PeopleCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/person-add-outline.svg",
+    "name": "PersonAddOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/people.svg",
+    "name": "People"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/copy-outline.svg",
+    "name": "CopyOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/albums-outline.svg",
+    "name": "TabsOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/people-outline.svg",
+    "name": "PeopleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/star.svg",
+    "name": "StarFilled"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chatbox-outline.svg",
+    "name": "ChatboxOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/map-outline.svg",
+    "name": "MapOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/book-outline.svg",
+    "name": "BookOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/calendar-outline.svg",
+    "name": "CalendarOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/calendar-number-outline.svg",
+    "name": "CalendarNumberOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/calendar-number.svg",
+    "name": "CalendarNumberSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/expand-outline.svg",
+    "name": "ExpandOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/happy-outline.svg",
+    "name": "HappyOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ellipsis-vertical.svg",
+    "name": "MoreVertical"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ellipsis-horizontal.svg",
+    "name": "More"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ellipsis-horizontal-circle-outline.svg",
+    "name": "MoreCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ellipsis-horizontal-circle-sharp.svg",
+    "name": "MoreCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/add.svg",
+    "name": "AddIcon"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/add.svg",
+    "name": "PlusIcon"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/add-circle-outline.svg",
+    "name": "AddCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/remove-circle-outline.svg",
+    "name": "RemoveCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/remove-circle.svg",
+    "name": "RemoveCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/git-network-outline.svg",
+    "name": "RelatedOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/paper-plane.svg",
+    "name": "PaperPlaneSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/menu-outline.svg",
+    "name": "MenuOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/shuffle-outline.svg",
+    "name": "ShuffleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/share-outline.svg",
+    "name": "ShareOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bar-chart-outline.svg",
+    "name": "BarChartOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/bar-chart.svg",
+    "name": "BarChartSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/analytics-outline.svg",
+    "name": "LineChartOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/options-outline.svg",
+    "name": "OptionsOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/apps-outline.svg",
+    "name": "AppsOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/download-outline.svg",
+    "name": "DownloadOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/apps.svg",
+    "name": "AppsSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/easel-outline.svg",
+    "name": "EaselOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/easel.svg",
+    "name": "EaselSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/calendar.svg",
+    "name": "CalendarSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/camera.svg",
+    "name": "CameraSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/trophy-outline.svg",
+    "name": "TrophyOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/trophy.svg",
+    "name": "TrophySolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/play-back-circle-outline.svg",
+    "name": "PlayBackCircle"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/search.svg",
+    "name": "SearchIcon"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/settings-outline.svg",
+    "name": "SettingsOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/settings.svg",
+    "name": "SettingsSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/stop.svg",
+    "name": "StopSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/eye.svg",
+    "name": "EyeSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/alarm-outline.svg",
+    "name": "AlarmOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/caret-down-outline.svg",
+    "name": "CaretDown"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/navigate-circle.svg",
+    "name": "NavigateCircleSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/navigate.svg",
+    "name": "NavigateSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ribbon.svg",
+    "name": "RibbonSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ribbon-outline.svg",
+    "name": "RibbonOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/navigate-circle-outline.svg",
+    "name": "NavigateCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/pin.svg",
+    "name": "PinSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/list-outline.svg",
+    "name": "ListOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/list.svg",
+    "name": "ListSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-back-circle-outline.svg",
+    "name": "ChevronBackCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/star.svg",
+    "name": "StarSolid"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/star-outline.svg",
+    "name": "StarOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-forward-circle-outline.svg",
+    "name": "ChevronForwardCircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-forward-outline.svg",
+    "name": "ChevronForwardOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-back-outline.svg",
+    "name": "ChevronBackOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-down-outline.svg",
+    "name": "ChevronDownOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/chevron-up-outline.svg",
+    "name": "ChevronUpOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/pencil-outline.svg",
+    "name": "PencilOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/pulse-outline.svg",
+    "name": "PulseOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/swap-horizontal-outline.svg",
+    "name": "SwapOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/duplicate-outline.svg",
+    "name": "DuplicateOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/trash-outline.svg",
+    "name": "TrashOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/moon-outline.svg",
+    "name": "MoonOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/sunny-outline.svg",
+    "name": "SunnyOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/ellipse-outline.svg",
+    "name": "CircleOutline"
+  },
+  {
+    "path": "node_modules/ionicons/dist/svg/archive-outline.svg",
+    "name": "ArchiveOutline"
+  }
+]

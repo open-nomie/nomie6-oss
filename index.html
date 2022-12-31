@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon"
+        href="/favicon.ico" />
+
+  <title>Nomie 6</title>
+  <script>
+    var global = global || window
+    var Buffer = Buffer || []
+    var process = process || { env: { DEBUG: undefined }, version: [] }
+  </script>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <base href="." />
+  <meta http-equiv="Cache-Control"
+        content="max-age=600" />
+  <meta name="description"
+        content="Privately, measure, monitor and master your life. Daily journal with the tap of a button." />
+  <meta name="apple-mobile-web-app-title"
+        content="Nomie 6" />
+  <meta name="theme-color"
+        content="#000000" />
+  <meta name="apple-mobile-web-app-capable"
+        content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style"
+        content="black" />
+  <meta name="full-screen"
+        content="yes" />
+
+  <link rel="apple-touch-icon"
+        href="/app-icons/nomie6-head-512.png" />
+  <link rel="icon"
+        type="image/png"
+        href="/favicon.png" />
+  <link rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="/app-icons/nomie6-head-192.png" />
+
+  <meta property="og:type"
+        content="website" />
+  <meta property="og:url"
+        content="https://6.nomie.app" />
+  <meta property="og:title"
+        content="Nomie 6 Dev" />
+  <meta property="og:description"
+        content="Private Mood and Life Tracking" />
+  <meta property="og:image"
+        content="" />
+
+  <meta name="twitter:card"
+        content="app" />
+  <meta name="twitter:site"
+        content="@nomieapp" />
+  <meta name="twitter:creator"
+        content="@nomieapp" />
+  <meta name="twitter:title"
+        content="Nomie.app" />
+  <meta name="twitter:description"
+        content="Mood and Life Tracking for Unique People" />
+  <meta name="twitter:app:country"
+        content="us" />
+
+  <style>
+    .loading-screen {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 4000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-screen.deleted {
+      pointer-events: none;
+      transform: translateY(600px);
+    }
+
+    .loading-screen:before {
+      transition: all 0.5s ease-in-out;
+      content: "";
+      /* background-color: #fff; */
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+    }
+
+    .loading-screen:after {
+      transition: all 0.5s ease-in-out;
+      content: "";
+      /* background-image: url(/images/nomie-splash.svg); */
+      background-size: cover;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 400;
+      background-position: center;
+    }
+
+    .version {
+      position: absolute;
+      width: 100px;
+      bottom: 50px;
+      font-size: 14px;
+      color: #FFF;
+
+      height: 24px;
+      line-height: 24px;
+      padding: 0 12px;
+      text-align: center;
+      transition: all 2s ease-in-out;
+    }
+
+    .delete-on-app {
+      transition: all 2s ease-in-out;
+    }
+
+    .delete-on-app.deleted {
+      transition: all 0.5s ease-in-out;
+      opacity: 0;
+      transform: scale(1.7);
+    }
+
+    .delete-on-app.deleted .version {
+      opacity: 0;
+    }
+
+    .launch-gradient {
+      background: linear-gradient(135deg, #00EAFF 0%, #3C8CE7 100%);
+    }
+
+    body .woot--bubble-holder {
+      display: none;
+    }
+  </style>
+  <script>window.sa_event = window.sa_event || function () { var a = [].slice.call(arguments); window.sa_event.q ? window.sa_event.q.push(a) : window.sa_event.q = [a] };</script>
+
+</head>
+
+<body>
+  <div class="loading-screen delete-on-app launch-gradient">
+    <div class="text-center h-16">
+      <img src="/app-icons/nomie6-head-120.png"
+           style="margin-bottom:10px; border-radius: 33%; overflow: hidden; box-shadow: 0px 13px 30px -5px rgba(0, 0, 0, 0.14)" /><br />
+      <div style="text-align: center; opacity:50%">Nomie 6</div>
+    </div>
+    <div class="version"></div>
+  </div>
+  <div id="app"
+       class=""></div>
+  <script type="module"
+          src="/src/main.ts"></script>
+  <!-- Simple Analytics-->
+  <script async
+          defer
+          src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+.pop-menu {
+  @apply px-3 pt-3 pb-4 lg:pb-3;
+  @apply backdrop-filter backdrop-saturate-150 backdrop-blur-sm;
+  @apply text-gray-900 dark:text-gray-50;
+  /* @apply bg-gray-200 dark:bg-gray-700 bg-opacity-70 dark:bg-opacity-50 backdrop-filter backdrop-saturate-150 backdrop-blur-sm; */
+  @apply rounded-t-2xl lg:rounded-b-2xl;
+  @apply bg-gray-200 dark:bg-gray-900;
+  max-height: 90vh;
+  width: 97vw;
+  @apply max-w-sm;
+  @apply shadow-2xl;
+  
+}
+
+.pop-menu .card .card-body {
+  @apply flex-grow;
+  @apply flex-shrink;
+  @apply overflow-y-auto;
+  @apply overflow-x-hidden;
+}
+.pop-menu .btn-toolbar .nbtn {
+  @apply min-w-full;
+}
+.pop-menu .pop-button {
+  box-shadow: none;
+}
+.pop-menu .n-list {
+  @apply rounded-2xl;
+  @apply overflow-y-auto;
+  @apply bg-opacity-50;
+  @apply bg-white dark:bg-black;
+  @apply shadow-lg;
+  @apply my-2;
+}
+
+.pop-menu .list {
+  border-radius: 1em;
+  max-height: 70vh;
+  overflow-y: scroll;
+  
+}
+.pop-menu .n-list .nbtn {
+  @apply bg-transparent;
+  min-height: 56px;
+  
+}
+.pop-menu .n-list .nbtn .main {
+  @apply font-semibold;
+  @apply flex;
+  @apply items-end;
+  @apply justify-start;
+  @apply leading-none;
+  
+}
+.pop-menu .n-list .nbtn ~ .nbtn:after {
+  content: '';
+  border-top: solid 1px rgba(155, 155, 155, 0.25) !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.pop-menu .nbtn-danger:hover,
+.pop-menu.nbtn-danger:active {
+  background-color: var(--color-red) !important;
+  color: rgba(128, 2, 2, 0.9) !important;
+}

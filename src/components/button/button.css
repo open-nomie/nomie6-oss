@@ -1,0 +1,275 @@
+.nbtn-desc {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+header[slot="header"] .nbtn.clear {
+  @apply focus:outline-none;
+  @apply rounded-xl;
+  @apply focus:ring-2 ring-yellow-500;
+  
+}
+
+.nbtn {
+  @apply relative;
+  @apply outline-none focus:outline-none; 
+  @apply transition-all duration-200 ease-in-out;
+  @apply inline-flex items-center justify-center;
+  @apply rounded-md;
+  @apply relative;
+  @apply transition-all duration-200;
+  @apply overflow-hidden;
+  @apply leading-tight;
+  @apply px-4;
+  @apply shadow-sm;
+
+  font-size: var(--button-base-size);
+  --button-base-size: calc(var(--base-font-size) * 1);
+  border: none;
+}
+
+button, .nbtn {
+  @apply focus:outline-none;
+  @apply focus:ring-2 ring-primary-500;
+}
+.hit-mark {
+  @apply transition-all duration-200 ease-in-out;
+  @apply opacity-0;
+  @apply pointer-events-none;
+  @apply bg-primary-500;
+  @apply absolute;
+  @apply top-0 right-0 left-0 bottom-0;
+}
+.nbtn:active {
+  transform: scale(0.95);
+}
+
+.nbtn:active  .hit-mark {
+  @apply opacity-30;
+  @apply dark:bg-white bg-primary-500;
+}
+
+.nbtn .main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.nbtn-sm {
+  font-size: calc(var(--button-base-size) * 0.8);
+  height: 30px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 6px;
+}
+.nbtn-xs {
+  font-size: calc(var(--button-base-size) * 0.7);
+  height: 24px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+}
+
+.nbtn svg {
+  @apply select-none;
+  user-select: none;
+}
+
+.nbtn.capture::before, button.capture {
+  @apply absolute top-0 left-0 right-0 bottom-0;
+  content: "";
+}
+
+.nbtn:disabled,
+.nbtn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.nbtn-badge {
+  @apply px-2 py-1 rounded-md;
+}
+.nbtn-solid {
+  @apply bg-white dark:bg-black;
+  @apply shadow-sm;
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.nbtn-md {
+  @apply text-lg;
+  @apply h-10;
+}
+.nbtn-lg {
+  @apply text-lg;
+  @apply leading-none;
+  @apply md:text-xl;
+  min-height:48px;
+}
+.nbtn-lg.nbtn-rounded {
+  @apply rounded-xl;
+  
+}
+.nbtn-desc {
+  min-height: 40px;
+  height: auto;
+  flex-grow: 1;
+  
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.nbtn-desc .main {
+  flex-direction: column;
+  align-items: flex-start !important;
+  text-align: left;
+}
+.nbtn-desc .n-text {
+  text-align: left;
+}
+.nbtn-text {
+  background-color: transparent;
+}
+.nbtn-circle {
+  @apply rounded-full;
+  text-align: center;
+}
+.nbtn-rounded {
+  @apply rounded-lg;
+  text-align: center;
+}
+.nbtn-round {
+  @apply rounded-full;
+  text-align: center;
+}
+.nbtn-inline {
+  display: inline-flex;
+}
+.nbtn-block {
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+}
+.nbtn-primary,
+.nbtn-primary-bright {
+  @apply bg-primary-500;
+  @apply text-white;
+}
+.nbtn-danger {
+  @apply bg-red-500;
+  @apply text-white;
+}
+.nbtn-success,
+.nbtn-green {
+  @apply bg-green-500;
+  @apply text-white;
+}
+.nbtn-orange {
+  @apply bg-yellow-500;
+  @apply text-white;
+}
+.nbtn-dark {
+  @apply bg-gray-700 dark:bg-gray-300;
+  @apply text-white dark:text-black;
+}
+.nbtn-light {
+  @apply text-primary-500;
+  @apply bg-gray-50;
+}
+.nbtn-clear,
+.nbtn-transparent,
+.nbtn-text {
+  box-shadow: none;
+  
+}
+.nbtn-text {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+.nbtn-text.nbtn-sm {
+  font-size: 0.8em;
+}
+.nbtn-text.nbtn-xs {
+  font-size: 0.65em;
+}
+.nbtn-round {
+  border-radius: 40px;
+}
+.nbtn-icon,
+.nbtn.tap-icon,
+.nbtn-circle {
+  padding-left: 0;
+  padding-right: 0;
+  padding: 4px;
+  border-radius: 50%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+
+}
+.nbtn .button-main {
+  @apply items-center  flex;
+}
+.nbtn-icon .button-main {
+  @apply flex items-center justify-center;
+}
+.nbtn-icon.nbtn-lg,
+.nbtn.tap-icon.nbtn-lg,
+.nbtn-circle.nbtn-lg {
+  height: 46px;
+  width: 46px;
+}
+.nbtn-icon.nbtn-lg svg,
+.nbtn.tap-icon.nbtn-lg svg,
+.nbtn-circle.nbtn-lg svg {
+  width: 28px;
+  height: 28px;
+}
+.nbtn-icon.nbtn-xl,
+.nbtn.tap-icon.nbtn-xl,
+.nbtn-circle.nbtn-xl {
+  height: 50px;
+  width: 50px;
+}
+.nbtn-icon.nbtn-xl svg,
+.nbtn.tap-icon.nbtn-xl svg,
+.nbtn-circle.nbtn-xl svg {
+  width: 42px;
+  height: 42px;
+}
+.nbtn-icon.nbtn-sm,
+.nbtn.tap-icon.nbtn-sm,
+.nbtn-circle.nbtn-sm {
+  height: 28px;
+  width: 28px;
+}
+.nbtn-icon {
+  @apply flex items-center justify-center;
+}
+.nbtn-icon.nbtn-sm svg,
+.nbtn.tap-icon.nbtn-sm svg,
+.nbtn-circle.nbtn-sm svg {
+  width: 16px;
+  height: 16px;
+}
+.nbtn-icon.nbtn-xs,
+.nbtn.tap-icon.nbtn-xs,
+.nbtn-circle.nbtn-xs {
+  height: 24px;
+  width: 24px;
+}
+.nbtn-icon.nbtn-xs svg,
+.nbtn.tap-icon.nbtn-xs svg,
+.nbtn-circle.nbtn-xs svg {
+  width: 16px;
+  height: 16px;
+}
+.nbtn-icon,
+.nbtn.tap-icon {
+  box-shadow: none;
+}

@@ -1,0 +1,524 @@
+{
+  "features": [
+    {
+      "version": "6.0.17",
+      "title": "adding support for plugins to open trackable editor"
+    },
+    {
+      "version": "6.0.17",
+      "title": "allowing direct image urls for trackable images"
+    },
+    {
+      "version": "6.0.17",
+      "title": "updated positivity score emojis"
+    },
+    {
+      "version": "6.0.17",
+      "title": "allowing editing of score at the list item level"
+    },
+    {
+      "version": "6.0.16",
+      "title": "adding language selection to plugin registration"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding irl integration"
+    },
+    {
+      "version": "6.0.15",
+      "title": "Adding a todo widget"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding backup reminder selection to more tab"
+    },
+    {
+      "version": "6.0.15",
+      "title": "allowing pinning from the expanded note entry modal"
+    },
+    {
+      "version": "6.0.15",
+      "title": "allowing combo trackers to have a custom default value"
+    },
+    {
+      "version": "6.0.15",
+      "title": "when adding people using the streak scroller, it will open the editor now"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding positivity chart widget"
+    },
+    {
+      "version": "6.0.15",
+      "title": "including duplication back into the trackable editor"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding location look up on expanded journal modal"
+    },
+    {
+      "version": "6.0.15",
+      "title": "better UI for longer trackable names and tags"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding date controls to the trending modal"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding url validation to is lib"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding connect library for plugin developers"
+    },
+    {
+      "version": "6.0.15",
+      "title": "plugins version 1"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding markdown support to alertbox descriptions"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding direct url support for opening external templates"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding plugin widget support"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding plugin access in capture menu"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding permissions access for plugins"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding openNoteEditor"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding initialization and data passing to KVStore"
+    },
+    {
+      "version": "6.0.13",
+      "title": "integrating irl.nomie.app - beta feature"
+    },
+    {
+      "version": "6.0.13",
+      "title": "note pinning for the day"
+    },
+    {
+      "version": "6.0.12",
+      "title": "adding templates"
+    },
+    {
+      "version": "6.0.12",
+      "title": "added [] and [x] support to notes"
+    },
+    {
+      "version": "6.0.12",
+      "title": "writing prompts can not be edited."
+    },
+    {
+      "version": "6.0.12",
+      "title": "improved onboarding flow"
+    },
+    {
+      "version": "6.0.12",
+      "title": "created pop select to start replacing traditional selects"
+    },
+    {
+      "version": "6.0.12",
+      "title": "adding title to iframe modal"
+    },
+    {
+      "version": "6.0.12",
+      "title": "convert metric if needed for templates"
+    },
+    {
+      "version": "6.0.12",
+      "title": "merging streak and calendar modals"
+    },
+    {
+      "version": "6.0.12",
+      "title": "improved goal view"
+    },
+    {
+      "version": "6.0.12",
+      "title": "added an Add button to the log card"
+    },
+    {
+      "version": "6.0.12",
+      "title": "adding min max labels for range trackers"
+    },
+    {
+      "version": "6.0.12",
+      "title": "limiting controls for encrypted cloud storage without a subscription"
+    },
+    {
+      "version": "6.0.11",
+      "title": "adding CSV importer back"
+    },
+    {
+      "version": "6.0.11",
+      "title": "preparing for other payment systems - like iOS maybe"
+    },
+    {
+      "version": "6.0.11",
+      "title": "including custom prompts in Prompt selector"
+    },
+    {
+      "version": "6.0.11",
+      "title": "requesting the browser persist storage if available"
+    },
+    {
+      "version": "6.0.11",
+      "title": "ability to delete a dashboard"
+    },
+    {
+      "version": "6.0.11",
+      "title": "dashboard sharing on mobile / downloading on desktop"
+    },
+    {
+      "version": "6.0.11",
+      "title": "timeline componentized and used for notes"
+    },
+    {
+      "version": "6.0.11",
+      "title": "better chart widget displays"
+    }
+  ],
+  "fixes": [
+    {
+      "version": "6.0.18",
+      "title": "tally trackers also include ignored by typeahead"
+    },
+    {
+      "version": "6.0.18",
+      "title": "dark mode positivity icon is hard to see"
+    },
+    {
+      "version": "6.0.18",
+      "title": "tracker editor - advanced not expanding if has also include"
+    },
+    {
+      "version": "6.0.17",
+      "title": "backup message slide down breaks page routing"
+    },
+    {
+      "version": "6.0.17",
+      "title": "highlighted trackable buttons are flickering when typing"
+    },
+    {
+      "version": "6.0.17",
+      "title": "note list item displays wrong values in trackable"
+    },
+    {
+      "version": "6.0.17",
+      "title": "renaming close to exit on plugin window"
+    },
+    {
+      "version": "6.0.17",
+      "title": "avatars are not centered vertically"
+    },
+    {
+      "version": "6.0.16",
+      "title": "slider needs a better value display"
+    },
+    {
+      "version": "6.0.16",
+      "title": "running time showing a TRUE on track tab"
+    },
+    {
+      "version": "6.0.16",
+      "title": "all plugin widgets are being selected when one is"
+    },
+    {
+      "version": "6.0.16",
+      "title": "allowing up to 3 plugins"
+    },
+    {
+      "version": "6.0.16",
+      "title": "combo not respecting also include"
+    },
+    {
+      "version": "6.0.15",
+      "title": "dashboard note with todo is not updating."
+    },
+    {
+      "version": "6.0.15",
+      "title": "editor ui with super long tags and labels looks awful"
+    },
+    {
+      "version": "6.0.15",
+      "title": "respecting defaults of zero in the note combo tracker"
+    },
+    {
+      "version": "6.0.15",
+      "title": "working on trackable popmenu"
+    },
+    {
+      "version": "6.0.15",
+      "title": "deduping positivity calcs"
+    },
+    {
+      "version": "6.0.15",
+      "title": "decreasing location lookup timeout to 3 seconds"
+    },
+    {
+      "version": "6.0.15",
+      "title": "trending modal is flipping values"
+    },
+    {
+      "version": "6.0.15",
+      "title": "todo widget says 'What is it?'"
+    },
+    {
+      "version": "6.0.15",
+      "title": "trackable selector errors when adding + to the search"
+    },
+    {
+      "version": "6.0.15",
+      "title": "trackable editor default value not selectable."
+    },
+    {
+      "version": "6.0.15",
+      "title": "display value widget showing wrong value for timer"
+    },
+    {
+      "version": "6.0.15",
+      "title": "latest note widget showing oldest first."
+    },
+    {
+      "version": "6.0.15",
+      "title": "catching error if storage engine cannot be found."
+    },
+    {
+      "version": "6.0.15",
+      "title": "related labels being cut off"
+    },
+    {
+      "version": "6.0.15",
+      "title": "6m and 1y chart is jacked"
+    },
+    {
+      "version": "6.0.15",
+      "title": "removing some opacities to help speed things up."
+    },
+    {
+      "version": "6.0.15",
+      "title": "update usage / streaks showing oldest dates first"
+    },
+    {
+      "version": "6.0.15",
+      "title": "capture menu / footer z-index height bug"
+    },
+    {
+      "version": "6.0.15",
+      "title": "adding plugin iframe portal for plugins that need to be on launch"
+    },
+    {
+      "version": "6.0.15",
+      "title": "plugin booting before account validation"
+    },
+    {
+      "version": "6.0.15",
+      "title": "allow createArrayStore to support initializing of data"
+    },
+    {
+      "version": "6.0.15",
+      "title": "disabling auto correct on plugin url"
+    },
+    {
+      "version": "6.0.15",
+      "title": "if missing dashboard plugin - wait for plugin store"
+    },
+    {
+      "version": "6.0.15",
+      "title": "test"
+    },
+    {
+      "version": "6.0.15",
+      "title": "tally default does not work"
+    },
+    {
+      "version": "6.0.15",
+      "title": "default value being over written with last tracked value"
+    },
+    {
+      "version": "6.0.15",
+      "title": "removing ripple effect to help with resources"
+    },
+    {
+      "version": "6.0.15",
+      "title": "writing prompt not opening prompt"
+    },
+    {
+      "version": "6.0.15",
+      "title": "weather fixes"
+    },
+    {
+      "version": "6.0.15",
+      "title": "multiple  dashboard widgets have Unknown as title"
+    },
+    {
+      "version": "6.0.15",
+      "title": "making global adjustments for smaller screen sizes"
+    },
+    {
+      "version": "6.0.15",
+      "title": "combo list editor doesn't allow manual adds, and is buggy in general"
+    },
+    {
+      "version": "6.0.15",
+      "title": "trackable not allowing default changes"
+    },
+    {
+      "version": "6.0.15",
+      "title": "dashboard duplicate error when importing dashboards"
+    },
+    {
+      "version": "6.0.13",
+      "title": "making widgets index more unique incase someone double imports"
+    },
+    {
+      "version": "6.0.13",
+      "title": "input styling work"
+    },
+    {
+      "version": "6.0.13",
+      "title": "resurrecting notes after using a list."
+    },
+    {
+      "version": "6.0.13",
+      "title": "track on this day failed for list and combo trackers"
+    },
+    {
+      "version": "6.0.13",
+      "title": "security passcode modal not showing after user hits ok"
+    },
+    {
+      "version": "6.0.13",
+      "title": "importing from onboarding is throwing an error"
+    },
+    {
+      "version": "6.0.13",
+      "title": "adding ability to delete context"
+    },
+    {
+      "version": "6.0.13",
+      "title": "tracking location if enabled"
+    },
+    {
+      "version": "6.0.12",
+      "title": "typeahead selected values ignoring the positivity score"
+    },
+    {
+      "version": "6.0.12",
+      "title": "positivity editor not allowing additional settings"
+    },
+    {
+      "version": "6.0.12",
+      "title": "auto import loop causing multiple imports"
+    },
+    {
+      "version": "6.0.12",
+      "title": "android scroll performance"
+    },
+    {
+      "version": "6.0.12",
+      "title": "catching if usage is found in widget"
+    },
+    {
+      "version": "6.0.12",
+      "title": "combo box using a tick item was saving it as a 1 on save"
+    },
+    {
+      "version": "6.0.12",
+      "title": "login register fiasco"
+    },
+    {
+      "version": "6.0.12",
+      "title": "double tracker value bug"
+    },
+    {
+      "version": "6.0.12",
+      "title": "grammar"
+    },
+    {
+      "version": "6.0.12",
+      "title": "reloading board, trackables and dashboard after template install"
+    },
+    {
+      "version": "6.0.11",
+      "title": "memories not linking properly"
+    },
+    {
+      "version": "6.0.11",
+      "title": "clearing on log save."
+    },
+    {
+      "version": "6.0.11",
+      "title": "timeselect not bound to value"
+    },
+    {
+      "version": "6.0.11",
+      "title": "adding smart merge, to ensure n6 imports merge properly"
+    },
+    {
+      "version": "6.0.11",
+      "title": "combo box - value trackers not always capturing value"
+    },
+    {
+      "version": "6.0.11",
+      "title": "dashboard share not working in production on iOS"
+    },
+    {
+      "version": "6.0.11",
+      "title": "catching error on widgets not having a type"
+    },
+    {
+      "version": "6.0.11",
+      "title": "trackable label should be visible while scrolling stats"
+    },
+    {
+      "version": "6.0.11",
+      "title": "chartjs touch improvements"
+    },
+    {
+      "version": "6.0.11",
+      "title": "stop scroll to top of trackable board after a note is saved"
+    },
+    {
+      "version": "6.0.11",
+      "title": "goal edit button not opening modal"
+    },
+    {
+      "version": "6.0.11",
+      "title": "goal config erased after setting the goal target value"
+    },
+    {
+      "version": "6.0.11",
+      "title": "app freezes after toggling goal edit mode, and navigating to dashboard"
+    },
+    {
+      "version": "6.0.11",
+      "title": "updating terminology for prompts"
+    },
+    {
+      "version": "6.0.11",
+      "title": "combo box range does not respect the step setting"
+    },
+    {
+      "version": "6.0.11",
+      "title": "allowing multiple note modals open at one time"
+    }
+  ],
+  "chores": [],
+  "build_date": "2022-09-21T14:06:29.915Z"
+}

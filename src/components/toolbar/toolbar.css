@@ -1,0 +1,60 @@
+.n-toolbar {
+  @apply flex-shrink;
+  @apply flex-grow;
+
+  @apply h-14;
+  @apply w-full;
+  @apply flex;
+  @apply items-center;
+  @apply justify-between;
+}
+
+.n-toolbar h1,
+.n-toolbar h2,
+.n-toolbar h3 {
+  font-size: 1.1em;
+  margin-bottom: 0;
+}
+.n-toolbar-grid .btn {
+  color: var(--color-inverse-1);
+}
+.n-toolbar [slot='left'],
+.n-toolbar [slot='right'] {
+  @apply flex;
+  @apply items-center;
+  @apply h-auto;
+}
+.n-toolbar-grid {
+  color: var(--color-inverse);
+  display: grid;
+  grid-column-gap: 2px;
+  grid-row-gap: 0px;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 1fr;
+  @apply items-center;
+  @apply px-4;
+  min-height:50px;
+}
+
+.n-toolbar-grid .left {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  /* grid-area: 0.25; */
+  justify-content: center;
+}
+.n-toolbar-grid .main {
+  @apply leading-tight;
+  @apply text-center;
+  @apply flex;
+  @apply flex-col;
+  @apply justify-center;
+  @apply items-center;
+}
+.n-toolbar-grid .main h1,
+.n-toolbar-grid .main .title {
+  @apply focus:outline-none;
+  @apply rounded-lg;
+}
+.n-toolbar-grid .right {
+}

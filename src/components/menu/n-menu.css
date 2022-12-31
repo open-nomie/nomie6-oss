@@ -1,0 +1,129 @@
+.n-menu {
+}
+.n-menu .pop-button {
+  @apply z-20 relative;
+  @apply w-full;
+  min-height: 44px;
+  @apply flex flex-row items-center space-x-3 justify-between;
+  @apply px-4 py-3;
+  @apply text-lg;
+  @apply leading-tight;
+  @apply transition-all duration-100;
+  @apply text-left;
+  @apply focus:outline-none;
+  @apply rounded-none;
+  @apply border-b border-gray-500 border-opacity-30;
+  @apply relative;
+}
+.n-menu .pop-button:focus {
+  @apply outline-none;
+  @apply ring-inset;
+}
+.n-menu .pop-button.active {
+  @apply bg-primary-500 dark:bg-primary-500;
+}
+.n-menu .pop-button .title {
+  @apply font-semibold leading-tight;
+  @apply text-black dark:text-white;
+}
+.n-menu .pop-button .description {
+  @apply dark:text-gray-400 text-gray-500  mt-1;
+}
+.n-menu .pop-button.active .title {
+  @apply text-white;
+}
+.n-menu .pop-button.active .description {
+  @apply leading-tight  text-primary-100;
+  
+}
+.n-menu .pop-button.disabled,
+.n-menu .pop-button:disabled {
+  @apply opacity-50;
+}
+
+.n-menu .pop-button:last-child {
+  @apply border-none;
+}
+.n-menu .n-menu-group:last-child {
+  @apply mb-0;
+}
+
+.n-menu {
+  @apply transform transition-all;
+  @apply rounded-2xl;
+  @apply shadow-2xl;
+  @apply transition-all duration-100 ease-in-out;
+  max-height: 70vh;
+  @apply overflow-y-auto;
+  @apply backdrop-filter backdrop-blur-sm backdrop-saturate-150;
+}
+
+.n-menu a:first-child .pop-button,
+.n-menu a:first-child:focus::after .pop-button {
+  @apply rounded-t-2xl;
+}
+.n-menu a:last-child .pop-button,
+.n-menu a:last-child:focus::after .pop-button {
+  @apply rounded-b-2xl;
+}
+
+/* 
+
+
+.n-menu .pop-button.focused {
+  @apply ring-2 ring-primary-500 ring-inset;
+}
+
+.n-menu .pop-button.active {
+  @apply bg-primary-600 dark:bg-primary-400;
+}
+
+.n-menu .pop-button {
+  @apply z-20 relative;
+  @apply w-full;
+  min-height: 44px;
+  @apply flex flex-row items-center space-x-3 justify-between;
+  @apply px-4 py-3;
+  @apply text-lg;
+  @apply leading-tight;
+  @apply transition-all duration-100;
+  @apply text-left;
+  @apply focus:outline-none;
+  @apply rounded-none;
+  @apply border-b border-gray-500 border-opacity-30;
+  @apply relative;
+}
+.n-menu .pop-button:hover {
+  @apply bg-black dark:bg-white dark:bg-opacity-5  bg-opacity-10;
+}
+.n-menu a:focus {
+  
+}
+
+
+ */
+
+.n-menu-group {
+  @apply flex;
+  @apply flex-col;
+  @apply overflow-hidden;
+  @apply rounded-2xl;
+  @apply mx-auto;
+  @apply max-w-lg;
+  @apply border-b-4;
+  @apply border-solid;
+  @apply border-gray-500 border-opacity-20;
+  @apply w-full;
+  /* background-color: var(--color-solid-2); */
+}
+
+.n-menu.size-xs .n-menu-group,
+.n-menu.size-sm .n-menu-group {
+  @apply rounded-lg;
+  @apply mb-2;
+}
+
+.n-menu-group .nbtn .button-main {
+  @apply text-left;
+  @apply leading-tight;
+}

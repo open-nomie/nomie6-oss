@@ -1,0 +1,270 @@
+{
+  "type": "template",
+  "id": "e42ac9fed24b826a6538024247196de6",
+  "name": "Period Tracking",
+  "description": "Privately track your period",
+  "version": "6.0.12",
+  "trackables": [
+    {
+      "type": "tracker",
+      "id": "#period",
+      "tracker": {
+        "id": "313c76cc1d078ff5dd62771089cc60a4",
+        "tag": "period",
+        "label": "Period",
+        "type": "note",
+        "color": "#369DD3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🔴",
+        "avatar": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#mood #flow #cramps #tender_b #sex",
+        "hidden": false,
+        "focus": ["body"]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#mood",
+      "tracker": {
+        "id": "6ef79c0fb66e39ea3c0b0afdabdf6451",
+        "tag": "mood",
+        "label": "Mood",
+        "type": "range",
+        "color": "#8e2cf5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😉",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "minLabel":"Bad",
+        "maxLabel":"Good",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "is": "gt",
+            "sc": "1",
+            "v": 3,
+            "if": "value"
+          },
+          {
+            "v": 3,
+            "sc": "-1",
+            "is": "lt",
+            "if": "value"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#flow",
+      "tracker": {
+        "id": "e8b81f7102b192dbe30d472de42f9938",
+        "tag": "flow",
+        "label": "Flow",
+        "type": "range",
+        "color": "#d50000",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🌊",
+        "avatar": null,
+        "default": "0",
+        "max": "5",
+        "min": "0",
+        "minLabel":"Little",
+        "maxLabel":"Heavy",
+        "step": "1",
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#cramps",
+      "tracker": {
+        "id": "9519c4a5424f91c18af1c926272ad10a",
+        "tag": "cramps",
+        "label": "Cramps",
+        "type": "range",
+        "color": "#f44336",
+        "math": "mean",
+        "ignore_zeros": false,
+        
+        "uom": "num",
+        "emoji": "💥",
+        "avatar": null,
+        "default": null,
+        "max": "5",
+        "min": "0",
+        "minLabel":"None",
+        "maxLabel":"Really Bad",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#tender_b",
+      "tracker": {
+        "id": "7c039d9085f639c731157f68e39c96d8",
+        "tag": "tender_b",
+        "label": "Breast Tender",
+        "type": "range",
+        "color": "#E040FB",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👙",
+        "avatar": null,
+        "default": "0",
+        "max": "5",
+        "min": "0",
+        "minLabel":"None",
+        "maxLabel":"Very",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sex",
+      "tracker": {
+        "id": "c918967758e0a50450e3ae8fbe2fc410",
+        "tag": "sex",
+        "label": "Sex",
+        "type": "tick",
+        "color": "#EA80FC",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💞",
+        "avatar": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    }
+  ],
+  "goals": [],
+  "boards": [
+    {
+      "id": "6548072515",
+      "label": "🔴",
+      "elements": [
+        "#period",
+        "#flow",
+        "#cramps",
+        "#sex",
+        "#tender_b"
+      ],
+      "active": true
+    }
+  ],
+  "dashboards": [
+    {
+      "label": "🔴",
+      "widgets": [
+        {
+          "token": {
+            "id": "period",
+            "type": "tracker",
+            "value": 1,
+            "raw": "#period",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "706a65b3cdd61c11b9934dbe5b5a45f0",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-90",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "cramps",
+            "type": "tracker",
+            "value": 3,
+            "raw": "#cramps",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "6922eea38493c505d4547eb6b23fa19d",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-90",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "flow",
+            "type": "tracker",
+            "value": 2,
+            "raw": "#flow",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "fb0ef924f7c21e6ed2db17c825f935f1",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-90",
+          "type": "barchart",
+          "loading": false
+        }
+      ],
+      "id": "a827f89c4e58e9e2b0770f0aae31beb3",
+      "created": "2022-07-03T17:45:50.695Z"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+[build]
+  command = "npm run vbuild"
+  publish = "dist"
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+[[redirects]]
+  from = "/system"
+  to = "/system/index.html"
+  status = 200
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+[functions]
+  # Directory with serverless functions, including background functions,
+  # to deploy. This is relative to the base directory if one has been set, 
+  # or the root directory if a base hasn’t been set.
+  directory = "functions/"

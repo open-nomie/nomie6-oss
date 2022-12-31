@@ -1,0 +1,258 @@
+[
+  {
+    "time": "evening",
+    "text": "What are you grateful for today?"
+  },
+  {
+    "time": "evening",
+    "text": "What brought you satisfaction today?"
+  },
+  {
+    "time": "evening",
+    "text": "What did you do today?"
+  },
+  {
+    "time": "evening",
+    "text": "What frustrated you today?"
+  },
+  {
+    "time": "morning",
+    "text": "How did you sleep?"
+  },
+  {
+    "time": "morning",
+    "text": "What is one positive thing that will happen today?"
+  },
+  {
+    "time": "morning",
+    "text": "What did you dream about?"
+  },
+  {
+    "time": "any",
+    "text": "Who is someone you miss hanging out with?"
+  },
+  {
+    "time": "any",
+    "text": "What is your favorite thing to watch right now?"
+  },
+  {
+    "time": "any",
+    "text": "What are some of your bad habits that you'd like to work on?"
+  },
+  {
+    "time": "any",
+    "text": "How can you show your loved ones more love?"
+  },
+  {
+    "time": "morning",
+    "text": "What are your top 3 goals for this week?"
+  },
+  {
+    "time": "evening",
+    "text": "What did you do today to work towards your goals?"
+  },
+  {
+    "time": "evening",
+    "text": "What was the best part of your day?"
+  },
+  {
+    "time": "evening",
+    "text": "What was the worst part of your day?"
+  },
+  {
+    "time": "morning",
+    "text": "What 3 things would make today amazing?"
+  },
+  {
+    "time": "morning",
+    "text": "How can you be kinder to yourself today?"
+  },
+  {
+    "time": "afternoon",
+    "text": "What are you feeling today?"
+  },
+  {
+    "time": "evening",
+    "text": "What did you learn today?"
+  },
+  {
+    "time": "evening",
+    "text": "Did you have feelings of regret today?"
+  },
+  {
+    "time": "any",
+    "text": "What is one of your favorite memories?"
+  },
+  {
+    "time": "any",
+    "text": "What has been your biggest accomplishment?"
+  },
+  {
+    "time": "any",
+    "text": "What is your biggest fear currently? "
+  },
+  {
+    "time": "any",
+    "text": "When was a time you were really proud of yourself?"
+  },
+  {
+    "time": "any",
+    "text": "When was the last time you felt really sad?"
+  },
+  {
+    "time": "any",
+    "text": "When was the last time you felt really embarrassed?"
+  },
+  {
+    "time": "any",
+    "text": "When was the last time you felt really angry?"
+  },
+  {
+    "time": "any",
+    "text": "When was the last time you felt really happy?"
+  },
+  {
+    "time": "any",
+    "text": "In the next few months I want to "
+  },
+  {
+    "time": "any",
+    "text": "What do you hope to accomplish in the next year?"
+  },
+  {
+    "time": "any",
+    "text": "What do you hope to accomplish in the next five years?"
+  },
+  {
+    "time": "any",
+    "text": "What do you hope to accomplish in the next ten years?"
+  },
+  {
+    "time": "any",
+    "text": "What is your favorite place, and why?"
+  },
+  {
+    "time": "any",
+    "text": "How are you improving your mental health?"
+  },
+  {
+    "time": "any",
+    "text": "How are you improving your physical health?"
+  },
+  {
+    "time": "any",
+    "text": "How can you improve your relationships with others?"
+  },
+  {
+    "time": "any",
+    "text": "How can you better manage your time and resources?"
+  },
+  {
+    "time": "any",
+    "text": "What do you do to improve your emotional health?"
+  },
+  {
+    "time": "any",
+    "text": "How can you become more self-aware and in tune with your needs?"
+  },
+  {
+    "time": "any",
+    "text": "What do you do to reduce stress and promote relaxation?"
+  },
+  {
+    "time": "any",
+    "text": "What do you do to improve your diet and nutrition?"
+  },
+  {
+    "time": "any",
+    "text": "How can you increase your physical activity and exercise?"
+  },
+  {
+    "time": "any",
+    "text": "What do you do to improve your sleep habits?"
+  },
+  {
+    "time": "any",
+    "text": "How do you usually feel when you wake up in the morning? "
+  },
+  {
+    "time": "any",
+    "text": "Did your moods change throughout the day? How so? "
+  },
+  {
+    "time": "any",
+    "text": "What kind of things usually put you in a bad mood? "
+  },
+  {
+    "time": "any",
+    "text": "What are some things that always make you happy? "
+  },
+  {
+    "time": "any",
+    "text": "What do you do when you're feeling down? "
+  },
+  {
+    "time": "any",
+    "text": "Do you ever get random mood swings? What causes them? "
+  },
+  {
+    "time": "any",
+    "text": "What is your go-to comfort food when you're feeling sad or stressed? "
+  },
+  {
+    "time": "any",
+    "text": "What kind of music do you usually listen to when you're in a good mood? "
+  },
+  {
+    "time": "any",
+    "text": "What do you like to do when you're feeling bored? "
+  },
+  {
+    "time": "any",
+    "text": "Are there any certain smells that affect your mood?"
+  },
+  {
+    "time": "evening",
+    "text": "Today I felt "
+  },
+  {
+    "time": "any",
+    "text": "Three things I'm grateful for are: "
+  },
+  {
+    "time": "any",
+    "text": "What did you do today that made you feel good?"
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling stressed "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling down "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling overwhelmed  "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling anxious  "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling angry "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling lonely  "
+  },
+  {
+    "time": "any",
+    "text": "The last time I was feeling loved "
+  },
+  {
+    "time": "any",
+    "text": "What is your favorite thing to do?"
+  }
+]

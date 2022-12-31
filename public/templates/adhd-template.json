@@ -1,0 +1,404 @@
+{
+  "type": "template",
+  "id": "373bc2a5a3d131013df0e7b937fe6cdc",
+  "name": "ADHD",
+  "description": "A template for journaling, tracking and monitoring ADHD symptoms",
+  "version": "6.0.12",
+  "trackables": [
+    {
+      "type": "tracker",
+      "id": "#adhd_check",
+      "tracker": {
+        "id": "49111a893993394894fabe286ccde297",
+        "tag": "adhd_check",
+        "label": "ADHD✓",
+        "type": "note",
+        "color": "#AD1457",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🐙",
+        "avatar": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#anxiety #energy #focus #hyperactivity #mood #motivation #stress #fidgety",
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#anxiety",
+      "tracker": {
+        "id": "c2c3eb6ef426f033d1caad1cea0086a8",
+        "tag": "anxiety",
+        "label": "Anxiety",
+        "type": "range",
+        "color": "#E91E63",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😬",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "0",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "v": 1,
+            "sc": "-1",
+            "if": "value",
+            "is": "gt"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#energy",
+      "tracker": {
+        "id": "76520bf848435f7476e09b14cf4813be",
+        "tag": "energy",
+        "label": "Energy",
+        "type": "range",
+        "color": "#64DD17",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "🥊",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "sc": -1,
+            "is": "lt",
+            "if": "value",
+            "v": 4
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#focus",
+      "tracker": {
+        "id": "425c4ad5cfe891b8db1405ad195eff5b",
+        "tag": "focus",
+        "label": "Focus",
+        "type": "range",
+        "color": "#3F51B5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🔎",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "mind"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#hyperactivity",
+      "tracker": {
+        "id": "24a82086dd7004b754cded0306661717",
+        "tag": "hyperactivity",
+        "label": "Hyperactivity ",
+        "type": "range",
+        "color": "#e57373",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👻",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#mood",
+      "tracker": {
+        "id": "6ef79c0fb66e39ea3c0b0afdabdf6451",
+        "tag": "mood",
+        "label": "Mood",
+        "type": "range",
+        "color": "#8e2cf5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😉",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "is": "gt",
+            "sc": "1",
+            "v": 3,
+            "if": "value"
+          },
+          {
+            "v": 3,
+            "sc": "-1",
+            "is": "lt",
+            "if": "value"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#motivation",
+      "tracker": {
+        "id": "87a459edc213e5d48a62826e32486dec",
+        "tag": "motivation",
+        "label": "Motivation",
+        "type": "range",
+        "color": "#FF3D00",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🤑",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#stress",
+      "tracker": {
+        "id": "bd2579beea14353cbe7b870f2ef73f3e",
+        "tag": "stress",
+        "label": "Stress",
+        "type": "range",
+        "color": "#d50000",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "😬",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "lte",
+            "v": 4,
+            "sc": "1"
+          },
+          {
+            "is": "gt",
+            "sc": "-1",
+            "if": "value",
+            "v": 5
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#fidgety",
+      "tracker": {
+        "id": "a861eb7c0e8e5fdd8a7b98c7062bbc04",
+        "tag": "fidgety",
+        "label": "FIdgety ",
+        "type": "range",
+        "color": "#7E57C2",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👾",
+        "avatar": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAQy4yOjIqQzo2OktHQ09kpmxkXFxkzJKaeabx1P767dTp5f//////////5en////////////////////////////bAEMBR0tLZFdkxGxsxP//6f/////////////////////////////////////////////////////////////////////AABEIACoAQAMBIgACEQEDEQH/xAAYAAEBAQEBAAAAAAAAAAAAAAAAAwIEAf/EAB0QAAMBAAIDAQAAAAAAAAAAAAABAhEDMRIhYUL/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAXEQEBAQEAAAAAAAAAAAAAAAAAARFB/9oADAMBAAIRAxEAPwDvAAA8q1PYbIcqvdlaWJVVyS/hs5EuWnnjiOjcFhLetgAigAAly14sK/Wjlal7RPW6z8s0zqqtNGbfrvDyZUp4Zmbdttppv18IvHSugF0CKAADNwr7MPjanEVA0xCIqU0ysTiNAAAAP//Z",
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    }
+  ],
+  "goals": [],
+  "boards": [
+    {
+      "id": "4310bdf3c8",
+      "label": "ADHD",
+      "elements": [
+        "#adhd_check",
+        "#hyperactivity",
+        "#focus",
+        "#fidgety",
+        "#anxiety",
+        "#motivation",
+        "#energy",
+        "#mood",
+        "#stress"
+      ],
+      "active": true
+    }
+  ],
+  "dashboards": [
+    {
+      "label": "ADHD",
+      "widgets": [
+        {
+          "token": {
+            "id": "hyperactivity",
+            "type": "tracker",
+            "value": null,
+            "raw": "#hyperactivity",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "fc02154c7e269554ef72432c7673ae7d",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "mood",
+            "type": "tracker",
+            "value": null,
+            "raw": "#mood",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "4a27ec62953b156538c8578b9680ca66",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "stress",
+            "type": "tracker",
+            "value": null,
+            "raw": "#stress",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "47162c961d99e7ad1f15bf50816ff945",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "energy",
+            "type": "tracker",
+            "value": null,
+            "raw": "#energy",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "33eccdc4a7873c8caf1cf6b05506de9b",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        }
+      ],
+      "id": "e0deb2b3383332fdc84932955685e8a6",
+      "created": "2022-07-02T00:07:20.142Z"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+
+  <script lang="ts">
+    export let size:number = 24;
+  </script>
+  <svg height="{size}px" width="{size}px" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Star</title><path d="M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/></svg>
+  

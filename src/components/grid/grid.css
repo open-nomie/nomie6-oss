@@ -1,0 +1,29 @@
+.n-grid {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-height: 30vh;
+  padding: 10px 0;
+  align-items: flex-start;
+  justify-content: space-evenly;
+}
+.n-grid-split {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+.n-grid.framed {
+  background-color: var(--color-solid-2);
+  width: calc(100% - 16pt);
+  border-radius: 8pt;
+  padding: 8pt;
+  position: relative;
+  margin: 8pt;
+}
+.n-grid.framed .btn-close {
+  left: auto;
+  right: 10px;
+  top: 10px;
+}

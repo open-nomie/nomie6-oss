@@ -1,0 +1,366 @@
+{
+  "type": "template",
+  "id": "11053cbb2c2a8e543eea23dc46933267",
+  "name": "Mood Journaling",
+  "description": "Quickly track your mood, motivation, stress and anxiety. Comes with a mood dashboard and goal.",
+  "version": "6.0.12",
+  "trackables": [
+    {
+      "type": "tracker",
+      "id": "#mood",
+      "tracker": {
+        "id": "6ef79c0fb66e39ea3c0b0afdabdf6451",
+        "tag": "mood",
+        "label": "Mood",
+        "type": "range",
+        "color": "#8e2cf5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😉",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "minLabel":"Bad",
+        "maxLabel":"Good",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "is": "gt",
+            "sc": "1",
+            "v": 3,
+            "if": "value"
+          },
+          {
+            "v": 3,
+            "sc": "-1",
+            "is": "lt",
+            "if": "value"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#anxiety",
+      "tracker": {
+        "id": "c2c3eb6ef426f033d1caad1cea0086a8",
+        "tag": "anxiety",
+        "label": "Anxiety",
+        "type": "range",
+        "color": "#E91E63",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🔦",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "0",
+        "minLabel":"Low",
+        "maxLabel":"High",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "gt",
+            "v": 4,
+            "sc": "-1"
+          },
+          {
+            "v": 1,
+            "sc": "-1",
+            "if": "value",
+            "is": "gt"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "spirit"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#stress",
+      "tracker": {
+        "id": "bd2579beea14353cbe7b870f2ef73f3e",
+        "tag": "stress",
+        "label": "Stress",
+        "type": "range",
+        "color": "#d50000",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "😬",
+        "avatar": null,
+        "default": "2",
+        "max": "5",
+        "min": "0",
+        "minLabel":"None",
+        "maxLabel":"Lots",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "lte",
+            "v": 4,
+            "sc": "1"
+          },
+          {
+            "if": "value",
+            "is": "gt",
+            "v": 5,
+            "sc": "-1"
+          },
+          {
+            "if": "value",
+            "is": "lte",
+            "v": 4,
+            "sc": "1"
+          },
+          {
+            "is": "gt",
+            "sc": "-1",
+            "if": "value",
+            "v": 5
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#motivation",
+      "tracker": {
+        "id": "ab156ac0-ea0d-414f-aa86-9407710e20fd",
+        "tag": "motivation",
+        "label": "Motivation",
+        "type": "range",
+        "color": "#FF3D00",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🤑",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "mind"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#life_checkup",
+      "tracker": {
+        "id": "4c92e8cc-1a5b-46ce-bd78-590743cebcc9",
+        "tag": "life_checkup",
+        "label": "Life Checkup",
+        "type": "note",
+        "color": "#0D47A1",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👋",
+        "avatar": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#mood #anxiety #energy #motivation #stress",
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#energy",
+      "tracker": {
+        "id": "45fcffcd-0b6c-415c-a0e4-335cbe13bb1d",
+        "tag": "energy",
+        "label": "Energy",
+        "type": "range",
+        "color": "#64DD17",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "🥊",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "lt",
+            "v": 4,
+            "sc": -1
+          },
+          {
+            "sc": -1,
+            "is": "lt",
+            "if": "value",
+            "v": 4
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "spirit",
+          "body"
+        ]
+      },
+      "value": 1
+    }
+  ],
+  "goals": [
+    {
+      "id": "a2c5d031-81a0-48ec-80fa-7072db3de1de",
+      "tag": "#mood",
+      "duration": "day",
+      "target": 5,
+      "comparison": "gte"
+    }
+  ],
+  "boards": [
+    {
+      "id": "ee223ff38b",
+      "label": "Mood",
+      "elements": [
+        "#life_checkup",
+        "#anxiety",
+        "#motivation",
+        "#mood",
+        "#stress"
+      ],
+      "active": true
+    }
+  ],
+  "dashboards": [
+    {
+      "label": "Mood",
+      "widgets": [
+        {
+          "token": {
+            "id": "mood",
+            "type": "tracker",
+            "value": null,
+            "raw": "#mood",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "5f00a6ea-8be4-485e-b613-c4b5f6587cde",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "anxiety",
+            "type": "tracker",
+            "value": 1,
+            "raw": "#anxiety",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "982e7b1c-7b60-4d8b-b2b7-1060432e31aa",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "stress",
+            "type": "tracker",
+            "value": 6,
+            "raw": "#stress",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "8d745658-8d26-4fae-818c-0f44532aae47",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "motivation",
+            "type": "tracker",
+            "value": 5,
+            "raw": "#motivation",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "3f809a4343cfd011f799901476e212e2",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        }
+      ],
+      "id": "42e182f4b2a7e9073279544bd7f9e2b3",
+      "created": "2022-07-03T14:50:05.286Z"
+    }
+  ]
+}

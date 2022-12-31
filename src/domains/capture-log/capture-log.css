@@ -1,0 +1,237 @@
+#note-capture {
+  @apply pt-2 pb-1;
+  
+}
+.capture-log .tracker-list {
+  margin-top: -10px !important;
+}
+
+.capture-wrapper .mask-textarea .bottom-section {
+  @apply pointer-events-auto;
+  @apply hidden;
+  @apply px-1;
+  @apply opacity-100;
+  @apply flex items-center;
+  /* @apply bg-white dark:bg-black; */
+  @apply rounded-t-none rounded-b-2xl;
+}
+
+.capture-wrapper .save-button {
+  @apply rounded-xl;
+  @apply text-white;
+  text-shadow:0px 1px 4px rgba(0,0,0,0.23);
+  @apply bg-gradient-to-b from-green-500  to-green-600;
+  @apply py-1 px-3;
+  @apply flex items-center flex-grow-0 flex-shrink-0;
+  @apply h-8;
+  @apply ml-2;
+}
+.capture-wrapper .save-button:active {
+  @apply scale-95;
+  @apply bg-gradient-to-b from-green-500 via-green-600 to-green-700;
+  
+}
+
+.capture-wrapper .mask-textarea.focused,
+.capture-wrapper .mask-textarea.populated {
+  @apply rounded-xl;
+}
+
+.capture-wrapper .mask-textarea .top-section {
+  @apply overflow-y-auto;
+}
+
+.capture-wrapper .mask-textarea .bottom-section {
+  @apply flex;
+  @apply items-center;
+  @apply flex-grow-0;
+  @apply flex-shrink-0;
+  @apply h-0;
+}
+
+.capture-wrapper .mask-textarea.focused .bottom-section,
+.capture-wrapper .mask-textarea.populated .bottom-section {
+  @apply flex;
+  @apply items-center;
+  @apply flex-grow-0;
+  @apply flex-shrink-0;
+  @apply h-auto;
+}
+
+.capture-wrapper .mask-textarea.focused .clear-button,
+.capture-wrapper .mask-textarea.populated .clear-button {
+  @apply w-9 h-9;
+  @apply rounded-full;
+  @apply flex items-center justify-center;
+}
+
+
+
+.capture-wrapper .mask-textarea.focused {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+
+.capture-log .mask-textarea.populated {
+  @apply bg-green-50 dark:bg-gray-700 dark:bg-opacity-20;
+  @apply border border-gray-800 border-opacity-30;
+}
+
+
+
+.capture-log .mask-textarea {
+  @apply transition-all duration-200;
+  @apply bg-gray-300 dark:bg-black bg-opacity-50 dark:bg-opacity-40;
+  @apply rounded-3xl;
+  min-height:40px;
+  /* @apply h-10; */
+}
+.capture-log .mask-textarea textarea { 
+  @apply px-3 py-2
+}
+.capture-log .mask-textarea.blurred textarea {
+  @apply flex-shrink;
+  @apply h-10;
+
+  
+}
+.capture-log .mask-textarea.focused,
+.capture-log .mask-textarea.populated {
+  @apply ring-2 ring-opacity-100 ring-primary-500;
+  @apply h-auto;
+}
+.capture-log.positive .mask-textarea.focused,
+.capture-log.positive .mask-textarea.populated {
+  @apply ring-green-500;
+}
+.capture-log.negative .mask-textarea.focused,
+.capture-log.negative .mask-textarea.populated {
+  @apply ring-red-500;
+}
+.capture-log .mask-textarea .clear-button {
+  @apply hidden;
+}
+
+.capture-log .mask-textarea .action-button {
+  margin-bottom: 7px;
+}
+
+
+
+.capture-log {
+  @apply px-4;
+  position: relative;
+  z-index: 1;
+  @apply pb-1;
+  @apply xl:pb-6;
+}
+/* .capture-wrapper .advanced {
+  position: relative;
+  z-index: 1200;
+  margin-top: 10px;
+  padding-top: 1px;
+  padding-bottom: 10px;
+  @apply bg-green-500;
+} */
+.capture-wrapper .mask-textarea .action-button {
+  margin-bottom: 7px;
+}
+.capture-wrapper .save-progress {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  height: 4px;
+  background-color: var(--color-green);
+  opacity: 0;
+  width: 0px;
+  transition: all 700ms ease-out;
+}
+.capture-wrapper .save-progress.saving {
+  background-color: var(--color-green);
+  opacity: 1;
+  width: 100%;
+}
+.capture-wrapper .save-progress.saved {
+  transition: none;
+  background-color: var(--color-green);
+  opacity: 0;
+  width: 0%;
+}
+.capture-wrapper .save-progress.clear {
+  transition: none;
+  width: 0;
+}
+
+
+.capture-wrapper .mask-textarea.populated {
+  box-sizing: border-box;
+}
+/* .capture-wrapper .mask-textarea.populated .save-button {
+  display: inline-flex;
+} */
+.capture-wrapper .mask-textarea textarea {
+  border: none;
+  background-color: transparent;
+  width: 100%;
+
+  /* @apply px-4;
+  @apply pt-1; */
+  @apply text-black dark:text-white;
+  @apply text-lg;
+  @apply flex;
+  @apply flex-col;
+  @apply w-full;
+  @apply justify-center;
+
+  max-height: 200px;
+  @apply rounded-2xl;
+  
+  @apply overflow-hidden;
+  @apply shadow-inner;
+  /* @apply border; */
+  /* @apply border-gray-200 dark:border-gray-700; */
+  @apply border-opacity-60;
+  transition: all 0.2s ease-in-out;
+}
+
+
+
+.mask-textarea .mask-textarea-wrapper {
+  @apply flex items-start;
+  @apply transition-all duration-200;
+  
+}
+
+.capture-log .mask-textarea.empty.blurred {
+  @apply max-h-10;
+}
+
+.capture-wrapper .mask-textarea.focused textarea {
+  @apply flex-shrink;
+  @apply bg-transparent;
+
+}
+
+.mask-textarea.focused .mask-textarea-wrapper:after,
+.mask-textarea.populated .mask-textarea-wrapper:after {
+  @apply transition-all duration-200;
+  @apply opacity-0;
+  @apply pointer-events-none;
+}
+
+.mask-textarea .mask-textarea-wrapper:after {
+  content:attr(data-placeholder);
+  @apply transition-all duration-200;
+  @apply pointer-events-none;
+  @apply absolute top-0 bottom-0 right-8 left-4;
+  @apply flex items-center;
+  @apply text-gray-500;
+  @apply opacity-100;
+  
+}
+
+.capture-wrapper .mask-textarea textarea:focus,
+.capture-wrapper .mask-textarea textarea:active {
+  outline: none;
+
+}

@@ -1,0 +1,545 @@
+{
+  "type": "template",
+  "id": "9b6c035048eb1cbeb9258d85b57df071",
+  "name": "Self Care",
+  "description": "Take care of yourself with this self-care template.",
+  "version": "6.0.12",
+  "trackables": [
+    {
+      "type": "tracker",
+      "id": "#brush_teeth",
+      "tracker": {
+        "id": "ac881169aa0d7653fa60cd6291bf2708",
+        "tag": "brush_teeth",
+        "label": "brush teeth",
+        "type": "tick",
+        "color": "#FF3D00",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🦷",
+        "avatar": null,
+        "default": null,
+        "score": "1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": true,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#energy",
+      "tracker": {
+        "id": "76520bf848435f7476e09b14cf4813be",
+        "tag": "energy",
+        "label": "Energy",
+        "type": "range",
+        "color": "#64DD17",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "🥊",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "minLabel":"Low",
+        "maxLabel":"High",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "lt",
+            "v": 4,
+            "sc": -1
+          },
+          {
+            "sc": -1,
+            "is": "lt",
+            "if": "value",
+            "v": 4
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "spirit",
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#headache",
+      "tracker": {
+        "id": "c683eec203f8e252f8f1f3412013cfd5",
+        "tag": "headache",
+        "label": "Headache",
+        "type": "range",
+        "color": "#FF6900",
+        "math": "mean",
+        
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🤯",
+        "avatar": null,
+        "default": null,
+        "max": "10",
+        "min": "1",
+        "minLabel":"Slight",
+        "maxLabel":"Awful",
+        "step": "1",
+        "score": "-1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#meditation",
+      "tracker": {
+        "id": "296442133a229ea47a7166e7d470b945",
+        "tag": "meditation",
+        "label": "Meditation",
+        "type": "timer",
+        "color": "#bd2da1",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "timer",
+        "emoji": "🧘🏽‍♀️",
+        "avatar": null,
+        "default": null,
+        "score": "2",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "spirit"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#mood",
+      "tracker": {
+        "id": "6ef79c0fb66e39ea3c0b0afdabdf6451",
+        "tag": "mood",
+        "label": "Mood",
+        "type": "range",
+        "color": "#8e2cf5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😉",
+        "avatar": null,
+        "default": "3",
+        "max": "5",
+        "min": "1",
+        "minLabel":"Bad",
+        "maxLabel":"Great",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "is": "gt",
+            "sc": "1",
+            "v": 5,
+            "if": "value"
+          },
+          {
+            "v": 5,
+            "sc": "-1",
+            "is": "lt",
+            "if": "value"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind",
+          "body"
+        ]
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#peed",
+      "tracker": {
+        "id": "cefaf1e3fc2b9e8e932e2541d6aea414",
+        "tag": "peed",
+        "label": "Peed",
+        "type": "tick",
+        "color": "#FFCA28",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💦",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#pooped",
+      "tracker": {
+        "id": "8cf0af78ae7bd31ca169c6b461e31af4",
+        "tag": "pooped",
+        "label": "Pooped",
+        "type": "note",
+        "color": "#8D6E63",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💩",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#po_amount #po_softness",
+        "hidden": false,
+        "picks": [
+          "Hardness:",
+          "#phrd(1) mud",
+          "#phrd(2) mush",
+          "#phrd(3) normal ",
+          "#phrd(4) hard",
+          "Amount:",
+          "#po(1) little",
+          "#po(2) normal",
+          "#po(3) lots",
+          "Other:",
+          "#pb(0.5)",
+          "#pb(1)",
+          "#pb(2)"
+        ],
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#po_amount",
+      "tracker": {
+        "id": "ed3ede022373169ee4a29cc55af3ae06",
+        "tag": "po_amount",
+        "label": "Amount",
+        "type": "range",
+        "color": "#795548",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💩⚖️",
+        "avatar": null,
+        "default": null,
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#po_softness",
+      "tracker": {
+        "id": "c7492bdee6c5c86819c5b74dbe941aa0",
+        "tag": "po_softness",
+        "label": "Softness",
+        "type": "range",
+        "color": "#3E2723",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💩",
+        "avatar": null,
+        "default": null,
+        "max": "5",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_quality",
+      "tracker": {
+        "id": "42f614c5a5871f07c5a247f038f4c8a1",
+        "tag": "sleep_quality",
+        "label": "Sleep Quality",
+        "type": "range",
+        "color": "#546E7A",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "percent",
+        "emoji": "🌚",
+        "avatar": null,
+        "default": "80",
+        "max": "100",
+        "min": "0",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "gt",
+            "v": 65,
+            "sc": "1"
+          },
+          {
+            "if": "value",
+            "is": "lte",
+            "v": 50,
+            "sc": "-1"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#water",
+      "tracker": {
+        "id": "97ceaea694840fb1c4dbeab66ecf6ca3",
+        "tag": "water",
+        "label": "Water",
+        "type": "value",
+        "color": "#0693E3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "fluidounce",
+        "emoji": "💧",
+        "avatar": null,
+        "default": "12",
+        "score": "1",
+        "score_calc": [],
+        "goal": {
+          "time": "day",
+          "is": "gte",
+          "v": 48
+        },
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#walk",
+      "tracker": {
+        "id": "36e674b8ff44d4244aeed65f5b864f5a",
+        "tag": "walk",
+        "label": "Walk",
+        "type": "value",
+        "color": "#369DD3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mile",
+        "emoji": "🚶",
+        "avatar": null,
+        "default": "1.5",
+        "score": "1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#weight",
+      "tracker": {
+        "id": "0a987811392875a0f4bb2452260114d8",
+        "tag": "weight",
+        "label": "Weight",
+        "type": "value",
+        "color": "#FF6900",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "pound",
+        "emoji": "⚖️",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    }
+  ],
+  "goals": [],
+  "boards": [
+    {
+      "id": "d759dca449",
+      "label": "Care",
+      "elements": [
+        "#brush_teeth",
+        "#energy",
+        "#headache",
+        "#meditation",
+        "#mood",
+        "#peed",
+        "#pooped",
+        "#sleep_quality",
+        "#water",
+        "#walk",
+        "#weight"
+      ],
+      "active": true
+    }
+  ],
+  "dashboards": [
+    {
+      "label": "Care",
+      "widgets": [
+        {
+          "token": {
+            "id": "weight",
+            "type": "tracker",
+            "value": null,
+            "raw": "#weight",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "ebfdc72152352bde9c6f7a61a46a9834",
+          "includeAvg": false,
+          "size": "sm",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "last-used",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "water",
+            "type": "tracker",
+            "value": null,
+            "raw": "#water",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "a56a6ca319e79a15cdf8366750039821",
+          "includeAvg": false,
+          "size": "sm",
+          "timeFormat": "h:mm a",
+          "timeRange": "today",
+          "type": "value",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "weight",
+            "type": "tracker",
+            "value": null,
+            "raw": "#weight",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "8969443ce39a3bc241d0ad28f7c098a5",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-90",
+          "type": "barchart",
+          "loading": false
+        },
+        {
+          "token": {
+            "id": "sleep_quality",
+            "type": "tracker",
+            "value": null,
+            "raw": "#sleep_quality",
+            "prefix": "#"
+          },
+          "tokens": [
+            null
+          ],
+          "id": "b39e95e932f4d50b55277055de21dfd7",
+          "includeAvg": false,
+          "size": "md",
+          "timeFormat": "h:mm a",
+          "timeRange": "last-30",
+          "type": "barchart",
+          "loading": false
+        }
+      ],
+      "id": "96d1fb3541def99ffa7ac9ad45b8191e",
+      "created": "2022-07-03T19:10:38.854Z"
+    }
+  ]
+}

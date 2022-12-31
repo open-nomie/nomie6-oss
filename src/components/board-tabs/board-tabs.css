@@ -1,0 +1,30 @@
+.n-board-tabs button {
+  @apply flex items-center justify-center;
+  @apply rounded-full;
+  @apply py-1 px-1;
+  @apply text-base font-medium;
+  @apply text-gray-800 dark:text-gray-200;
+  @apply transform;
+  @apply transition-all;
+}
+.n-board-tabs {
+  @apply h-10;
+  @apply shadow-inner lg:shadow-none;
+  @apply rounded-full;
+  @apply overflow-hidden;
+  @apply w-full lg:w-auto;
+}
+.n-board-tabs .wrapper {
+  @apply px-2;
+  @apply h-10;
+  @apply items-center;
+}
+.n-board-tabs button.selected {
+  @apply bg-white dark:bg-black;
+  @apply text-primary-500;
+  @apply shadow-md;
+  @apply px-4 py-1 rounded-full;
+}
+.n-board-tabs button {
+  @apply whitespace-nowrap;
+}
