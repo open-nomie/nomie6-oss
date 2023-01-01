@@ -15,7 +15,7 @@
   import { Prefs } from '../preferences/Preferences'
 
   import { onMount } from 'svelte'
-  import { getAllLibraryTrackers, LibraryTrackerType } from './library-manager/LibraryManagerStore'
+  import type { LibraryTrackerType } from './library-manager/LibraryManagerStore'
   import LibraryTrackerItem from './library-tracker-item.svelte'
   import LibraryTrackerItemDetails from './library-tracker-item-details.svelte'
   import { UOMClass } from '../uom/uom.class'
@@ -46,9 +46,10 @@
   })
 
   $: if ($TrackerLibrary && !libraryTrackers.length && ready) {
-    getAllLibraryTrackers().then((lts: Array<LibraryTrackerType>) => {
-      libraryTrackers = lts.sort((a, b) => (a?.title.toLowerCase() > b?.title.toLowerCase() ? 1 : -1))
-    })
+    // getAllLibraryTrackers().then((lts: Array<LibraryTrackerType>) => {
+    //   libraryTrackers = lts.sort((a, b) => (a?.title.toLowerCase() > b?.title.toLowerCase() ? 1 : -1))
+    // })
+    libraryTrackers = []
   }
   let activeId: any
 
@@ -153,11 +154,11 @@
     <SearchBar bind:searchTerm />
     <div class="h-1">&nbsp;</div>
   </header>
-  {#if libraryTrackers.length == 0}
+  <!-- {#if libraryTrackers.length == 0}
     <div class="flex-grow flex-shrink justify-center items-center flex h-75vh">
       <Spinner size={32} />
     </div>
-  {/if}
+  {/if} -->
 
   {#if searchTerm}
     <List className="mb-6">
@@ -193,7 +194,7 @@
     <AvailableTemplatesList />
   </List>
 
-  <List solo outside title="Individual Trackers">
+  <!-- <List solo outside title="Individual Trackers">
     {#each libraryTrackers as libraryTracker, index}
       <LibraryTrackerItem
         {libraryTracker}
@@ -216,7 +217,7 @@
         </div>
       {/if}
     {/each}
-  </List>
+  </List> -->
 </BackdropModal>
 
 <style global lang="postcss">
