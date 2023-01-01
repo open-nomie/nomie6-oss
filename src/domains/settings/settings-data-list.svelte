@@ -25,7 +25,6 @@
   import { showImportModal } from '../import-export/ImporterStore'
   import { showToast } from '../../components/toast/ToastStore'
 
-  import S3Options from '../storage/views/s3-options.svelte'
   import BackupListItems from '../../components/backup-message/backup-list-items.svelte'
 
   // let fileInputF
@@ -82,8 +81,6 @@
         🗄
       {:else if $Prefs.storageType === 'firebase'}
         ☁️
-      {:else if $Prefs.storageType === 's3'}
-        ☁️
       {:else if $Prefs.storageType == 'pouchdb'}
         🛋
       {/if}
@@ -94,9 +91,6 @@
   {#if $Prefs.storageType === 'pouchdb'}
     <Divider left={32} />
     <PouchdbSettings />
-  {:else if $Prefs.storageType === 's3'}
-    <Divider left={32} />
-    <S3Options />
   {/if}
 </List>
 
