@@ -68,7 +68,7 @@
         return trackable
       })
       .sort((a, b) => {
-        if ((activeBoard?.id || "").substring(0, 1) === '_') {
+        if ((activeBoard?.id || '').substring(0, 1) === '_') {
           let aUsage = usage[a.tag]?.last?.d ? new Date(usage[a.tag].last.d) : 1
           let bUsage = usage[b.tag]?.last?.d ? new Date(usage[b.tag].last.d) : 0
           return aUsage > bUsage ? -1 : 1
@@ -308,7 +308,8 @@
                   <div class="text-center  text-gray-500 dark:text-gray-400 leading-snug px-6 mb-6 lg:mb-10 flex-fill ">
                     <h1 class="text-black dark:text-white font-bold mb-1">Empty.</h1>
                     <p class="text-xs">
-                      This is your {board.label} board; used to display your trackable buttons. Get started by adding a trackable below.
+                      This is your {board.label} board; used to display your trackable buttons. Get started by adding a trackable
+                      below.
                     </p>
                   </div>
                 </div>
@@ -320,7 +321,8 @@
                   <span class="text-primary-600 dark:text-primary-400 underline inline">create your own</span> from scratch.
                 </p> -->
 
-                <Menu size="sm"
+                <Menu
+                  size="sm"
                   buttons={getEmptyBoardMenu()}
                   className="max-w-xs mx-auto rounded-2xl border border-gray-500 border-opacity-30"
                 />
