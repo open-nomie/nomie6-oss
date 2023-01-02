@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from 'svelte-navigator'
   import FileBrowser from './file-browser.svelte'
-  import DynamicPage from '../DynamicPage.svelte'
+  // import DynamicPage from '../DynamicPage.svelte'
   // import Messages from './Messages.svelte'
   import Csv from './export/csv.svelte'
 
@@ -9,6 +9,20 @@
   // import Track from './track.svelte'
   import { Prefs } from '../domains/preferences/Preferences'
   import RouteControl from './RouteControl.svelte'
+  import Dashboard from './dashboard.svelte'
+  import Track from './track.svelte'
+  import Timeline from './Timeline.svelte'
+  import Goals from './Goals.svelte'
+  import Analytics from './Analytics.svelte'
+  import Tests from './tests/tests.svelte'
+  import Uoms from './Uoms.svelte'
+  import Awards from './Awards.svelte'
+  // import Language from './tests/language.svelte'
+  import Faq from './faq.svelte'
+  import History from './history.svelte'
+  import Settings from './settings.svelte'
+  import Export from './export.svelte'
+  import Setup from './setup.svelte'
 </script>
 
 <Router>
@@ -16,85 +30,74 @@
   <Route path="/">
     {#if $Prefs.startPage === 'track'}
       <!-- <Track /> -->
-      <DynamicPage route="track" />
+      <Track />
     {:else if $Prefs.startPage === 'dashboard'}
-      <DynamicPage route="dashboard" />
+      <Dashboard />
     {:else if $Prefs.startPage === 'timeline'}
-      <DynamicPage route="Timeline" />
+      <Timeline />
     {:else if $Prefs.startPage === 'history'}
-      <DynamicPage route="Timeline" />
+      <Timeline />
     {:else if $Prefs.startPage === 'goals'}
-      <DynamicPage route="Goals" />
+      <Goals />
     {:else}
       <!-- <Track /> -->
-      <DynamicPage route="track" />
+      <Track />
     {/if}
   </Route>
   <Route path="/track">
     <!-- <Track /> -->
-    <DynamicPage route="track" />
+    <Track />
   </Route>
   <Route path="/analytics">
-    <DynamicPage route="Analytics" />
+    <Analytics />
   </Route>
-  <Route path="/api">
-    <DynamicPage route="nomie-api" />
-  </Route>
+
   <Route path="/timeline">
-    <DynamicPage route="Timeline" />
+    <Timeline />
   </Route>
   <Route path="/goals">
-    <DynamicPage route="Goals" />
+    <Goals />
   </Route>
   <Route path="/test">
-    <DynamicPage route="tests/tests" />
+    <Tests />
   </Route>
-  <Route path="/cloud-api">
-    <DynamicPage route="cloud-api-page" />
-  </Route>
+
   <Route path="/uoms">
-    <DynamicPage route="Uoms" />
+    <Uoms />
   </Route>
   <Route path="/awards">
-    <DynamicPage route="Awards" />
+    <Awards />
   </Route>
-  <Route path="/messages">
-    <DynamicPage route="messages" />
-    <!-- <Messages /> -->
-  </Route>
-  <Route path="/lang">
-    <DynamicPage route="tests/language" />
-  </Route>
+
+  <!-- <Route path="/lang">
+    <Language />
+  </Route> -->
   <Route path="/dashboard">
-    <DynamicPage route="dashboard" />
+    <Dashboard />
   </Route>
   <Route path="/faq">
-    <DynamicPage route="faq" />
+    <Faq />
   </Route>
   <Route path="/history">
-    <DynamicPage route="history" />
+    <History />
   </Route>
   <Route path="/history/:date">
-    <DynamicPage route="history" />
+    <History />
   </Route>
 
   <Route path="/settings">
-    <DynamicPage route="settings" />
+    <Settings />
   </Route>
   <Route path="/settings/export">
-    <DynamicPage route="export" />
+    <Export />
   </Route>
   <Route path="/settings/export/csv">
-    <!-- <DynamicPage route="export/csv" /> -->
     <Csv />
-  </Route>
-  <Route path="/library/helper">
-    <DynamicPage route="LibraryManager" />
   </Route>
   <Route path="/files/*path" let:params>
     <FileBrowser path={params.path} />
   </Route>
   <Route path="/setup">
-    <DynamicPage route="setup" />
+    <Setup />
   </Route>
 </Router>

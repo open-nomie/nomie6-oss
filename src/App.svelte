@@ -8,7 +8,7 @@
 
   import { onMount } from 'svelte'
 
-  import DynamicPage from './DynamicPage.svelte'
+  // import DynamicPage from './DynamicPage.svelte'
 
   // Vendors
   import { gestures } from '@composi/gestures'
@@ -55,6 +55,7 @@
   import { trackLaunch } from './domains/preferences/LaunchCount'
   import PluginLoader from './domains/plugins/plugin-loader.svelte'
   import { PluginStore } from './domains/plugins/PluginStore'
+  import Setup from './domains/setup/setup.svelte'
 
   // initiailze gestures
   gestures()
@@ -211,7 +212,8 @@
 <Tailwindcss />
 
 {#if onBoarding}
-  <DynamicPage route="setup" />
+  <Setup />
+  <!-- <DynamicPage route="setup" /> -->
 {/if}
 
 {#if !onBoarding && $Prefs.storageType && !loading}
