@@ -1,7 +1,5 @@
 <script lang="ts">
-  import Backdrop from '@/components/backdrop/backdrop.svelte'
   import { useRegisterSW } from 'virtual:pwa-register/svelte'
-  import BackdropModal from '../backdrop/backdrop-modal.svelte'
 
   const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
     onRegistered(swr: ServiceWorkerRegistration) {
@@ -79,7 +77,7 @@
     right: 0;
     bottom: 0;
     margin: 16px;
-    min-width:200px;
+    min-width: 200px;
     @apply p-4;
     border: 1px solid #8885;
     @apply rounded-xl;

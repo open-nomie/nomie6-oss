@@ -38,12 +38,9 @@ export default defineConfig({
   },
   plugins: [
     svelte({
-      preprocess: sveltePreprocess({
-        postcss: true,
-      }),
+
     }),
     loadVersion(),
-    // rollupPluginsSvelte({}),
     svelteSVG({
       svgoConfig: {}, // See https://github.com/svg/svgo#configuration
     }),
