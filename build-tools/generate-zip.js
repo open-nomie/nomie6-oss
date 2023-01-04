@@ -36,7 +36,7 @@ const zipDirectory = (sourceDir, targetDir, zipFile) => {
 
     outputZip.on('error', function(err) {
       reject(err)
-    })
+    }) 
 
     archive.pipe(outputZip)
     archive.glob(
