@@ -6,6 +6,14 @@ Since Closing down nomie (https://nomie.app), I wanted to provide it as an open 
 
 ![Nomie 6 Github](https://shareking.s3.amazonaws.com/Screen-Shot-2022-12-31-11-20-09.31-w0qBQwGRkANjPuv5Xtl1xFHYFIg0GgJSYluiKMI5v69Ak7Lgbk5g0mR9bx9QrdiRlUVQrmXGb4T1AwIA02oApD3YfL97thUL0Kl3.png)
 
+## Downloading and running on any HTTP server
+
+Nomie 6 can be run on any web server without special server side code.
+
+Latest build: `bin/nomie6-oss.latest.zip`
+
+## Building and Running
+
 You'll need Node >= 16 and NPM. I have not tested running this on Windows.
 
 ```bash
