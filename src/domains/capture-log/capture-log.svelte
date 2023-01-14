@@ -360,7 +360,6 @@
                 placeholder={isPopulated || isFocused ? Lang.t('general.whats-up', "What's up?") : ''}
                 disabled={saving || saved}
                 bind:this={textarea}
-                autofocus
                 on:input={monitorNoteChange}
                 on:keydown={methods.keyPress}
                 on:focus={() => {
