@@ -106,7 +106,6 @@ export const createNewBoard = async () => {
 export const getAddContextButton = (board: UniboardType) => {
   return {
     title: Lang.t('general.new-context', ' Add New +Context'),
-    awardRequired: 'open-streak-1',
     icon: BookmarksOutline,
     async click() {
       await 200
@@ -418,7 +417,6 @@ export const getAddPersonButton = (board?: UniboardType) => {
   return {
     title: `${Lang.t('general.new-person', 'Add New @Person')}`,
     icon: PeopleOutline,
-    awardRequired: 'open-streak-1',
     async click() {
       await wait(300)
       addNewPerson()
@@ -471,7 +469,6 @@ export const browseLibraryButton = {
 /* Creating a new tab button. */
 export const newTabButton = {
   title: `${Lang.t('general.new-tab', 'Add New Tab')}`,
-  // awardRequired: 'open-streak-1',
   icon: TabsOutline,
   divider: true,
   async click() {
