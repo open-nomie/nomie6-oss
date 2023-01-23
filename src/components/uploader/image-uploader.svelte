@@ -15,8 +15,8 @@
 
   export let className = ''
   export let label: string = 'Select'
-  export let maxW = 64
-  export let maxH = 64
+  export let maxW = 64*4
+  export let maxH = 64*4
 
   let output: string
 
@@ -36,7 +36,8 @@
       canvas.width = iwScaled
       canvas.height = ihScaled
       ctx.drawImage(img, 0, 0, iwScaled, ihScaled)
-      output = canvas.toDataURL('image/jpeg', 0.12)
+      output = canvas.toDataURL('image/webp', 0.2)
+      console.log(output, output.length);
       dispatch('image', output)
     }
     img.src = URL.createObjectURL(e.target.files[0])
