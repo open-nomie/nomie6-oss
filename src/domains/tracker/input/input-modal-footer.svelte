@@ -50,7 +50,7 @@
             >
               <IonIcon icon={StopSolid} size={32} className="text-white" />
             </button>
-          {:else if !tracker.started && !value}
+          {:else if !tracker.started && !tracker.timeTracked}
             <button
               aria-label="Start Timer"
               type="button"

@@ -49,6 +49,7 @@ export type ITracker = {
   note?: string // Content to include when a note tracker
   hidden?: boolean // Hidden from All Board
   started?: number // If its started (and a timer based tracker)
+  timeTracked?: number
   picks?: Array<string> // Picks for a Picker type of tracker
   focus?: Array<IFocusUnit>
 }
@@ -78,6 +79,7 @@ export default class TrackerClass {
   public note?: string // Content to include when a note tracker
   public hidden?: boolean // Hidden from All Board
   public started?: number // If its started (and a timer based tracker)
+  public timeTracked?: number // amount of time previously tracker if paused (and a timer based tracker)
   public picks?: Array<string> // Picks for a Picker type of tracker
   public _dirty?: boolean
   public focus?: Array<IFocusUnit>
@@ -142,6 +144,7 @@ export default class TrackerClass {
     // If it's a timer, set if started else null
     if (this.type === 'timer') {
       this.started = starter.started
+      this.timeTracked = starter.timeTracked || 0
     }
 
     this.picks = starter.picks || undefined

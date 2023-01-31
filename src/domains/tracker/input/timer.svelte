@@ -41,7 +41,7 @@
   {#if tracker.started}
     <div class="flex flex-col items-center justify-center">
       <div class="filler" />
-      <Counter started={tracker.started} lg className="py-5 bg-light" on:change={(event) => {}} />
+      <Counter initialDuration={tracker.timeTracked} started={tracker.started} lg className="py-5 bg-light" />
       <div class="filler" />
     </div>
   {:else}
@@ -54,9 +54,9 @@
           dispatch('change', event.detail)
         }}
       />
-      {#if !tracker.started && value}
+      {#if !tracker.started && tracker.timeTracked}
         <button
-          aria-label="Start Timer"
+          aria-label="Resume Timer"
           on:click={() => {
             dispatch('forceStart')
           }}
