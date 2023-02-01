@@ -232,11 +232,11 @@
             >
               <NTimer
                 {tracker}
-                bind:value={data.value}
+                value={data.value}
                 on:forceStart={methods.startTimer}
                 on:change={async (event) => {
                   data.value = event.detail
-                  tracker = await resetTimer(tracker)
+                  tracker = await resetTimer(tracker, event.detail)
                 }}
               />
             </div>

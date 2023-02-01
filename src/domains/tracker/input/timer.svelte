@@ -7,12 +7,12 @@
    */
 
   // svelte
-  import { onMount } from 'svelte'
   import { createEventDispatcher } from 'svelte'
 
   // Components
   import Counter from '../../../components/counter/counter.svelte'
   import ManualTime from '../../../components/counter/manual-time.svelte'
+  import type TrackerClass from '../../../modules/tracker/TrackerClass'
 
   // Stores
 
@@ -22,19 +22,8 @@
   const dispatch = createEventDispatcher()
 
   // Props
-  export let value
-  export let tracker: any
-
-  // Data
-  let data = {
-    tempValue: (value || '') + '' || '',
-    changed: false,
-    started: tracker.started,
-  }
-
-  onMount(() => {
-    data.tempValue = value
-  })
+  export let value: number
+  export let tracker: TrackerClass
 </script>
 
 <div class="n-timer-input w-full">
@@ -54,7 +43,7 @@
           dispatch('change', event.detail)
         }}
       />
-      {#if !tracker.started && tracker.timeTracked}
+      {#if !tracker.started && value}
         <button
           aria-label="Resume Timer"
           on:click={() => {
