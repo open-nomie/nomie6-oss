@@ -16,14 +16,12 @@
 
   let textarea: any
   export let value: string
-  export let autofocus: boolean
   export let id: string
   const emit = createEventDispatcher()
 </script>
 
 <Textarea
   aria-label="Note entry field"
-  {autofocus}
   {id}
   on:inserted={async (evt) => {
     const tag = evt.detail.item.original.key
