@@ -1,7 +1,7 @@
 <script lang="ts">
 
 
-
+  import { onMount } from 'svelte'
   import { CloseOutline } from '../../components/icon/nicons'
   import { createEventDispatcher } from 'svelte'
   import { DashboardClass } from './dashboard-class'
@@ -9,19 +9,26 @@
   import { Interact } from '../../store/interact'
   import { Lang } from '../../store/lang'
   import { TrackableStore } from '../trackable/TrackableStore'
-  import { widgetTypes } from './widget/widget-types'
+  import { getWidgetTypes , IWidgetType } from './widget/widget-types'
   import Button from '../../components/button/button.svelte'
   import Container from '../../components/container/container.svelte'
   import Input from '../../components/input/input.svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import SortableList2 from '../../components/sortable-list/sortable-list2.svelte'
   import TrackablePill from '../trackable/trackable-pill.svelte'
+  import { PluginStore } from '../plugins/PluginStore'
 
   export let dashboard: DashboardClass
 
   const dispatch = createEventDispatcher()
 
   let workingDashboard: DashboardClass
+  let allWidgetTypes: Array<IWidgetType> = []
+  let mounted = false
+
+  $: if (mounted && !allWidgetTypes.length) {
+    allWidgetTypes = getWidgetTypes($PluginStore)
+  }
 
   $: if (dashboard && !workingDashboard) {
     workingDashboard = new DashboardClass(dashboard)
@@ -35,6 +42,10 @@
     }
     workingDashboard.widgets = workingDashboard.widgets
   }
+
+  onMount(() => {
+    mounted = true
+  })
 </script>
 
 <section class="max-w-full w-96 lg:w-full lg:max-w-screen-xl mx-auto">
@@ -93,8 +104,13 @@
           {item.token.raw}
         {/if}
         <div class="text-gray-500 text-sm">
-          {widgetTypes.find((a) => a.id === item.type)?.label}
+        {#if item.type == "plugin"}
+          <span class="text-2xl">{allWidgetTypes.find((a) => a.data && a.data.pluginId === item.data.pluginId)?.emoji}</span>
+          <span> {allWidgetTypes.find((a) => a.data && a.data.pluginId === item.data.pluginId)?.label}</span>
+        {:else}
+          {allWidgetTypes.find((a) => a.id === item.type)?.label}
           {item.timeRange}
+        {/if}
         </div>
       </div>
     </SortableList2>
