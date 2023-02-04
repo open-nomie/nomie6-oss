@@ -83,7 +83,7 @@ import { PluginStore } from "../../../plugins/PluginStore";
   const saveWidget = async () => {
     try {
 
-      if(![...activeType.requires, ...activeType.optional].indexOf('timeframe')) {
+      if([...activeType.requires, ...activeType.optional].indexOf('timeframe') === -1) {
         editingWidget.timeRange = undefined;
       }
 

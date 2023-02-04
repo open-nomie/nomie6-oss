@@ -56,6 +56,7 @@
   import PluginLoader from './domains/plugins/plugin-loader.svelte'
   import { PluginStore } from './domains/plugins/PluginStore'
   import Setup from './domains/setup/setup.svelte'
+  import locate from './modules/locate/locate'
 
   // initiailze gestures
   gestures()
@@ -157,6 +158,16 @@
     wait(200).then(() => {
       hideSplashScreen()
     })
+
+    /**
+     * Fetch location onload if configured
+     * This caches a location to speed up Log creation on some mobile devices
+     */
+    if ($Prefs.alwaysLocate) {
+      // Get the Location
+      locate().catch((e) => console.warn('Error fetching initial onload location', e))
+    }
+
     Storage.init().then(async () => {
       // await initGoals()
       wait(2000).then(() => {

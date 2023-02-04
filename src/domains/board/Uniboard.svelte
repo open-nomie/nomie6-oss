@@ -192,7 +192,6 @@
     !lastActiveId.length &&
     swiper
   ) {
-    lastActiveId = $UniboardStore.activeId
     setActiveBoard($UniboardStore.activeId)
     initialBoardActived = true
   }

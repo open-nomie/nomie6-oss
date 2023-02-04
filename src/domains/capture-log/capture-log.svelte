@@ -178,11 +178,13 @@
     clearTimeout(clearMonitor)
     clearMonitor = setTimeout(() => {
       showCaptureTextarea = true
-      // Extract Tokens
-      // await wait(5)
-      const parsed: Array<Token> = extract.parse($ActiveLogStore.note)
-      // Calculate Score
-      $ActiveLogStore.score = ScoreNote($ActiveLogStore.note, new Date(), $TrackerStore)
+      let parsed: Array<Token>;
+      ActiveLogStore.update((s) => {
+        parsed = extract.parse(s.note)
+        // Calculate Score
+        s.score = ScoreNote(s.note, new Date(), $TrackerStore)
+        return s
+      });
       // Highligh any visuble tracker buttons
       highlightSelectedTrackers(parsed || [])
     }, 500)
@@ -360,7 +362,6 @@
                 placeholder={isPopulated || isFocused ? Lang.t('general.whats-up', "What's up?") : ''}
                 disabled={saving || saved}
                 bind:this={textarea}
-                autofocus
                 on:input={monitorNoteChange}
                 on:keydown={methods.keyPress}
                 on:focus={() => {

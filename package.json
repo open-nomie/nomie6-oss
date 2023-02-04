@@ -1,6 +1,6 @@
 {
   "name": "nomie",
-  "version": "6.1",
+  "version": "6.2.0",
   "homepage": "https://github.com/open-nomie/nomie-oss",
   "bugs": {
     "url": "https://github.com/open-nomie/nomie-oss/issues",
@@ -21,6 +21,7 @@
     "vserve": "vite preview --host 0.0.0.0 --port 5000",
     "serve": "vite serve",
     "generate-whatsnew": "node build-tools/generate-whats-new.js && git add . && git commit -m 'build: whats new'",
+    "generate-zip": "node build-tools/generate-zip.js",
     "commit": "git cz",
     "pre:run": "node build-tools/move-resources.js && node build-tools/bundle-vendors.js",
     "autobuild": "rollup -c -w",
@@ -123,6 +124,7 @@
     "@stripe/firestore-stripe-payments": "0.0.6",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@tailwindcss/line-clamp": "^0.2.2",
+    "archiver": "^5.3.1",
     "calculate-correlation": "^1.2.2",
     "canvas-confetti": "^1.4.0",
     "chart.js": "^3.6.2",
