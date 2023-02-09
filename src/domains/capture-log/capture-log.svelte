@@ -353,31 +353,24 @@
             data-placeholder={Lang.t('general.whats-up', "What's up?")}
             class=" mask-textarea-wrapper  top-section mock-textarea"
           >
-            {#if showCaptureTextarea}
-              <CaptureTextarea
-                bind:value={$ActiveLogStore.note}
-                aria-label="Note entry field"
-                id="textarea-capture-note"
-                class="overflow-y-scroll"
-                placeholder={isPopulated || isFocused ? Lang.t('general.whats-up', "What's up?") : ''}
-                disabled={saving || saved}
-                bind:this={textarea}
-                on:input={monitorNoteChange}
-                on:keydown={methods.keyPress}
-                on:focus={() => {
-                  setFocused()
-                }}
-                on:blur={() => {
-                  // isFocused = false
-                }}
-                on:paste={methods.keyPress}
-              />
-            {:else}
-              <!-- For Accessibility -->
-              <textarea aria-label="Note entry field" class=" w-full rounded-full" on:focus={() => setFocused()} />
-            {/if}
-
-            <!-- Close Note-->
+            <CaptureTextarea
+              bind:value={$ActiveLogStore.note}
+              aria-label="Note entry field"
+              id="textarea-capture-note"
+              class="overflow-y-scroll"
+              placeholder={isPopulated || isFocused ? Lang.t('general.whats-up', "What's up?") : ''}
+              disabled={saving || saved}
+              bind:this={textarea}
+              on:input={monitorNoteChange}
+              on:keydown={methods.keyPress}
+              on:focus={() => {
+                setFocused()
+              }}
+              on:blur={() => {
+                // isFocused = false
+              }}
+              on:paste={methods.keyPress}
+            />
           </div>
 
           <!-- Toolbar for advanced options -->

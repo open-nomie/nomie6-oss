@@ -191,7 +191,6 @@
   /* @apply border; */
   /* @apply border-gray-200 dark:border-gray-700; */
   @apply border-opacity-60;
-  transition: all 0.2s ease-in-out;
 }
 
 
