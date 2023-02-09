@@ -24,10 +24,11 @@
   // Props
   export let value: number
   export let tracker: TrackerClass
+  export let manual: boolean = false
 </script>
 
 <div class="n-timer-input w-full">
-  {#if tracker.started}
+  {#if !manual && tracker.started}
     <div class="flex flex-col items-center justify-center">
       <div class="filler" />
       <Counter initialDuration={tracker.timeTracked} started={tracker.started} lg className="py-5 bg-light" />
@@ -43,7 +44,7 @@
           dispatch('change', event.detail)
         }}
       />
-      {#if !tracker.started && value}
+      {#if !manual && value}
         <button
           aria-label="Resume Timer"
           on:click={() => {

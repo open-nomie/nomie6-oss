@@ -51,6 +51,7 @@
   export let nextLabel = Lang.t('general.next', 'Next') // The label of the save Button
 
   let tracker: TrackerClass | undefined = undefined
+  let manual: boolean = false
 
   export let id: string
   export let payload: TrackerInputProps
@@ -144,6 +145,11 @@
     } else {
       data.value = tracker.default || 0
     }
+
+    if (payload.retrospective) {
+      manual = true
+    }
+
     setTimeout(() => {
       data.ready = true
     }, 12)
@@ -232,6 +238,7 @@
             >
               <NTimer
                 {tracker}
+                {manual}
                 value={data.value}
                 on:forceStart={methods.startTimer}
                 on:change={async (event) => {
