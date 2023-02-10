@@ -222,7 +222,6 @@ export const initUniboardStore = async (knownTrackables: ITrackables) => {
   // TODO: Handle Sorting
   UniboardStore.update((s) => {
     s.boards = boards
-    s.activeId = s.activeId || boards.length ? boards[0].id : undefined
     s.hash = objectHash(boards)
 
     s.dynamicBoards.people = {
@@ -244,8 +243,13 @@ export const initUniboardStore = async (knownTrackables: ITrackables) => {
       elements: trackables.filter((t) => t.type === 'tracker').map((t) => t.tag),
     }
 
+    if (s.boards.find((b) => b.id == getLastBoardId())) {
+      s.activeId = getLastBoardId()
+    } else {
+      s.activeId = boards.length ? boards[0].id : undefined
+    }
     s.loaded = true
-    s.activeId = getLastBoardId()
+
     return s
   })
 }
