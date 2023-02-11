@@ -26,13 +26,18 @@ export const TrackerStore = createKVStore(NPaths.storage.trackers(), {
  * @returns Promise<TrackerClass>
  */
 const startStopTimer = async (tracker: TrackerClass, ss: 'start' | 'stop'): Promise<TrackerClass> => {
-  const newTracker = new TrackerClass(tracker)
-  if (ss == 'stop') {
-    newTracker.started = undefined
-  } else {
-    newTracker.started = new Date().getTime()
-  }
+  let newTracker;
   await TrackerStore.updateSync((trackerMap) => {
+    newTracker = new TrackerClass(trackerMap[tracker.tag])
+    newTracker.timeTracked = trackerMap[tracker.tag].timeTracked || newTracker.default
+    switch (ss) {
+      case 'start':
+        newTracker.started = new Date().getTime()
+        break
+      case 'stop':
+        newTracker.timeTracked += (new Date().getTime() - trackerMap[tracker.tag].started)/1000
+        newTracker.started = undefined
+    }
     trackerMap[tracker.tag] = newTracker
     return trackerMap
   })
@@ -57,6 +62,27 @@ export const startTimer = async (tracker: TrackerClass): Promise<TrackerClass> =
  */
 export const stopTimer = async (tracker): Promise<TrackerClass> => {
   return await startStopTimer(tracker, 'stop')
+}
+
+/**
+ * Clear a Timer
+ * @param tracker
+ * @returns Promise<TrackerClass>
+ */
+export const resetTimer = async (tracker, timeTracked = 0): Promise<TrackerClass> => {
+  let newTracker;
+  await TrackerStore.updateSync((trackerMap) => {
+    newTracker = new TrackerClass(trackerMap[tracker.tag])
+
+    newTracker.timeTracked = timeTracked
+    newTracker.started = undefined
+
+    trackerMap[tracker.tag] = newTracker
+    return trackerMap
+  })
+  InitTrackableStore()
+
+  return newTracker
 }
 
 /**

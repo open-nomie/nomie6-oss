@@ -43,7 +43,7 @@
         >
           <TrackableAvatar {trackable} slot="left" />
           <h1 class="ntitle py-3">{trackable.label}</h1>
-          <Counter slot="right" started={trackable.tracker.started} color={trackable.tracker.color} />
+          <Counter slot="right" initialDuration={trackable.tracker.timeTracked} started={trackable.tracker.started} color={trackable.tracker.color} />
         </ListItem>
         {#if index < trackables.length - 1}
           <Divider center />

@@ -1,6 +1,5 @@
 import {
-  getTrackerInputAsString,
-  openTrackerInputModal,
+  getTrackerInputAsString
 } from '../tracker/input/TrackerInputStore'
 
 import type { ITrackables } from '../trackable/trackable-utils'
@@ -35,6 +34,7 @@ export const trackOnThisDay = async (trackable: Trackable, date: Date, known: IT
           allowSave: false,
           expandNote: true,
           nextLabel: `Add to ${dayjs(date).format(dateFormats.tinyDate)} →`,
+          retrospective: true,
           // onClose: closeModal,
         })
         log.note = response.raw;

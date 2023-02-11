@@ -71,7 +71,7 @@
       >
         <div slot="subtitle">
           {#if trackable.tracker?.started}
-            <Counter started={trackable.tracker.started} color={trackable.tracker.color} />
+            <Counter initialDuration={trackable.tracker.timeTracked} started={trackable.tracker.started} color={trackable.tracker.color} />
           {/if}
         </div>
       </ShortcutButton>

@@ -25,6 +25,7 @@ export type TrackerInputProps = {
   raw?: string
   suffix?: string
   action?: string
+  retrospective?: boolean
 }
 
 const initialState = {
@@ -259,6 +260,7 @@ export const getTrackerInputAsString = async (props: TrackerInputProps): Promise
         allowSave: props.allowSave,
         expandNote: props.expandNote,
         nextLabel: props.nextLabel,
+        retrospective: props.retrospective,
         onClose: closeModal,
       })
     }

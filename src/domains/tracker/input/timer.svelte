@@ -7,12 +7,12 @@
    */
 
   // svelte
-  import { onMount } from 'svelte'
   import { createEventDispatcher } from 'svelte'
 
   // Components
   import Counter from '../../../components/counter/counter.svelte'
   import ManualTime from '../../../components/counter/manual-time.svelte'
+  import type TrackerClass from '../../../modules/tracker/TrackerClass'
 
   // Stores
 
@@ -22,26 +22,16 @@
   const dispatch = createEventDispatcher()
 
   // Props
-  export let value
-  export let tracker: any
-
-  // Data
-  let data = {
-    tempValue: (value || '') + '' || '',
-    changed: false,
-    started: tracker.started,
-  }
-
-  onMount(() => {
-    data.tempValue = value
-  })
+  export let value: number
+  export let tracker: TrackerClass
+  export let manual: boolean = false
 </script>
 
 <div class="n-timer-input w-full">
-  {#if tracker.started}
+  {#if !manual && tracker.started}
     <div class="flex flex-col items-center justify-center">
       <div class="filler" />
-      <Counter started={tracker.started} lg className="py-5 bg-light" on:change={(event) => {}} />
+      <Counter initialDuration={tracker.timeTracked} started={tracker.started} lg className="py-5 bg-light" />
       <div class="filler" />
     </div>
   {:else}
@@ -54,9 +44,9 @@
           dispatch('change', event.detail)
         }}
       />
-      {#if !tracker.started && value}
+      {#if !manual && value}
         <button
-          aria-label="Start Timer"
+          aria-label="Resume Timer"
           on:click={() => {
             dispatch('forceStart')
           }}

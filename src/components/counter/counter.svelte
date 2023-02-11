@@ -3,6 +3,7 @@
   import { onMount } from 'svelte'
 
   export let started = undefined
+  export let initialDuration = 0
   export let lg = undefined
   export let className = ''
   export let color = 'var(--color-red)'
@@ -19,10 +20,10 @@
   const methods = {
     init() {
       setInterval(() => {
-        let ms = new Date().getTime() - started
+        let ms = initialDuration*1000 + new Date().getTime() - started
         value = methods.secondsToTime(methods.msToSecond(ms))
       }, 1000)
-      let ms = new Date().getTime() - started
+      let ms = initialDuration*1000 + new Date().getTime() - started
       value = methods.secondsToTime(methods.msToSecond(ms))
     },
     normalizeTime(time) {

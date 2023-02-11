@@ -116,7 +116,7 @@
     </Text>
     {#if tracker.started}
       <div class="center">
-        <Counter started={tracker.started} />
+        <Counter initialDuration={tracker.timeTracked} started={tracker.started} />
       </div>
     {/if}
   </button>

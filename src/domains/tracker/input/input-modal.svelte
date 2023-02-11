@@ -29,8 +29,6 @@
   import { Lang } from '../../../store/lang'
 
   import Button from '../../../components/button/button.svelte'
-  import dayjs from 'dayjs'
-
   import ToolbarGrid from '../../../components/toolbar/toolbar-grid.svelte'
   import type { TrackerInputProps } from './TrackerInputStore'
   import type TrackerClass from '../../../modules/tracker/TrackerClass'
@@ -41,19 +39,19 @@
 
   import KeyDown from '../../../modules/keyDown/keyDown.svelte'
   import { openTrackableEditor } from '../../trackable/trackable-editor/TrackableEditorStore'
-  import { startTimer, stopTimer } from '../TrackerStore'
+  import { startTimer, stopTimer, resetTimer } from '../TrackerStore'
   import BackdropModal from '../../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../../components/backdrop/BackdropStore2'
   import type { TrackerInputResponseType } from './tracker-input-utils'
 
   // Props
-  // export let tracker = ; // You can provide a tracker
   export let value = undefined // If a valid is provided
 
   export let saveLabel = Lang.t('general.save', 'Save') // The label of the save Button
   export let nextLabel = Lang.t('general.next', 'Next') // The label of the save Button
 
   let tracker: TrackerClass | undefined = undefined
+  let manual: boolean = false
 
   export let id: string
   export let payload: TrackerInputProps
@@ -64,7 +62,6 @@
 
   let data = {
     value: null, // holds current value
-    tracker: null, // holds current tracker
     ready: false,
     suffix: '',
     calcUsed: false, // when it's ready
@@ -73,7 +70,7 @@
     note: undefined as undefined | string,
   }
 
-  // Set up the Methodsx
+  // Set up the Methods
   const methods = {
     // When the Save is hit
     onSave() {
@@ -88,6 +85,7 @@
           note: `#${tracker.tag}${data.value ? `(${data.value})` : ``} ${tracker.getIncluded(data.value)}`.trim(),
         }
         // dispatch('save', results)
+        resetTimer(tracker)
         payload.onComplete(results)
         closeModal(id)
         data.saving = false
@@ -96,6 +94,7 @@
     // When Add is hit
     onAdd() {
       // Dispatch add
+      resetTimer(tracker)
       payload.onComplete({
         value: data.value,
         action: 'add',
@@ -106,56 +105,25 @@
       closeModal(id)
     },
     async onCancel() {
+      if (tracker.type === 'timer' && !tracker.started) {
+        await resetTimer(tracker)
+      }
       closeModal(id)
-      // $Interact.trackerInput.show = false;
-      // if (!$Interact.trackerInput.allowSave) {
-      //   dispatch("cancelAll");
-      // } else {
-      //   dispatch("cancel");
-      // }
     },
     // When the user starts the time
-    startTimer() {
-      // Set the date to epoch time (best to avoid timezones);
-      let startingDate = dayjs().subtract(data.value, 'second')
-      data.tracker.started = startingDate.toDate().getTime()
+    async startTimer() {
       // Start the Timer for this tracker
-      startTimer(data.tracker)
+      tracker = await startTimer(tracker)
       methods.onCancel()
     },
     // Stop the Timer
-    stopTimer() {
+    async stopTimer() {
       // Get the Seconds between now and when the tracker started
-      if (data.tracker.started) {
-        data.value = (new Date().getTime() - tracker.started) / 1000
-        // Clear local
-        data.tracker.started = undefined
-        // tell store to stop timer
-        stopTimer(data.tracker)
-        tracker.started = undefined
+      if (tracker.started) {
+        tracker = await stopTimer(tracker)
+        data.value = tracker.timeTracked
       }
     },
-  }
-
-  // If Tracker Changes
-  // FIres each time something happens to this object
-  $: if (tracker && data.tracker && data.tracker !== tracker) {
-    // Set to local variable
-    setTimeout(() => {
-      // Set to not ready and the new tracker
-      data.ready = true // TODO: make this lack janky
-      data.tracker = tracker
-      data.value = tracker.default || 0
-      data.ready = true
-      data.suffix = ''
-    }, 1)
-  }
-
-  $: if (!payload.tracker) {
-    data.ready = true // TODO: make this lack janky
-    data.tracker = tracker
-    data.value = 0
-    data.suffix = ''
   }
 
   function editTracker() {
@@ -176,20 +144,18 @@
       data.value = value
     } else {
       data.value = tracker.default || 0
-      value = data.value
     }
-    data.tracker = tracker
+
+    if (payload.retrospective) {
+      manual = true
+    }
+
     setTimeout(() => {
       data.ready = true
     }, 12)
   }
 
-  let lastTracker: TrackerClass | undefined = undefined
-  $: if (payload.tracker && lastTracker !== payload.tracker) {
-    lastTracker = payload.tracker
-    data.suffix = ''
-    initialize()
-  }
+  initialize();
 </script>
 
 <BackdropModal className="tracker-input-modal">
@@ -257,14 +223,12 @@
             />
           {:else if tracker.type === 'value' || tracker.type === 'tick'}
             <NCalculator
-              {value}
+              value={data.value}
               displayFormat={(input) => {
                 return tracker.displayValue(input || '')
               }}
               on:change={(changedValue) => {
                 data.value = changedValue.detail
-                value = changedValue.detail
-                data = data
               }}
             />
           {:else if tracker.type === 'timer'}
@@ -273,12 +237,13 @@
               class="filler flex items-center justify-center"
             >
               <NTimer
-                tracker={data.tracker}
-                bind:value={data.value}
+                {tracker}
+                {manual}
+                value={data.value}
                 on:forceStart={methods.startTimer}
-                on:change={(event) => {
+                on:change={async (event) => {
                   data.value = event.detail
-                  value = event.detail
+                  tracker = await resetTimer(tracker, event.detail)
                 }}
               />
             </div>
@@ -291,7 +256,6 @@
                 }}
                 on:change={(value) => {
                   data.value = value.detail
-                  value = value.detail
                 }}
               />
             </div>
