@@ -264,7 +264,7 @@
       {/each}
     </Input>
       
-        <div class="text-gray-500 leading-tight px-4 text-sm pb-4">Plugin widget selection placeholder</div>
+        <div class="text-gray-500 leading-tight px-4 text-sm pb-4">Select your Widget for this Plugin</div>
       </List>
     {/if}
     {/if}
