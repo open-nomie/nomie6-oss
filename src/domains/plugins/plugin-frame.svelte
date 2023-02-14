@@ -8,6 +8,7 @@
 
   export let plugin: PluginClass
   export let openAction: PluginUseTypes = 'onUIOpened'
+  export let widgetindexparam: string = "";
   export let lid: string
 
   let registered: boolean = false
@@ -17,6 +18,7 @@
 
   $: if (registered && !ready && mounted) {
     ready = true
+    plugin.url 
     broadcastPluginMessage(
       {
         action: openAction,
@@ -72,6 +74,6 @@
   }}
   class="h-full w-full "
   title={plugin.name}
-  src={plugin.urlWithParams}
+  src={plugin.urlWithParams}{widgetindexparam}
   id="plugin-{lid}-{plugin.id}"
 />

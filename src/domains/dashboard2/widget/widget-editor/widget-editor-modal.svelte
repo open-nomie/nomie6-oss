@@ -32,8 +32,9 @@
   import { isTruthy } from '../../../../utils/truthy/truthy'
   import { closeModal } from '../../../../components/backdrop/BackdropStore2'
   import BackdropModal from '../../../../components/backdrop/backdrop-modal.svelte'
-import CloseOutline from '../../../../n-icons/CloseOutline.svelte'
-import { PluginStore } from "../../../plugins/PluginStore";
+  import CloseOutline from '../../../../n-icons/CloseOutline.svelte'
+  import { PluginStore } from "../../../plugins/PluginStore";
+  import Storage from '../../../../domains/storage/storage'
 
   let visible: boolean = false
   let editingWidget: WidgetClass | undefined
@@ -57,6 +58,9 @@ import { PluginStore } from "../../../plugins/PluginStore";
 
   $: if (editingWidget.type) {
     activeType = widgetTypes.find((wt) => wt.id === editingWidget.type)
+    if (editingWidget.type == "plugin"){
+      pluginGetWidgets(editingWidget.data.pluginId);
+    }
   }
 
   let lastWidgetHash: string | undefined = undefined
@@ -68,6 +72,32 @@ import { PluginStore } from "../../../plugins/PluginStore";
       console.error(e)
       canSave = false
     }
+  }
+
+  let pluginWidgets = [];
+  async function pluginGetWidgets(pluginId:String) {
+    let path = `plugins/${pluginId}/prefs.json`
+    let data: any = undefined
+    try {
+      data = await Storage.get(path) || {widgets:[]};
+      pluginWidgets = data.widgets;
+      if (pluginWidgets == undefined || !validateWidgetParams(data.widgets)){pluginWidgets = [];}
+    } catch (e) {
+      console.error(e)
+      pluginWidgets = [];
+    }
+  }
+
+  function validateWidgetParams(widgets){
+    let valid = true;
+    let i = 0;
+    while (i < widgets.length) {
+    if (!widgets[i].emoji || !widgets[i].name || !widgets[i].widgetid || widgets[i].emoji =="" || widgets[i].name =="" || widgets[i].widgetid ==""){
+      valid = false;
+      }
+      i++;
+    }   
+    return valid;
   }
 
   const close = async () => {
@@ -212,6 +242,31 @@ import { PluginStore } from "../../../plugins/PluginStore";
         <Input listItem placeholder="Message" type="textarea" rows={2} bind:value={editingWidget.description} />
         <div class="text-gray-500 leading-tight px-4 text-sm pb-4">Leave yourself a positive message or something!</div>
       </List>
+    {/if}
+
+    <!-- Plugins -->
+    {#if activeType?.id == 'plugin'}
+    {#if pluginWidgets.length > 0}
+    <List solo className="mt-4">
+    <Input listItem bind:value={editingWidget.data.widgetindex} type="select" label="Widget">
+      <div
+        slot="left"
+        class="{!editingWidget.data.widgetindex
+          ? 'pl-2 pt-3 w-full'
+          : ''} text-black dark:text-white pointer-events-none absolute"
+      >
+        {#if !editingWidget.data.widgetindex}
+          Select a Widget
+        {/if}
+      </div>
+      {#each pluginWidgets as pluginWidget}
+        <option value={pluginWidget.widgetid}>{pluginWidget.emoji} {pluginWidget.name}</option>
+      {/each}
+    </Input>
+      
+        <div class="text-gray-500 leading-tight px-4 text-sm pb-4">Select your Widget for this Plugin</div>
+      </List>
+    {/if}
     {/if}
 
     <!-- Start Conditional Styling -->
