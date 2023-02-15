@@ -3,6 +3,7 @@ import { writable } from 'svelte/store'
 type ChartOptions = {
   type: 'bar' | 'line'
   startWithZero: boolean
+  stats: 'none' | "avg" | 'sma-7' | 'sma-15' | 'sma-30' | 'ema-7' | 'ema-15' | 'ema-30' | 'split-11' | 'split-12' | 'split-13' | 'cumm'
 }
 export type ChartOptionsStoreState = {
   [key: string]: ChartOptions
