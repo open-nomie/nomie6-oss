@@ -11,10 +11,8 @@
   import Spinner from '../../components/spinner/spinner.svelte'
   import { hex2rgba } from '../../modules/colors/colors'
   import { Lang } from '../../store/lang'
-  import { LedgerStore } from '../ledger/LedgerStore'
   import { parseNumber } from '../../utils/parseNumber/parseNumber'
   import { wait } from '../../utils/tick/tick'
-  import logsToTrackableUsage, { logFilter } from '../usage/usage-utils'
   import { queryToTrackableUsage } from '../ledger/LedgerStore'
   import { getDateFormats } from '../preferences/Preferences'
   import { selectTrackable } from '../trackable/trackable-selector/TrackableSelectorStore'
@@ -23,10 +21,9 @@
   import { TrackableStore } from '../trackable/TrackableStore'
   import { saveChartOptions, getChartOption } from './ChartOptionsStore'
 
-  import { TrackableUsage } from './trackable-usage.class'
+  import type { TrackableUsage } from './trackable-usage.class'
   import { openDateOptionPopMenu, openPopMenu, PopMenuButton } from '../../components/pop-menu/usePopmenu'
   import CloseOutline from '../../n-icons/CloseOutline.svelte'
-  import { getAroundThisTimeDateRanges } from "../trending/TrendingModalStore"
 
   export let usages: Array<TrackableUsage> = []
   export let style: string = ''
@@ -58,15 +55,20 @@
   let chartScale: 'linear' | 'logarithmic' = 'linear'
   let chartStats: 'none' | "avg" | 'sma-7' | 'sma-15' | 'sma-30' | 'ema-7' | 'ema-15' | 'ema-30' | 'split-11' | 'split-12' | 'split-13' | 'cumm' = 'none'
   let startWithZero: boolean = true
+  let includeAlso: Trackable
+  let includeAlsoLabel = "None"
 
-  const setChartType = async (type, swz, stats, save: boolean = true) => {
+  const setChartType = async (type, swz, stats, include, save: boolean = true) => {
     showChart = false
     localType = type
     startWithZero = swz
     chartStats = stats
+    includeAlso = include
     if (save) {
-      saveChartOptions(id, { type, startWithZero, stats})
+      saveChartOptions(id, { type, startWithZero, stats, include})
     }
+    await wait(60)
+    await alsoInclude()
     await wait(60)
     await includeStats()
     showChart = true
@@ -78,41 +80,63 @@
     let t = (options.type || type) == 'line' ? 'line' : 'bar'
     let swz = options.startWithZero === undefined || options.startWithZero === false ? false : true
     let st = options.stats || 'none'
-    setChartType(t, swz, st, false)
+    let incl = options.include || undefined
+    setChartType(t, swz, st, incl, false)
   }
 
-  const alsoInclude = async () => {
-   const selected: Trackable = await selectTrackable()
-   const usage :TrackableUsage = await queryToTrackableUsage(
+  const alsoInclude = async (newtrackable: boolean = false) => {
+    
+    //remove current also included trackable
+    for (var i = 0; i < usages.length; i++) { 
+      if (usages.length >1) {
+        usages.splice(_.findIndex(usages, function(item) {
+        return item.trackable.id === "-alsoinclude-";
+        }), 1);
+      }
+    }
+    var selected:Trackable
+    if (newtrackable == true) {
+      selected = await selectTrackable()
+      includeAlso = selected}
+    else {selected = includeAlso}
+    if (selected != undefined) {
+      includeAlsoLabel = selected.id
+      const temp = $TrackableStore.trackables[selected.id] 
+      selected = temp
+      const usage :TrackableUsage = await queryToTrackableUsage(
       selected,
       {
         start: usages[0].dates[0],
         end: usages[0].dates[usages[0].dates.length - 1],
       },
       $TrackableStore.trackables
-    )
-   
-    if (usages[0].groupedBy == "week") {
-      reverseUsage = usage
-        .reverse()
-        .groupBy('week', 'YYYY-MM-D')
-        .backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
-    } else {
-      reverseUsage = usage
-        .reverse()
-        .byDay.backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
+      )
+      usage.trackable.id = "-alsoinclude-"
+      if (usages[0].groupedBy == "week") {
+        reverseUsage = usage
+          .reverse()
+          .groupBy('week', 'YYYY-MM-D')
+          .backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
+      } 
+      else {
+        reverseUsage = usage
+          .reverse()
+          .byDay.backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
+      }
+      // below is a strange bug => when array length =1 I need to push twice and slice again the last one. To be investigated
+      if (usages.length == 1) {
+        usages.push(reverseUsage)
+        usages.push(reverseUsage)
+        //usages.push(reverseUsage)
+        usages.slice(0, -1)
+      }
+      else {usages.push(reverseUsage)}
+      return usage
     }
-   
-    // below is a strange bug => I need to push twice and slice again the last one. To be investigated
-    usages.push(reverseUsage)
-    usages.push(reverseUsage)
-    usages.slice(0, -1);
-    console.log(usages)
-    return usage
+    else {
+      return null
+    }
   }
-
-
-   
 
   const includeStats = async () => {
     //remove current stats data if exist
@@ -143,14 +167,14 @@
         title: Lang.t('general.line-chart', 'Line Chart'),
         icon: localType === 'line' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('line', startWithZero, chartStats)
+          setChartType('line', startWithZero, chartStats, includeAlso)
         },
       },
       {
         title: Lang.t('general.bar-chart', 'Bar Chart'),
         icon: localType === 'bar' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('bar', startWithZero, chartStats)
+          setChartType('bar', startWithZero, chartStats, includeAlso)
         },
       },
       {
@@ -193,7 +217,7 @@
                 chartStats = 'none'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -204,7 +228,7 @@
                 chartStats = 'avg'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -215,7 +239,7 @@
                 chartStats = 'split-11'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -226,7 +250,7 @@
                 chartStats = 'split-12'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -237,7 +261,7 @@
                 chartStats = 'split-13'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -248,7 +272,7 @@
                 chartStats = 'sma-7'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -259,7 +283,7 @@
                 chartStats = 'sma-15'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -270,7 +294,7 @@
                 chartStats = 'sma-30'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -281,7 +305,7 @@
                 chartStats = 'ema-7'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -292,7 +316,7 @@
                 chartStats = 'ema-15'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -303,7 +327,7 @@
                 chartStats = 'ema-30'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
             {
@@ -314,7 +338,7 @@
                 chartStats = 'cumm'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
               },
             },
 
@@ -328,16 +352,37 @@
         divider: true,
         click() {
           startWithZero = !startWithZero
-          setChartType(localType, startWithZero, chartStats)
+          setChartType(localType, startWithZero, chartStats, includeAlso)
         },
       },
       {
-        title: Lang.t('general.also-include', 'Also Include...'),
-        icon: usages.length > 1 ? CheckmarkCircle : undefined,
-        async click() {
-          await wait(10)
-          await alsoInclude()
-          setChartType(localType, startWithZero, chartStats)
+        title: `Include: ${includeAlsoLabel}`,
+        divider: true,
+        click() {
+          const buttons: Array<PopMenuButton> = [
+            {
+              id: 'none',
+              title: 'No Other Trackable',
+              checked: includeAlsoLabel === 'None',
+              async click() {
+                includeAlso = undefined
+                includeAlsoLabel = "None"
+                await alsoInclude(false)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'trackable',
+              title: 'Select Trackable',
+              checked: includeAlsoLabel != 'None',
+              async click() {
+                //await wait(10)
+                await alsoInclude(true)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+          ]
+          openPopMenu({ id: 'also-include', buttons })
         },
       },
     ]

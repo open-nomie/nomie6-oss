@@ -680,7 +680,6 @@ export const queryToTrackableUsage = async (
   known: ITrackables
 ): Promise<TrackableUsage> => {
   const usages = await queryToUsageMap(query, known)
-  console.log(usages)
   return usages[trackable.tag] || new TrackableUsage({ trackable, dates: [], values: [] })
 }
 
