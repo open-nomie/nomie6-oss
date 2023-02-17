@@ -403,6 +403,14 @@
       data,
     }
 
+    // some visual adjustments if dataset is statistics dataset
+    var lineweight = 1.5;
+    var dotsweight = 1;
+    if (usageByDay.trackable.id === "-statistics-"){
+      lineweight = 2.5
+      dotsweight = 0
+    }
+
     const skipped = (ctx, value) => (ctx.p0.skip || ctx.p1.skip ? value : undefined)
 
     // Setup Line of Bar differences
@@ -412,12 +420,12 @@
         ...dataset,
         ...{
           type: "line",
-          pointRadius: 1,
+          pointRadius: dotsweight,
           pointHitRadius: 10,
           borderColor: usageByDay.trackable.color,
 
           spanGaps: true,
-          borderWidth: 1.5,
+          borderWidth: lineweight,
           backgroundColor: hex2rgba(usageByDay.trackable.color, 0.1),
           fill: 'origin',
           segment: {

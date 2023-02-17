@@ -21,7 +21,6 @@
   import { Lang } from '../../../store/lang'
   import { showToast } from '../../../components/toast/ToastStore'
   import { PluginStore } from "../../plugins/PluginStore";
-import WidgetBarChart from './types/widget-bar-chart.svelte';
 
   const dispatch = createEventDispatcher()
   const id = nid()
