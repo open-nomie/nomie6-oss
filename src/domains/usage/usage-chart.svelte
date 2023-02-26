@@ -1,8 +1,9 @@
 <script lang="ts">
+  import _ from "lodash"
   import type { ChartConfiguration, ChartDataset } from 'chart.js'
   import type { Dayjs } from 'dayjs'
   import { onMount } from 'svelte'
-
+  import usageStats from "./usage-stats";
   import Chartjs from '../../components/charts/chartjs.svelte'
   import { openDropMenu } from '../../components/menu/useDropmenu'
   import IonIcon from '../../components/icon/ion-icon.svelte'
@@ -10,10 +11,8 @@
   import Spinner from '../../components/spinner/spinner.svelte'
   import { hex2rgba } from '../../modules/colors/colors'
   import { Lang } from '../../store/lang'
-
   import { parseNumber } from '../../utils/parseNumber/parseNumber'
   import { wait } from '../../utils/tick/tick'
-
   import { queryToTrackableUsage } from '../ledger/LedgerStore'
   import { getDateFormats } from '../preferences/Preferences'
   import { selectTrackable } from '../trackable/trackable-selector/TrackableSelectorStore'
@@ -24,8 +23,7 @@
 
   import type { TrackableUsage } from './trackable-usage.class'
   import { openDateOptionPopMenu, openPopMenu, PopMenuButton } from '../../components/pop-menu/usePopmenu'
-import Badge from '../../components/badge/badge.svelte'
-import CloseOutline from '../../n-icons/CloseOutline.svelte'
+  import CloseOutline from '../../n-icons/CloseOutline.svelte'
 
   export let usages: Array<TrackableUsage> = []
   export let style: string = ''
@@ -39,6 +37,7 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
 
   let dateFormats = getDateFormats()
   let usage: TrackableUsage
+  let reverseUsage: TrackableUsage
 
   let activeDate: Dayjs | undefined = undefined
   let activeFormatedValue: string
@@ -54,41 +53,112 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
   let localType: 'bar' | 'line' = type
   let showChart: boolean = true
   let chartScale: 'linear' | 'logarithmic' = 'linear'
-
+  let chartStats: 'none' | "avg" | 'sma-7' | 'sma-15' | 'sma-30' | 'ema-7' | 'ema-15' | 'ema-30' | 'split-11' | 'split-12' | 'split-13' | 'cumm' = 'none'
   let startWithZero: boolean = true
+  let includeAlso: Trackable
+  let includeAlsoLabel = "None"
 
-  const setChartType = async (type, swz, save: boolean = true) => {
+  const setChartType = async (type, swz, stats, include, save: boolean = true) => {
     showChart = false
     localType = type
     startWithZero = swz
+    chartStats = stats
+    includeAlso = include
     if (save) {
-      saveChartOptions(id, { type, startWithZero })
+      saveChartOptions(id, { type, startWithZero, stats, include})
     }
     await wait(60)
+    await alsoInclude()
+    await wait(60)
+    await includeStats()
     showChart = true
   }
 
-  const initChartOptions = () => {
+  const initChartOptions = async () => {
     let options: any = getChartOption(id) || {}
 
     let t = (options.type || type) == 'line' ? 'line' : 'bar'
     let swz = options.startWithZero === undefined || options.startWithZero === false ? false : true
-    setChartType(t, swz, false)
+    let st = options.stats || 'none'
+    let incl = options.include || undefined
+    setChartType(t, swz, st, incl, false)
   }
 
-  const alsoInclude = async () => {
-    const selected: Trackable = await selectTrackable()
-    const usage = await queryToTrackableUsage(
+  const alsoInclude = async (newtrackable: boolean = false) => {
+    
+    //remove current also included trackable
+    for (var i = 0; i < usages.length; i++) { 
+      if (usages.length >1) {
+        usages.splice(_.findIndex(usages, function(item) {
+        return item.trackable.id === "-alsoinclude-";
+        }), 1);
+      }
+    }
+    var selected:Trackable
+    if (newtrackable == true) {
+      selected = await selectTrackable()
+      includeAlso = selected}
+    else {selected = includeAlso}
+    if (selected != undefined) {
+      includeAlsoLabel = selected.id
+      const temp = $TrackableStore.trackables[selected.id] 
+      selected = temp
+      const usage :TrackableUsage = await queryToTrackableUsage(
       selected,
       {
         start: usages[0].dates[0],
         end: usages[0].dates[usages[0].dates.length - 1],
       },
       $TrackableStore.trackables
-    )
-    usages.push(usage)
+      )
+      usage.trackable.id = "-alsoinclude-"
+      if (usages[0].groupedBy == "week") {
+        reverseUsage = usage
+          .reverse()
+          .groupBy('week', 'YYYY-MM-D')
+          .backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
+      } 
+      else {
+        reverseUsage = usage
+          .reverse()
+          .byDay.backfill(usages[0].dates[0].toDate(), usages[0].dates[usages[0].dates.length - 1].toDate())
+      }
+      // below is a strange bug => when array length =1 I need to push twice and slice again the last one. To be investigated
+      if (usages.length == 1) {
+        usages.push(reverseUsage)
+        usages.push(reverseUsage)
+        //usages.push(reverseUsage)
+        usages.slice(0, -1)
+      }
+      else {usages.push(reverseUsage)}
+      return usage
+    }
+    else {
+      return null
+    }
+  }
 
-    return usage
+  const includeStats = async () => {
+    //remove current stats data if exist
+    if (usages.length >1) {
+        usages.splice(_.findIndex(usages, function(item) {
+        return item.trackable.id === "-statistics-";
+        }), 1);
+    }
+    //define new if applicable
+    var statusage = usages.find(x=>x!==undefined);
+    if (chartStats != "none") {
+      if ((chartStats == "cumm" && statusage.trackable.tracker.math == "sum") || chartStats != "cumm") {
+        let datasetMain = statusage.values;
+        let statsTrackable = usageStats.defineStatsDataset(
+          datasetMain,
+          chartStats,
+          statusage.trackable.tracker.math,
+          usages[0]
+        );
+        usages.push(statsTrackable)
+      }
+    }
   }
 
   export const showOptionsMenu = async (caller: HTMLElement) => {
@@ -97,14 +167,14 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
         title: Lang.t('general.line-chart', 'Line Chart'),
         icon: localType === 'line' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('line', startWithZero)
+          setChartType('line', startWithZero, chartStats, includeAlso)
         },
       },
       {
         title: Lang.t('general.bar-chart', 'Bar Chart'),
         icon: localType === 'bar' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('bar', startWithZero)
+          setChartType('bar', startWithZero, chartStats, includeAlso)
         },
       },
       {
@@ -135,21 +205,184 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
         },
       },
       {
+        title: `Stats: ${chartStats}`,
+        divider: true,
+        click() {
+          const buttons: Array<PopMenuButton> = [
+            {
+              id: 'none',
+              title: 'No Stats',
+              checked: chartStats === 'none',
+              async click() {
+                chartStats = 'none'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'avg',
+              title: 'Average',
+              checked: chartStats === 'avg',
+              async click() {
+                chartStats = 'avg'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'split-11',
+              title: 'Average Split(50%-50%)',
+              checked: chartStats === 'split-11',
+              async click() {
+                chartStats = 'split-11'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'split-12',
+              title: 'Average Split(33%-66%)',
+              checked: chartStats === 'split-12',
+              async click() {
+                chartStats = 'split-12'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'split-13',
+              title: 'Average Split(25%-75%)',
+              checked: chartStats === 'split-13',
+              async click() {
+                chartStats = 'split-13'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'sma-7',
+              title: '7 days Simple Moving Average',
+              checked: chartStats === 'sma-7',
+              async click() {
+                chartStats = 'sma-7'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'sma-15',
+              title: '15 days Simple Moving Average',
+              checked: chartStats === 'sma-15',
+              async click() {
+                chartStats = 'sma-15'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'sma-30',
+              title: '30 days Simple Moving Average',
+              checked: chartStats === 'sma-30',
+              async click() {
+                chartStats = 'sma-30'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'ema-7',
+              title: '7 days Exponential Moving Average',
+              checked: chartStats === 'ema-7',
+              async click() {
+                chartStats = 'ema-7'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'ema-15',
+              title: '15 days Exponential Moving Average',
+              checked: chartStats === 'ema-15',
+              async click() {
+                chartStats = 'ema-15'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'ema-30',
+              title: '30 days Exponential Moving Average',
+              checked: chartStats === 'ema-30',
+              async click() {
+                chartStats = 'ema-30'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'cumm',
+              title: 'Cummulative trend',
+              checked: chartStats === 'cumm',
+              async click() {
+                chartStats = 'cumm'
+                await wait(10)
+                await includeStats()
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+
+          ]
+          openPopMenu({ id: 'chart-stats', buttons })
+        },
+      },
+      {
         title: Lang.t('general.start-with-zero', 'Start with Zero'),
         icon: startWithZero ? CheckmarkCircle : undefined,
         divider: true,
         click() {
           startWithZero = !startWithZero
-          setChartType(localType, startWithZero)
+          setChartType(localType, startWithZero, chartStats, includeAlso)
         },
       },
       {
-        title: Lang.t('general.also-include', 'Also Include...'),
-        icon: usages.length > 1 ? CheckmarkCircle : undefined,
-        async click() {
-          await wait(10)
-          await alsoInclude()
-          setChartType(localType, startWithZero)
+        title: `Include: ${includeAlsoLabel}`,
+        divider: true,
+        click() {
+          const buttons: Array<PopMenuButton> = [
+            {
+              id: 'none',
+              title: 'No Other Trackable',
+              checked: includeAlsoLabel === 'None',
+              async click() {
+                includeAlso = undefined
+                includeAlsoLabel = "None"
+                await alsoInclude(false)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+            {
+              id: 'trackable',
+              title: 'Select Trackable',
+              checked: includeAlsoLabel != 'None',
+              async click() {
+                //await wait(10)
+                await alsoInclude(true)
+                setChartType(localType, startWithZero, chartStats, includeAlso)
+              },
+            },
+          ]
+          openPopMenu({ id: 'also-include', buttons })
         },
       },
     ]
@@ -165,27 +398,34 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
     const data = dates.map((date, index) => {
       return values[index]
     })
-
     let dataset: ChartDataset = {
-      type: localType,
       label: usageByDay.trackable.label,
       data,
+    }
+
+    // some visual adjustments if dataset is statistics dataset
+    var lineweight = 1.5;
+    var dotsweight = 1;
+    if (usageByDay.trackable.id === "-statistics-"){
+      lineweight = 2.5
+      dotsweight = 0
     }
 
     const skipped = (ctx, value) => (ctx.p0.skip || ctx.p1.skip ? value : undefined)
 
     // Setup Line of Bar differences
-    if (localType === 'line') {
+    if (localType === 'line' || usageByDay.trackable.id === "-statistics-") {
       //@ts-ignore
       dataset = {
         ...dataset,
         ...{
-          pointRadius: 1,
+          type: "line",
+          pointRadius: dotsweight,
           pointHitRadius: 10,
           borderColor: usageByDay.trackable.color,
 
           spanGaps: true,
-          borderWidth: 1.5,
+          borderWidth: lineweight,
           backgroundColor: hex2rgba(usageByDay.trackable.color, 0.1),
           fill: 'origin',
           segment: {
@@ -199,6 +439,7 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
       dataset = {
         ...dataset,
         ...{
+          type: "bar",
           backgroundColor: usageByDay.trackable.color,
           barPercentage: 0.9,
           borderRadius: 100,
@@ -215,7 +456,6 @@ import CloseOutline from '../../n-icons/CloseOutline.svelte'
     const datasets = usages.map((usage) => {
       return usageToDataset(usage)
     })
-
     // Setup Config
     const config: ChartConfiguration = {
       type: localType,
