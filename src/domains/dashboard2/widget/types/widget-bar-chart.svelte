@@ -39,7 +39,7 @@
 {#if widget}
   <div class="chart-value relative h-full">
     <UsageChart
-      id={`usage-${nid(usage.trackable.tag)}`}
+      id={`usage-${nid(widget.id)}`}
       hideValues={widget.size == 'sm'}
       usages={[reverseUsage]}
       {type}

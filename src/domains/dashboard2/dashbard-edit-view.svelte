@@ -17,6 +17,7 @@
   import SortableList2 from '../../components/sortable-list/sortable-list2.svelte'
   import TrackablePill from '../trackable/trackable-pill.svelte'
   import { PluginStore } from '../plugins/PluginStore'
+  import { deleteWidget } from './DashStore'
 
   export let dashboard: DashboardClass
 
@@ -38,9 +39,10 @@
   const removeWidget = async (widget) => {
     const confirmed = await Interact.confirm('Remove Widget?', 'You can always add it back later.')
     if (confirmed) {
-      workingDashboard.widgets = dedupArray(workingDashboard.widgets, 'id')
+      //workingDashboard.widgets = dedupArray(workingDashboard.widgets, 'id')
+     await deleteWidget(widget);
     }
-    workingDashboard.widgets = workingDashboard.widgets
+    workingDashboard.widgets = dashboard.widgets
   }
 
   onMount(() => {
