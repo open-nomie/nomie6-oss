@@ -53,7 +53,7 @@
 
     // Set time frame
     let start = dashboard.timeframe.start
-    let end = dashboard.timeframe.end
+    let end = dashboard.timeframe.end.add(1, 'day') //add(1, 'day') is a fix for the extra day in the last week widget when Monday is first day of week
 
     // Get the Widgets
     widgets = dashboardWidgets.map((widget) => {
