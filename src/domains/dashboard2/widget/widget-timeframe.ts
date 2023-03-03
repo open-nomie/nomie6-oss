@@ -88,7 +88,7 @@ export const timeFrames: Array<WidgetTimeFrameConfig> = [
     label: 'Last 7 days',
     dayCount: 7,
     start: {
-      subtract: [7, 'day'],
+      subtract: [6, 'day'],
       startOf: 'day',
     },
     end: {
