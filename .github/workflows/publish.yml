@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        token: ${{secrets.RELEASE_TOKEN}}
     - name: Use Node.js 16
       uses: actions/setup-node@v3
       with:
@@ -26,9 +28,7 @@ jobs:
         cp $release_zip /tmp
         git clean -f
         echo "release_zip=/tmp/$(basename $release_zip)" >> $GITHUB_OUTPUT
-    - run: npm run release:patch -- --ci --github.release \
-        --git.pushRepo=https://${{secrets.RELEASE_TOKEN}}@github.com/open-nomie/nomie6-oss.git \
-        --github.assets=${{steps.clean_working_dir.outputs.release_zip}}
+    - run: npm run release:patch -- --ci --github.release --github.assets=${{steps.clean_working_dir.outputs.release_zip}}
       env:
         GIT_COMMITTER_NAME: Nomie Release Bot
         GIT_AUTHOR_NAME: Nomie Release Bot
@@ -39,9 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        curl -X POST \
+        curl -f -X POST \
           -H "Authorization: Bearer ${{secrets.RELEASE_TOKEN}}" \
           -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/open-nomie/open-nomie.github.io/actions/workflows/deploy.yml/dispatches \
+          https://api.github.com/repos/open-nomie/open-nomie.github.io/actions/workflows/publish.yml/dispatches \
           -d '{"ref": "master"}'
-
