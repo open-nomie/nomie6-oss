@@ -224,6 +224,10 @@
   "fixes": [
     {
       "version": "6.4.0-dn",
+      "title": "fix option to compare trackables in statistics settings"
+    },
+    {
+      "version": "6.4.0-dn",
       "title": "dashboard editor widget delete fixed"
     },
     {
