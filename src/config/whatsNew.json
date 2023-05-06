@@ -224,10 +224,10 @@
   "fixes": [
     {
       "version": "6.4.0-dn",
-      "title": "dashboard editor widget delete"
+      "title": "dashboard editor widget delete fixed"
     },
     {
-      "version": "6.4.0-dn",
+      "version": "6.4.0-dn", 
       "title": "timeframe bugs for last-7days & last week"
     },
     {
