@@ -10,7 +10,7 @@ Since Closing down nomie (https://nomie.app), I wanted to provide it as an open 
 
 Nomie 6 can be run on any web server without special server side code.
 
-Latest build: [`bin/nomie6-oss.latest.zip`](https://github.com/open-nomie/nomie6-oss/raw/master/bin/nomie6-oss.latest.zip)
+Latest build: [`bin/nomie6-oss.latest.zip`](https://github.com/dailynomie/nomie6-oss/raw/master/bin/nomie6-oss.latest.zip)
 
 ## Building and Running
 
