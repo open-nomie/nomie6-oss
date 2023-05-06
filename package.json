@@ -1,19 +1,19 @@
 {
   "name": "nomie",
-  "version": "6.3.0",
-  "homepage": "https://github.com/open-nomie/nomie-oss",
+  "version": "6.4.0-dn",
+  "homepage": "https://github.com/dailynomie/nomie-oss",
   "bugs": {
-    "url": "https://github.com/open-nomie/nomie-oss/issues",
-    "email": "support@happydata.org"
+    "url": "https://github.com/dailynomie/nomie-oss/issues",
+    "email": "ronald_de_lange@hotmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-nomie/nomie-oss.git"
+    "url": "https://github.com/dailynomie/nomie-oss.git"
   },
   "author": {
-    "name": "Brandon Corbin",
-    "email": "support@happydata.org",
-    "url": "https://github.com/open-nomie/nomie-ossnp"
+    "name": "Ronald de Lange",
+    "email": "ronald_de_lange@hotmail.com",
+    "url": "https://www.dailynomie.com"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5001",

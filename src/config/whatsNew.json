@@ -1,6 +1,34 @@
 {
   "features": [
     {
+      "version": "6.4.0-dn",
+      "title": "stats option for line bar charts"
+    },
+    {
+      "version": "6.3.0",
+      "title": "option to have multiple widgets for a single plugin"
+    },
+    {
+      "version": "6.3.0",
+      "title": "resumable timers"
+    },
+    {
+      "version": "6.3.0",
+      "title": "keep capture log input when switching tabs on desktop (should have no effect on mobile)"
+    },
+    {
+      "version": "6.2.0",
+      "title": "reduce compress/increase quality of user uploaded images"
+    },
+    {
+      "version": "6.2.0",
+      "title": "remove feature restrictions requiring awards"
+    },
+    {
+      "version": "6.2.0",
+      "title": "automatically create a patch release and trigger app deploy to GH pages"
+    },
+    {
       "version": "6.0.17",
       "title": "adding support for plugins to open trackable editor"
     },
@@ -194,6 +222,42 @@
     }
   ],
   "fixes": [
+    {
+      "version": "6.4.0-dn",
+      "title": "dashboard editor widget delete fixed"
+    },
+    {
+      "version": "6.4.0-dn", 
+      "title": "timeframe bugs for last-7days & last week"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fixes a particular case where the tracking board doesn't load after initial onboarding"
+    },
+    {
+      "version": "6.3.0",
+      "title": "plugin titles visible on db editor"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fetch and cache location on app startup"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fixes bug where previous text overwrites capture field when using trackers consecutively"
+    },
+    {
+      "version": "6.2.0",
+      "title": "active board doesn't load/show trackables on page load"
+    },
+    {
+      "version": "6.2.0",
+      "title": "timeframe always being reset to Today in widget editor modal on save"
+    },
+    {
+      "version": "6.2.0",
+      "title": "remove auto focus on what's up text area"
+    },
     {
       "version": "6.0.18",
       "title": "tally trackers also include ignored by typeahead"
