@@ -1,7 +1,9 @@
 
 import { writable } from 'svelte/store'
 import type { ITracker } from '../../../modules/tracker/TrackerClass'
-import type TrackerClass from '../../../modules/tracker/TrackerClass'
+import TrackerClass from '../../../modules/tracker/TrackerClass'
+
+import trackables from '../all-individual-trackers.json';
 
 export type LibraryCategoryType = {
   id: string
@@ -37,21 +39,16 @@ export const saveLibraryTracker = async (props: LibraryTrackerType) => {
 }
 
 export const getAllLibraryTrackers = async () => {
-  // const collection = getCollectionRef()
-  // const q = query(collection)
-  // const final: Array<LibraryTrackerType> = []
-  // ;(await getDocs(q)).docs.forEach((doc) => {
-  //   const data: LibraryTrackerType = doc.data() as LibraryTrackerType
-  //   data._id = doc.id
-  //   if (data.trackers?.length) {
-  //     data.trackers = data.trackers.map((t) => new TrackerClass(t))
-  //   } else {
-  //     data.trackers = []
-  //   }
-  //   final.push(data)
-  // })
-  // return final
-  return []
+  const fullist = trackables.trackables;
+  let libraryTrackers: Array<LibraryTrackerType> = []
+  for (var tracker of fullist) {
+    var newtracker: LibraryTrackerType = {title:"",trackers:[],tags:[]}
+    newtracker.title = tracker.tracker.label;
+    newtracker.trackers = [new TrackerClass(tracker.tracker)]
+    newtracker._id = tracker.tracker.id;
+    libraryTrackers.push(newtracker)
+}
+  return libraryTrackers;
 }
 
 export const getLibraryTrackersByCategory = async (
