@@ -1,6 +1,10 @@
 {
   "features": [
     {
+      "version": "6.4.1-dn",
+      "title": "Tracker Library Added"
+    },
+    {
       "version": "6.4.0-dn",
       "title": "stats option for line bar charts"
     },
@@ -222,6 +226,10 @@
     }
   ],
   "fixes": [
+    {
+      "version": "6.4.0-dn",
+      "title": "fix option to compare trackables in statistics settings"
+    },
     {
       "version": "6.4.0-dn",
       "title": "dashboard editor widget delete fixed"

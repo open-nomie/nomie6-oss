@@ -1,0 +1,1294 @@
+{
+  "type": "template",
+  "id": "f0493d9475df74e3f6e4a037ef73a902",
+  "name": "All Individual Trackers in Nomie 6",
+  "description": "All Individual Trackers that came with Nomie 6",
+  "version": "6.0.18",
+  "trackables": [
+    {
+      "type": "tracker",
+      "id": "#adderall_xr",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "adderall_xr",
+        "label": "Adderall XR",
+        "type": "value",
+        "color": "#E91E63",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#alcohol",
+      "tracker": {
+        "id": "b8ad9b105651d05572b62c9d3f087642",
+        "tag": "alcohol",
+        "label": "Alcohol",
+        "type": "value",
+        "color": "#A1887F",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍹",
+        "avatar": null,
+        "default": 340.19,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#anxiety",
+      "tracker": {
+        "id": "c2c3eb6ef426f033d1caad1cea0086a8",
+        "tag": "anxiety",
+        "label": "Anxiety",
+        "type": "range",
+        "color": "#E91E63",
+        "math": "avg",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😬",
+        "avatar": null,
+        "default": null,
+        "max": "10",
+        "min": "0",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "v": 1,
+            "if": "value",
+            "is": "gt",
+            "sc": "-1"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#apple",
+      "tracker": {
+        "id": "4b5eed1aa68b12899fda153993c4b003",
+        "tag": "apple",
+        "label": "Apple",
+        "type": "range",
+        "color": "#E91E63",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍎",
+        "avatar": null,
+        "default": 0,
+        "max": "10",
+        "min": "1",
+        "step": "0.5",
+        "score": null,
+        "one_tap": false,
+        "include": "#cals({value}*15}",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#banana",
+      "tracker": {
+        "id": "4b5eed1aa68b12899fda153993c4b003",
+        "tag": "banana",
+        "label": "Banana",
+        "type": "range",
+        "color": "#FFCA28",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍌",
+        "avatar": null,
+        "default": 0,
+        "max": "10",
+        "min": "1",
+        "step": "0.5",
+        "score": null,
+        "one_tap": false,
+        "include": "#cals({value}*25}",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#beer",
+      "tracker": {
+        "id": "62b1ff24e09e541f14510abab4c0d867",
+        "tag": "beer",
+        "label": "beer",
+        "type": "value",
+        "color": "#369DD3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍺",
+        "avatar": null,
+        "default": 340.19,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": true,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#bourbon",
+      "tracker": {
+        "id": "30f9bdac0b8bae952110249c2754086f",
+        "tag": "bourbon",
+        "label": "Bourbon",
+        "type": "value",
+        "color": "#795548",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "milliliter",
+        "emoji": "🥃",
+        "avatar": null,
+        "default": 59.15,
+        "score": null,
+        "one_tap": false,
+        "include": "#alcohol({value}*0.45)",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#brocolli",
+      "tracker": {
+        "id": "4b5eed1aa68b12899fda153993c4b003",
+        "tag": "brocolli",
+        "label": "Brocolli ",
+        "type": "range",
+        "color": "#4CAF50",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🥦",
+        "avatar": null,
+        "default": 0,
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "#cals({value}*10}",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#brushed_teeth",
+      "tracker": {
+        "id": "7157ba86e4454e73e07c5ddd2e909222",
+        "tag": "brushed_teeth",
+        "label": "Brushed Teeth",
+        "type": "tick",
+        "color": "#448AFF",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🦷",
+        "avatar": null,
+        "default": null,
+        "score": "1",
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#cider",
+      "tracker": {
+        "id": "c4283ef38c6138b6d8410ecfe3369144",
+        "tag": "cider",
+        "label": "cider",
+        "type": "value",
+        "color": "#FF6900",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍺",
+        "avatar": null,
+        "default": 340.19,
+        "score": "-1",
+        "score_calc": null,
+        "goal": {
+          "v": 56,
+          "is": "lte",
+          "time": "week"
+        },
+        "one_tap": false,
+        "include": "#alcohol({value}*0.05)",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#coffee",
+      "tracker": {
+        "id": "86684b92f507c2d2f2207b6396e4f053",
+        "tag": "coffee",
+        "label": "coffee",
+        "type": "value",
+        "color": "#ef5350",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "cup",
+        "emoji": "☕️",
+        "avatar": null,
+        "default": "1.5",
+        "score": "custom",
+        "score_calc": [
+          {
+            "is": "gt",
+            "if": "value",
+            "sc": "-1",
+            "v": 3
+          }
+        ],
+        "goal": {
+          "is": "lte",
+          "v": 3,
+          "time": "day"
+        },
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#concerta",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "concerta",
+        "label": "Concerta",
+        "type": "value",
+        "color": "#00ACC1",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#energy",
+      "tracker": {
+        "id": "76520bf848435f7476e09b14cf4813be",
+        "tag": "energy",
+        "label": "Energy",
+        "type": "range",
+        "color": "#64DD17",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "🥊",
+        "avatar": null,
+        "default": "5",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "is": "lt",
+            "v": 4,
+            "sc": -1
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#evekeo",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "evekeo",
+        "label": "Evekeo",
+        "type": "value",
+        "color": "#2196F3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#fidgety",
+      "tracker": {
+        "id": "a861eb7c0e8e5fdd8a7b98c7062bbc04",
+        "tag": "fidgety",
+        "label": "FIdgety ",
+        "type": "range",
+        "color": "#7E57C2",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👾",
+        "avatar": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAQy4yOjIqQzo2OktHQ09kpmxkXFxkzJKaeabx1P767dTp5f//////////5en////////////////////////////bAEMBR0tLZFdkxGxsxP//6f/////////////////////////////////////////////////////////////////////AABEIACoAQAMBIgACEQEDEQH/xAAYAAEBAQEBAAAAAAAAAAAAAAAAAwIEAf/EAB0QAAMBAAIDAQAAAAAAAAAAAAABAhEDMRIhYUL/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAXEQEBAQEAAAAAAAAAAAAAAAAAARFB/9oADAMBAAIRAxEAPwDvAAA8q1PYbIcqvdlaWJVVyS/hs5EuWnnjiOjcFhLetgAigAAly14sK/Wjlal7RPW6z8s0zqqtNGbfrvDyZUp4Zmbdttppv18IvHSugF0CKAADNwr7MPjanEVA0xCIqU0ysTiNAAAAP//Z",
+        "default": "5",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#fireball",
+      "tracker": {
+        "id": "26fcd09682aa97fad0be1f94f2edb37a",
+        "tag": "fireball",
+        "label": "Fireball",
+        "type": "value",
+        "color": "#757575",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "☄️",
+        "avatar": null,
+        "default": 28.35,
+        "score": "-1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "#alcohol({value}*0.33) ",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#focalin",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "focalin",
+        "label": "Focalin",
+        "type": "value",
+        "color": "#9C27B0",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#focus",
+      "tracker": {
+        "id": "425c4ad5cfe891b8db1405ad195eff5b",
+        "tag": "focus",
+        "label": "Focus",
+        "type": "range",
+        "color": "#3F51B5",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🔎",
+        "avatar": null,
+        "default": "5",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#hyperactivity",
+      "tracker": {
+        "id": "24a82086dd7004b754cded0306661717",
+        "tag": "hyperactivity",
+        "label": "Hyperactivity ",
+        "type": "range",
+        "color": "#e57373",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👻",
+        "avatar": null,
+        "default": "5",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#made_bed",
+      "tracker": {
+        "id": "af94355afc9ab96ea2fabbb69c6e32e5",
+        "tag": "made_bed",
+        "label": "Made Bed",
+        "type": "tick",
+        "color": "#8E24AA",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🛏️",
+        "avatar": null,
+        "default": null,
+        "score": "1",
+        "one_tap": true,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "spirit"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#mega_sleep",
+      "tracker": {
+        "id": "31284fa4140f4a272f27b4deea82620b",
+        "tag": "mega_sleep",
+        "label": "Mega Sleep",
+        "type": "note",
+        "color": "#607D8B",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🛌🏻",
+        "avatar": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#sleep #sleep_rem #sleep_deep  #sleep_restless  #sleep_ahr #sleep_quality ",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep",
+      "tracker": {
+        "id": "45aea73c8557df054be60954709d569c",
+        "tag": "sleep",
+        "label": "Sleep",
+        "type": "timer",
+        "color": "#E040FB",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "timer",
+        "emoji": "😴",
+        "avatar": null,
+        "default": null,
+        "score": "custom",
+        "score_calc": [
+          {
+            "v": 25201,
+            "is": "lt",
+            "if": "value",
+            "sc": "-1"
+          },
+          {
+            "is": "gte",
+            "if": "value",
+            "sc": "1",
+            "v": 25200
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": "#sleep #sleep_quality",
+        "hidden": false,
+        "started": null,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_rem",
+      "tracker": {
+        "id": "608dff69e7d162608fad5549bc0533bd",
+        "tag": "sleep_rem",
+        "label": "Sleep Rem",
+        "type": "timer",
+        "color": "#369DD3",
+        "math": "avg",
+        "ignore_zeros": false,
+        "uom": "timer",
+        "emoji": "😌",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "started": null,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_deep",
+      "tracker": {
+        "id": "42d0fc164d99db38a4d69b640351038b",
+        "tag": "sleep_deep",
+        "label": "Sleep Deep",
+        "type": "timer",
+        "color": "#ABB8C3",
+        "math": "avg",
+        "ignore_zeros": false,
+        "uom": "timer",
+        "emoji": "😞",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "started": null,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_restless",
+      "tracker": {
+        "id": "c776dd391515de586ed45db298de44da",
+        "tag": "sleep_restless",
+        "label": "Restless",
+        "type": "value",
+        "color": "#7BDCB5",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👽",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_ahr",
+      "tracker": {
+        "id": "f9342bc47ad770d16c31f88aa5670ac1",
+        "tag": "sleep_ahr",
+        "label": "Sleep Ahr",
+        "type": "value",
+        "color": "#EB144C",
+        "math": "avg",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "❤️",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#sleep_quality",
+      "tracker": {
+        "id": "42f614c5a5871f07c5a247f038f4c8a1",
+        "tag": "sleep_quality",
+        "label": "Sleep Qual",
+        "type": "range",
+        "color": "#546E7A",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "percent",
+        "emoji": "🌚",
+        "avatar": null,
+        "default": "95",
+        "max": "100",
+        "min": "50",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "if": "value",
+            "sc": "1",
+            "is": "gt",
+            "v": 65
+          },
+          {
+            "is": "lte",
+            "if": "value",
+            "sc": "-1",
+            "v": 50
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": 1
+    },
+    {
+      "type": "tracker",
+      "id": "#mood",
+      "tracker": {
+        "id": "6ef79c0fb66e39ea3c0b0afdabdf6451",
+        "tag": "mood",
+        "label": "Mood",
+        "type": "range",
+        "color": "#FFAB91",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "😉",
+        "avatar": null,
+        "default": "3",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "sc": "1",
+            "is": "gt",
+            "v": 5,
+            "if": "value"
+          },
+          {
+            "if": "value",
+            "sc": "-1",
+            "v": 5,
+            "is": "lt"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#motivation",
+      "tracker": {
+        "id": "87a459edc213e5d48a62826e32486dec",
+        "tag": "motivation",
+        "label": "Motivation",
+        "type": "range",
+        "color": "#FF3D00",
+        "math": "mean",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🤑",
+        "avatar": null,
+        "default": "5",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#pullups",
+      "tracker": {
+        "id": "01df921a275b7f4112e52d162c74af1b",
+        "tag": "pullups",
+        "label": "Pullups",
+        "type": "value",
+        "color": "#558B2F",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "💪",
+        "avatar": null,
+        "default": "5",
+        "score": 4,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#pushups",
+      "tracker": {
+        "id": "cad53c64eb5e41d31be5df20cb984fff",
+        "tag": "pushups",
+        "label": "Pushups",
+        "type": "value",
+        "color": "#F50057",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🤽🏻‍♂️",
+        "avatar": null,
+        "default": "20",
+        "score": "1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#quillivant",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "quillivant",
+        "label": "Quillivant",
+        "type": "value",
+        "color": "#3F51B5",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#ritalin",
+      "tracker": {
+        "id": "968cfd338060b1a766f92198634b9696",
+        "tag": "ritalin",
+        "label": "Ritalin",
+        "type": "value",
+        "color": "#ef5350",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "mg",
+        "emoji": "💊",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body",
+          "mind"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#running",
+      "tracker": {
+        "id": "a65e4dc61ba00b8f05dbe86d8465987b",
+        "tag": "running",
+        "label": "Running",
+        "type": "value",
+        "color": "#00BCD4",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "km",
+        "emoji": "👟",
+        "avatar": null,
+        "default": 3.22,
+        "score": "1",
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#shower",
+      "tracker": {
+        "id": "e6e922975f7a3576c24a3470b20f429e",
+        "tag": "shower",
+        "label": "Shower",
+        "type": "tick",
+        "color": "#03A9F4",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🚿",
+        "avatar": null,
+        "default": null,
+        "score": "1",
+        "one_tap": true,
+        "include": "",
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#situps",
+      "tracker": {
+        "id": "e8548395fdf79c9e058a7a91e9726e31",
+        "tag": "situps",
+        "label": "Situps",
+        "type": "value",
+        "color": "#03A9F4",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "🧜🏼",
+        "avatar": null,
+        "default": null,
+        "score": "1",
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#slushy",
+      "tracker": {
+        "id": "a03daa19c273d08d3bbbf2ba442e4066",
+        "tag": "slushy",
+        "label": "Slushy",
+        "type": "value",
+        "color": "#9C27B0",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "milliliter",
+        "emoji": "🥤",
+        "avatar": null,
+        "default": 354.88,
+        "score": null,
+        "one_tap": false,
+        "include": "",
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#soda",
+      "tracker": {
+        "id": "6a5497b6b8db260bc98393cc9c09243e",
+        "tag": "soda",
+        "label": "soda",
+        "type": "value",
+        "color": "#0693E3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🥤",
+        "avatar": null,
+        "default": 340.19,
+        "score": "-1",
+        "score_calc": null,
+        "goal": {
+          "is": "lt",
+          "time": "day",
+          "v": 1
+        },
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#steps",
+      "tracker": {
+        "id": "54242ed60b4f56cd816c3288ec79396a",
+        "tag": "steps",
+        "label": "Steps",
+        "type": "value",
+        "color": "#7BDCB5",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "num",
+        "emoji": "👢",
+        "avatar": null,
+        "default": null,
+        "score": null,
+        "score_calc": null,
+        "goal": {
+          "is": "gt",
+          "time": "week",
+          "v": 40000
+        },
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": true,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#stress",
+      "tracker": {
+        "id": "bd2579beea14353cbe7b870f2ef73f3e",
+        "tag": "stress",
+        "label": "Stress",
+        "type": "range",
+        "color": "#D500F9",
+        "math": "mean",
+        "ignore_zeros": true,
+        "uom": "num",
+        "emoji": "😬",
+        "avatar": null,
+        "default": "6",
+        "max": "10",
+        "min": "1",
+        "step": "1",
+        "score": "custom",
+        "score_calc": [
+          {
+            "v": 4,
+            "sc": "1",
+            "is": "lte",
+            "if": "value"
+          },
+          {
+            "v": 5,
+            "is": "gt",
+            "sc": "-1",
+            "if": "value"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#tea",
+      "tracker": {
+        "id": "14bc2ea4de19f9d3128576cd12a5585f",
+        "tag": "tea",
+        "label": "Tea",
+        "type": "value",
+        "color": "#00BCD4",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "milliliter",
+        "emoji": "🍵",
+        "avatar": null,
+        "default": 118.29,
+        "score": null,
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#vodka",
+      "tracker": {
+        "id": "26fcd09682aa97fad0be1f94f2edb37a",
+        "tag": "vodka",
+        "label": "vodka",
+        "type": "value",
+        "color": "#757575",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🥃",
+        "avatar": null,
+        "default": 56.7,
+        "score": "-1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "#alcohol({value}*0.4) ",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#walk",
+      "tracker": {
+        "id": "36e674b8ff44d4244aeed65f5b864f5a",
+        "tag": "walk",
+        "label": "Walk",
+        "type": "value",
+        "color": "#369DD3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "km",
+        "emoji": "🚶",
+        "avatar": null,
+        "default": 2.41,
+        "score": "1",
+        "score_calc": null,
+        "goal": null,
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#water",
+      "tracker": {
+        "id": "97ceaea694840fb1c4dbeab66ecf6ca3",
+        "tag": "water",
+        "label": "Water",
+        "type": "value",
+        "color": "#0693E3",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "milliliter",
+        "emoji": "💧",
+        "avatar": null,
+        "default": 354.88,
+        "score": "1",
+        "score_calc": [],
+        "goal": {
+          "is": "gte",
+          "time": "day",
+          "v": 48
+        },
+        "one_tap": false,
+        "include": "",
+        "note": null,
+        "hidden": false,
+        "focus": [
+          "body"
+        ]
+      },
+      "value": null
+    },
+    {
+      "type": "tracker",
+      "id": "#wine",
+      "tracker": {
+        "id": "17399f5aaa294139ccb0b72a9835370f",
+        "tag": "wine",
+        "label": "wine",
+        "type": "value",
+        "color": "#EB144C",
+        "math": "sum",
+        "ignore_zeros": false,
+        "uom": "gram",
+        "emoji": "🍷",
+        "avatar": null,
+        "default": 113.4,
+        "score": null,
+        "score_calc": [
+          {
+            "v": 18,
+            "sc": 1,
+            "if": "total",
+            "is": "gt"
+          }
+        ],
+        "goal": null,
+        "one_tap": false,
+        "include": "#alcohol({value}*0.2)",
+        "note": null,
+        "hidden": false,
+        "focus": []
+      },
+      "value": null
+    }
+  ],
+  "goals": [],
+  "boards": [],
+  "dashboards": []
+}
