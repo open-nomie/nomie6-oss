@@ -1,6 +1,10 @@
 {
   "features": [
     {
+      "version": "6.4.1-dn",
+      "title": "Tracker Library Added"
+    },
+    {
       "version": "6.4.0-dn",
       "title": "stats option for line bar charts"
     },
