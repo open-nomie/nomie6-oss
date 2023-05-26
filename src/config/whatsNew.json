@@ -227,6 +227,10 @@
   ],
   "fixes": [
     {
+      "version": "6.4.2-dn",
+      "title": "fix dataloss bug"
+    },
+    {
       "version": "6.4.0-dn",
       "title": "fix option to compare trackables in statistics settings"
     },
