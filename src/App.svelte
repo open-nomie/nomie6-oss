@@ -48,15 +48,19 @@
   import { bootCoreComponents, bootNomie } from './BootStore'
 
   import { TrackableStore } from './domains/trackable/TrackableStore'
+  import { TrackerStore } from './domains/tracker/TrackerStore'
+  import { PeopleStore } from './domains/people/PeopleStore'
   import { GoalStore, loadGoalsForToday } from './domains/goals/GoalStore'
   import { LedgerStore } from './domains/ledger/LedgerStore'
   import { loadToday } from './domains/usage/today/TodayStore'
 
   import { trackLaunch } from './domains/preferences/LaunchCount'
+  import { LaunchCount } from './domains/preferences/LaunchCount';
   import PluginLoader from './domains/plugins/plugin-loader.svelte'
   import { PluginStore } from './domains/plugins/PluginStore'
   import Setup from './domains/setup/setup.svelte'
   import locate from './modules/locate/locate'
+  import { Interaction } from 'chart.js'
 
   // initiailze gestures
   gestures()
@@ -72,7 +76,7 @@
    * Fire off the MinuteChecker30 every 30 minutes
    * This will check if the day changed
    */
-  let todayCheckPeriod = 1000 * 60 * 2
+  let todayCheckPeriod = 1000 * 60 * 1
   let todayCheckFormat = 'YYYY-MM-DD'
   // let todayKey = dayjs().format(todayCheckFormat)
   let todayKey = dayjs().format(todayCheckFormat)
@@ -104,11 +108,37 @@
     }
   }
 
+  const checkConnection = async () => {
+    // Check if lost Data
+    var pouchdbcheck = false;
+    var firsdateavailable = false;
+    var totalcount = Object.keys($TrackerStore).length + Object.keys($PeopleStore).length;
+    var firstdate = await LedgerStore.getFirstDate(true)
+    if (firstdate) {firsdateavailable = true}
+    if ($Prefs.storageType === 'pouchdb') {pouchdbcheck = true}
+    console.log("check data lost")
+    console.log("Launchcount: ",$LaunchCount)
+    console.log("Trackablecount: ",totalcount)
+    console.log("FirstDate: ",firsdateavailable)
+    console.log("PouchDB On: ",pouchdbcheck)
+    if (pouchdbcheck && totalcount == 0 && !firsdateavailable) {
+      console.log("Reload triggered due to dataloss bug")
+      let confirm = await Interact.confirm(
+      `Reload triggered due to dataloss bug`,
+      `Now you can reload Nomie`,
+      'Yes, Reload'
+    )
+    if (confirm) {
+      window.location.href = window.location.href}
+  }
+  }
+
   // Check every X minutes
-  setInterval(() => {
+  setInterval(async () => {
     checkIfNewDay()
     // Check if the theme has Changed
     setDocParams()
+    await checkConnection()
   }, todayCheckPeriod)
 
   const hideSplashScreen = () => {
