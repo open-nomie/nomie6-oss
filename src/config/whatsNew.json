@@ -227,8 +227,8 @@
   ],
   "fixes": [
     {
-      "version": "6.4.2-dn",
-      "title": "fix dataloss bug"
+      "version": "6.4.2a-dn",
+      "title": "dirty fix dataloss bug"
     },
     {
       "version": "6.4.0-dn",
