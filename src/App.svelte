@@ -48,8 +48,8 @@
   import { bootCoreComponents, bootNomie } from './BootStore'
 
   import { TrackableStore } from './domains/trackable/TrackableStore'
-  //import { TrackerStore } from './domains/tracker/TrackerStore'
-  //import { PeopleStore } from './domains/people/PeopleStore'
+  import { TrackerStore } from './domains/tracker/TrackerStore'
+  import { PeopleStore } from './domains/people/PeopleStore'
   import { GoalStore, loadGoalsForToday } from './domains/goals/GoalStore'
   import { LedgerStore } from './domains/ledger/LedgerStore'
   import { loadToday } from './domains/usage/today/TodayStore'
@@ -115,13 +115,13 @@
     var firstdatechanged = false;
     //var totalcount = Object.keys($TrackerStore).length + Object.keys($PeopleStore).length;
     var firstdate = await LedgerStore.getFirstDate(true)
-    if (firstdate.toString() != last_firstdate.toString()) {firstdatechanged = true}
+    if (firstdate.toDate() < last_firstdate.toDate()) {firstdatechanged = true}
     if ($Prefs.storageType === 'pouchdb') {pouchdbcheck = true}
     console.log("check data lost")
     //console.log("Launchcount: ",$LaunchCount)
     //console.log("Trackablecount: ",totalcount)
-    console.log("First Date: ",firstdate.toString())
-    console.log("Last First Date: ",last_firstdate.toString())
+    console.log("First Date: ",firstdate.toDate())
+    console.log("Last First Date: ",last_firstdate.toDate())
     console.log("FirstDate Changed: ",firstdatechanged)
     console.log("PouchDB On: ",pouchdbcheck)
     if (pouchdbcheck && firstdatechanged) {
