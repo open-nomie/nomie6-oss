@@ -48,19 +48,18 @@
   import { bootCoreComponents, bootNomie } from './BootStore'
 
   import { TrackableStore } from './domains/trackable/TrackableStore'
-  import { TrackerStore } from './domains/tracker/TrackerStore'
-  import { PeopleStore } from './domains/people/PeopleStore'
+  //import { TrackerStore } from './domains/tracker/TrackerStore'
+  //import { PeopleStore } from './domains/people/PeopleStore'
   import { GoalStore, loadGoalsForToday } from './domains/goals/GoalStore'
   import { LedgerStore } from './domains/ledger/LedgerStore'
   import { loadToday } from './domains/usage/today/TodayStore'
 
   import { trackLaunch } from './domains/preferences/LaunchCount'
-  import { LaunchCount } from './domains/preferences/LaunchCount';
+  //import { LaunchCount } from './domains/preferences/LaunchCount';
   import PluginLoader from './domains/plugins/plugin-loader.svelte'
   import { PluginStore } from './domains/plugins/PluginStore'
   import Setup from './domains/setup/setup.svelte'
   import locate from './modules/locate/locate'
-  import { Interaction } from 'chart.js'
 
   // initiailze gestures
   gestures()
@@ -83,6 +82,7 @@
 
   let loading = true
   let onBoarding: Boolean | undefined = undefined
+  let last_firstdate = undefined
 
   /**
    * Check if New Day
@@ -110,18 +110,21 @@
 
   const checkConnection = async () => {
     // Check if lost Data
+    if (last_firstdate == undefined) {last_firstdate = await LedgerStore.getFirstDate(true)}
     var pouchdbcheck = false;
-    var firsdateavailable = false;
-    var totalcount = Object.keys($TrackerStore).length + Object.keys($PeopleStore).length;
+    var firstdatechanged = false;
+    //var totalcount = Object.keys($TrackerStore).length + Object.keys($PeopleStore).length;
     var firstdate = await LedgerStore.getFirstDate(true)
-    if (firstdate) {firsdateavailable = true}
+    if (firstdate.toString() != last_firstdate.toString()) {firstdatechanged = true}
     if ($Prefs.storageType === 'pouchdb') {pouchdbcheck = true}
     console.log("check data lost")
-    console.log("Launchcount: ",$LaunchCount)
-    console.log("Trackablecount: ",totalcount)
-    console.log("FirstDate: ",firsdateavailable)
+    //console.log("Launchcount: ",$LaunchCount)
+    //console.log("Trackablecount: ",totalcount)
+    console.log("First Date: ",firstdate.toString())
+    console.log("Last First Date: ",last_firstdate.toString())
+    console.log("FirstDate Changed: ",firstdatechanged)
     console.log("PouchDB On: ",pouchdbcheck)
-    if (pouchdbcheck && totalcount == 0 && !firsdateavailable) {
+    if (pouchdbcheck && firstdatechanged) {
       console.log("Reload triggered due to dataloss bug")
       let confirm = await Interact.confirm(
       `Reload triggered due to dataloss bug`,
