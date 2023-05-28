@@ -228,7 +228,7 @@
   "fixes": [
     {
       "version": "6.4.2a-dn",
-      "title": "dirty fix dataloss bug"
+      "title": "Reload Database fix when transaction on'IDBDatabase' fails"
     },
     {
       "version": "6.4.0-dn",
