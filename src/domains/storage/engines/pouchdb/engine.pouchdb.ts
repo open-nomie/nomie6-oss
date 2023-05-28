@@ -192,7 +192,7 @@ export const PouchDBEngine: IStorage = {
     let doc = null
     try {
       doc = await this.db.get(path)
-    } catch (e) { }
+    } catch (e) { console.log("getFullDoc error")}
     return doc
   },
   async get(path, onChange) {
@@ -204,7 +204,7 @@ export const PouchDBEngine: IStorage = {
     try {
       let fullDoc = await this.getFullDoc(path)
       doc = fullDoc ? fullDoc.data : null
-    } catch (e) { }
+    } catch (e) {console.log("get error") }
     return doc
   },
   async list() {
