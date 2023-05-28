@@ -12,6 +12,7 @@ import Remote from '../../../../modules/remote/remote'
  */
 // import pouchdb from "pouchdb";
 import Storage from '../../storage'
+import { useLocation, useNavigate } from 'svelte-navigator'
 
 // import * as PouchDB from 'pouchdb';
 
@@ -194,21 +195,23 @@ export const PouchDBEngine: IStorage = {
       doc = await this.db.get(path)
     } catch (e) { 
      console.log("getFullDoc error found => reload DB",e)
-     // let confirm = await Interact.confirm(
-     //   `Reload DB triggered due to dataloss bug`,
-     //   `Now you can reload Nomie`,
-     //   'Yes, Reload'
-     // )
-     // if (confirm) {
-       // this.db = new PouchDB(dbKey, {
-       //   auto_compaction: true,
-       //   ajax: { cache: false },
-       // })
+     if (e.toString().includes("Failed to execute 'transaction' on 'IDBDatabase'"))
+     {
+      let confirm = await Interact.confirm(
+        `Reload DB triggered due to dataloss bug`,
+        `Now you can reload Nomie`,
+        'Yes, Reload'
+      )
+      if (confirm) {
+        this.db = new PouchDB(dbKey, {
+          auto_compaction: true,
+          ajax: { cache: false },
+        })
         //window.location.reload()
-        //window.location.href = window.location.href
+        window.location.href = window.location.href
         //window.location.href = '/'
-    //  }
-    }
+      }
+    }}
     return doc
   },
   async get(path, onChange) {
