@@ -204,6 +204,7 @@ export const PouchDBEngine: IStorage = {
           auto_compaction: true,
           ajax: { cache: false },
         })
+        window.location.reload()
         //window.location.href = window.location.href
       }}
     return doc
