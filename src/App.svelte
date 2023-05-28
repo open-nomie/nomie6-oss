@@ -75,7 +75,7 @@
    * Fire off the MinuteChecker30 every 30 minutes
    * This will check if the day changed
    */
-  let todayCheckPeriod = 1000 * 60 * 1
+  let todayCheckPeriod = 1000 * 60 * 2
   let todayCheckFormat = 'YYYY-MM-DD'
   // let todayKey = dayjs().format(todayCheckFormat)
   let todayKey = dayjs().format(todayCheckFormat)
@@ -108,40 +108,11 @@
     }
   }
 
-  const checkConnection = async () => {
-    // Check if lost Data
-    if (last_firstdate == undefined) {last_firstdate = await LedgerStore.getFirstDate(true)}
-    var pouchdbcheck = false;
-    var firstdatechanged = false;
-    //var totalcount = Object.keys($TrackerStore).length + Object.keys($PeopleStore).length;
-    var firstdate = await LedgerStore.getFirstDate(true)
-    if (firstdate.toDate() < last_firstdate.toDate()) {firstdatechanged = true}
-    if ($Prefs.storageType === 'pouchdb') {pouchdbcheck = true}
-    console.log("check data lost")
-    //console.log("Launchcount: ",$LaunchCount)
-    //console.log("Trackablecount: ",totalcount)
-    console.log("First Date: ",firstdate.toDate())
-    console.log("Last First Date: ",last_firstdate.toDate())
-    console.log("FirstDate Changed: ",firstdatechanged)
-    console.log("PouchDB On: ",pouchdbcheck)
-    if (pouchdbcheck && firstdatechanged) {
-      console.log("Reload triggered due to dataloss bug")
-      let confirm = await Interact.confirm(
-      `Reload triggered due to dataloss bug`,
-      `Now you can reload Nomie`,
-      'Yes, Reload'
-    )
-    if (confirm) {
-      window.location.href = window.location.href}
-  }
-  }
-
   // Check every X minutes
   setInterval(async () => {
     checkIfNewDay()
     // Check if the theme has Changed
     setDocParams()
-    await checkConnection()
   }, todayCheckPeriod)
 
   const hideSplashScreen = () => {
