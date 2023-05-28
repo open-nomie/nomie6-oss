@@ -194,24 +194,16 @@ export const PouchDBEngine: IStorage = {
     try {
       doc = await this.db.get(path)
     } catch (e) { 
-     console.log("getFullDoc error found => reload DB",e)
-     if (e.toString().includes("Failed to execute 'transaction' on 'IDBDatabase'"))
-     {
-      let confirm = await Interact.confirm(
-        `Reload DB triggered due to dataloss bug`,
-        `Now you can reload Nomie`,
-        'Yes, Reload'
-      )
-      if (confirm) {
-        this.db = new PouchDB(dbKey, {
+      console.log("getFullDoc error found: ",e)
+      if (e.toString().includes("Failed to execute 'transaction' on 'IDBDatabase'"))
+        {console.log("Reload DB action triggered",e)
+          this.db = new PouchDB(dbKey, {
           auto_compaction: true,
           ajax: { cache: false },
-        })
-        //window.location.reload()
-        window.location.href = window.location.href
-        //window.location.href = '/'
-      }
-    }}
+          })
+         window.location.href = window.location.href
+        }
+    }
     return doc
   },
   async get(path, onChange) {
