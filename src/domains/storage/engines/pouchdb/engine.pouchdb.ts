@@ -12,7 +12,6 @@ import Remote from '../../../../modules/remote/remote'
  */
 // import pouchdb from "pouchdb";
 import Storage from '../../storage'
-import { useLocation, useNavigate } from 'svelte-navigator'
 
 // import * as PouchDB from 'pouchdb';
 
