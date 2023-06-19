@@ -57,6 +57,7 @@
   import ChatboxOutline from '../../n-icons/ChatboxOutline.svelte'
   import Badge from '../../components/badge/badge.svelte'
   import { openTemplateManager } from '../templates/templates-svelte-helpers'
+  import { openAnalytics } from '../templates/templates-svelte-helpers'
   import { openPluginsModal } from '../plugins/PluginStore'
   import PluginsMoreMenu from '../plugins/plugins-more-menu.svelte'
 
@@ -194,6 +195,12 @@
             <List solo className="mt-4">
               <ListItem detail bottomLine={16} on:click={() => openTemplateManager()} title="Templates">
                 <span slot="left">🏭</span>
+              </ListItem>
+            </List>
+
+            <List solo className="mt-4">
+              <ListItem detail bottomLine={16} on:click={() => openAnalytics()} title="Analytics">
+                <span slot="left">💡</span>
               </ListItem>
             </List>
 

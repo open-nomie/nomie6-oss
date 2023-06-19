@@ -38,6 +38,7 @@
     boards: { running: false, done: false },
     locations: { running: false, done: false },
     goals: { running: false, done: false },
+    pivots: { running: false, done: false },
     logs: { running: false, done: false, progress: 0 },
     trackers: { running: false, done: false },
     people: { running: false, done: false },
@@ -363,6 +364,23 @@
         </ListItem>
       {/if}
 
+      <!-- Importable Items -->
+      {#if importLoader.normalized.pivots?.length > 0}
+        <ImporterItem
+          emoji="🤪"
+          title="Pivots"
+          count={importLoader.normalized.pivots?.length.toLocaleString()}
+          bind:status={importing.pivots}
+          on:import={() => {
+            // methods.importTrackers(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.pivots', 'Pivots')}>
+          <div slot="left">🏆</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
       <!-- Importable Items -->
       {#if importLoader.normalized.goals?.length > 0}
         <ImporterItem

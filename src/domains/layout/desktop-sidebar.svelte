@@ -11,6 +11,10 @@
 
   import AppsOutline from '../../n-icons/AppsOutline.svelte'
   import AppsSolid from '../../n-icons/AppsSolid.svelte'
+  //import BarChartSolid from '../../n-icons/BarChartSolid.svelte'
+  //import BarChartOutline from '../../n-icons/BarChartOutline.svelte'
+  import CubeOutline from '../../n-icons/CubeOutline.svelte'
+  import CubeSolid from '../../n-icons/CubeSolid.svelte'
 
   import EaselSolid from '../../n-icons/EaselSolid.svelte'
   import RibbonSolid from '../../n-icons/RibbonSolid.svelte'
@@ -91,6 +95,13 @@
       title: Lang.t('tabs.goals', 'Goals'),
       icon: RibbonOutline,
       activeIcon: RibbonSolid,
+    },
+    {
+      id: 'analytics',
+      path: '/analytics',
+      title: Lang.t('tabs.analytics', 'Analytics'),
+      icon: CubeOutline,
+      activeIcon: CubeSolid,
     },
     // {
     //   id: 'awards',

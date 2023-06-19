@@ -41,7 +41,6 @@
   // import DateRangeController from '../../components/date-range-controller/date-range-controller.svelte'
   import dayjs from 'dayjs'
   import { LedgerStore } from '../ledger/LedgerStore'
-  import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
 
   let view: GoalDurationType = 'day'
   let goals: Array<GoalClass> = []

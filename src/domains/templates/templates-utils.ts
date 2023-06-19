@@ -7,6 +7,7 @@ import type { ITracker } from "../../modules/tracker/TrackerClass"
 import type { UniboardType } from "../board/UniboardStore"
 import type { DashboardClass } from "../dashboard2/dashboard-class"
 import type { GoalClass } from "../goals/goal-class"
+import type { PivotClass } from "../analytics/pivot-class"
 import type { StorageBackupType } from "../storage/storage-export.helper"
 import type { Trackable } from "../trackable/Trackable.class"
 import { UOMClass } from "../uom/uom.class"
@@ -21,6 +22,7 @@ export type TemplateType = {
   version?: string
   trackables: Array<Trackable>
   goals: Array<GoalClass>
+  pivots: Array<PivotClass>
   boards: Array<UniboardType>
   dashboards: Array<DashboardClass>
 }
@@ -35,6 +37,7 @@ export class Template {
   version?: string
   trackables: Array<Trackable>
   goals: Array<GoalClass>
+  pivots: Array<PivotClass>
   boards: Array<UniboardType>
   dashboards: Array<DashboardClass>
   constructor(starter?:TemplateType) {
@@ -46,6 +49,7 @@ export class Template {
     this.version = base.version || AppVersion;
     this.trackables = base.trackables ? base.trackables : [];
     this.goals = base.goals ? base.goals : [];
+    this.pivots = base.pivots ? base.pivots : [];
     this.boards = base.boards ? base.boards : [];
     this.dashboards = base.dashboards ? base.dashboards : [];
   }

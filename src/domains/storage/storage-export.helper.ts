@@ -6,6 +6,7 @@ import type { UniboardType } from "../board/UniboardStore"
 import type { ContextType } from "../context/context-class"
 import type { DashboardClass } from "../dashboard2/dashboard-class"
 import type { GoalType } from "../goals/goal-class"
+import type { PivotType } from "../analytics/pivot-class"
 import { convertTrackerValue, Template } from "../templates/templates-utils"
 
 export type StorageBackupType = {
@@ -16,6 +17,7 @@ export type StorageBackupType = {
     "boards.json"?: Array<UniboardType>,
     "dashboards.json"?: Array<DashboardClass>,
     "goals.json"?: Array<GoalType>,
+    "pivots.json"?: Array<PivotType>,
     "trackers.json"?: ITrackers,
     "people.json"?: IPeople,
     "context.json"?: Array<ContextType>
@@ -36,6 +38,7 @@ export const TemplateToImport = (template:Template, useMetric:boolean = false):S
       "people.json": people,
       "context.json": template.trackables.filter(t=>t.type == 'context').map(t=>t),
       "goals.json": template.goals,
+      "pivots.json": template.pivots,
       "dashboards.json": template.dashboards,
       "boards.json": template.boards
     }

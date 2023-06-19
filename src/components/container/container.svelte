@@ -3,7 +3,7 @@
   export let className: string = ''
 </script>
 
-<div class={`nui-container nui-container-${size} ${className}`}>
+<div class={`nui-container nui-container-${size} ${className}`}> 
   <slot />
 </div>
 

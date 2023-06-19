@@ -51,6 +51,7 @@
   import { TrackerStore } from './domains/tracker/TrackerStore'
   import { PeopleStore } from './domains/people/PeopleStore'
   import { GoalStore, loadGoalsForToday } from './domains/goals/GoalStore'
+  import { PivotStore } from './domains/analytics/PivotStore'
   import { LedgerStore } from './domains/ledger/LedgerStore'
   import { loadToday } from './domains/usage/today/TodayStore'
 

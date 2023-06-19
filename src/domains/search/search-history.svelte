@@ -15,7 +15,7 @@
 </script>
 
 <Panel className="h-full">
-  <main class="h-full mb-4 bg-gray-200 filler dark:bg-gray-800">
+  <main class="h-full mb-4 bg-gray-200 filler dark:bg-gray-800"> 
     {#if term}
       <section class="h-full p-4 search-results">
         <LogListLoader

@@ -1,5 +1,6 @@
 import { Device } from './store/device-store'
 import { GoalStore } from './domains/goals/GoalStore'
+import { PivotStore } from './domains/analytics/PivotStore'
 import { InitTrackableStore } from './domains/trackable/TrackableStore'
 import { Interact } from './store/interact'
 import { LedgerStore } from './domains/ledger/LedgerStore'
@@ -61,6 +62,7 @@ export const bootCoreComponents = async (trackables: ITrackables) => {
   Device.init()
   UsageStore.init()
   GoalStore.init()
+  PivotStore.init()
   SearchStore.init()
   WritingPromptStore.init();
   initAwardStore()

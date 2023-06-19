@@ -245,6 +245,7 @@ export default {
       dashboard: 'Dash',
       track: 'Track',
       settings: 'Settings',
+      analytics: 'Analytics',
     },
     'nomie-api': {
       'generate-api-key': 'Generate API Key...',
