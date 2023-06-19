@@ -32,10 +32,10 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       
       - name: Build and push Docker image
-        run: |
-              export NODE_OPTIONS="--max_old_space_size=8192"
-              docker build . --tag ${{ steps.meta.outputs.tags }}
-              docker push ${{ steps.meta.outputs.tags }}
-        env:
-              NODE_OPTIONS: --max_old_space_size=4096
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
         
