@@ -6,7 +6,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NODE_OPTIONS: "--max_old_space_size=4096"
+  NODE_OPTIONS: "--max_old_space_size=8192"
 
 jobs:
   build-and-push-image:
