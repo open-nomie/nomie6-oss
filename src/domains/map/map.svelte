@@ -511,7 +511,7 @@
   .leaflet-touch .geocoder-control::after {
     content: '🔎';
     display: block;
-    z-idnex: 1000;
+    z-index: 1000;
   }
 
   .n-map-container .n-map-wrapper {

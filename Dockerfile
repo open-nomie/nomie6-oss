@@ -4,7 +4,7 @@ WORKDIR /usr/app
 COPY ./package.json ./
 RUN npm install
 COPY ./ /usr/app
-RUN npm run vbuild
+RUN NODE_OPTIONS=--max-old-space-size=8192 npm run vbuild
 
 FROM nginx
 WORKDIR /usr/app
