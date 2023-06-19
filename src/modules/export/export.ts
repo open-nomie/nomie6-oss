@@ -6,6 +6,8 @@ import { ContextStore } from '../../domains/context/context-store'
 import type { DashboardClass } from '../../domains/dashboard2/dashboard-class'
 import type { GoalClass } from '../../domains/goals/goal-class'
 import { GoalStore } from '../../domains/goals/GoalStore'
+import type { PivotClass } from '../../domains/analytics/pivot-class'
+import { PivotStore } from '../../domains/analytics/PivotStore'
 import { Interact } from '../../store/interact'
 import { LedgerStore } from '../../domains/ledger/LedgerStore'
 import type Location from '../../domains/locations/LocationClass'
@@ -33,6 +35,7 @@ export interface IBackupItems {
     endDate: string
   }
   goals: Array<GoalClass>
+  pivots: Array<PivotClass>
   boards: Array<UniboardType>
   events: Array<NLog>
   trackers: ITrackers
@@ -59,6 +62,7 @@ export default class Export {
         endDate: new Date().toJSON(),
       },
       goals: options.goals || [],
+      pivots: options.pivots || [],
       boards: options.boards || [],
       events: options.events || [],
       trackers: options.trackers || {},
@@ -83,6 +87,10 @@ export default class Export {
       this.fireChange('Goals...')
       let goals = await GoalStore.rawState()
       this.backup.goals = goals
+
+      this.fireChange('Pivots...')
+      let pivots = await PivotStore.rawState()
+      this.backup.pivots = pivots
 
       this.fireChange('Context...')
       let context = await ContextStore.rawState()

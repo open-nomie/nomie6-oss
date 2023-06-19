@@ -30,6 +30,8 @@
   import type { ITrackables } from '../ledger/ledger-tools'
   import { GoalStore } from '../goals/GoalStore'
   import type { GoalClass } from '../goals/goal-class'
+  import { PivotStore } from '../analytics/PivotStore'
+  import type { PivotClass } from '../analytics/pivot-class'
   // import download from '../../modules/download/download'
   // import { strToTagSafe } from '../trackable/trackable-utils'
 
@@ -318,6 +320,35 @@
     // })
   }
 
+  const openPivotImporter = (pivots: Array<PivotClass>) => {
+    const buttons = pivots.map((pivot: PivotClass) => {
+      return {
+        title: `${pivot.emoji}${pivot.tag}`,
+        id: pivot.tag,
+        click() {
+          let index = template.pivots.findIndex((g) => g.id === pivot.id)
+          if (index > -1) {
+            template.pivots[index] = pivot
+          } else {
+            template.pivots.push(pivot)
+          }
+          template.pivots = template.pivots
+        },
+      }
+    })
+    
+    openPopMenu({
+      id: 'import-pivot',
+      title: 'Which pivot would you like to import?',
+      buttons: buttons,
+    })
+  }
+
+  const addPivot = async () => {
+    openPivotImporter($PivotStore)
+    
+  }
+
   const addTrackableOptions = () => {
     openPopMenu({
       id: 'add-trackable',
@@ -403,6 +434,22 @@
             <span>{goal.tag}</span>
             <span>{goal.comparison}</span>
             <span>{goal.target}</span>
+          </div>
+        </ListItem>
+      {/each}
+    {/if}
+  </List>
+  <List solo outside title="Pivots">
+    <Button size="sm" on:click={() => addPivot()} primary clear slot="header-right">+ Add</Button>
+    {#if !template.pivots.length}
+      <Empty small>
+        <span class="text-gray-500">No Pivots</span>
+      </Empty>
+    {:else}
+      {#each template.pivots as pivot, index}
+        <ListItem>
+          <div class="ntitle">
+            <span>{pivot.emoji}{pivot.tag}</span>
           </div>
         </ListItem>
       {/each}

@@ -12,6 +12,9 @@ import BarChartIcon from '../../n-icons/BarChart.svelte'
 import BarChartOutlineIcon from '../../n-icons/BarChartOutline.svelte'
 import BarChartSolidIcon from '../../n-icons/BarChartSolid.svelte'
 import BookOutlineIcon from '../../n-icons/BookOutline.svelte'
+import BulbOutlineIcon from '../../n-icons/BulbOutline.svelte'
+import CubeOutlineIcon from '../../n-icons/CubeOutline.svelte'
+import CubeSolidIcon from '../../n-icons/CubeSolid.svelte'
 import CalendarOutlineIcon from '../../n-icons/CalendarOutline.svelte'
 import CalendarSolidIcon from '../../n-icons/CalendarSolid.svelte'
 import CaretDownIcon from '../../n-icons/CaretDown.svelte'
@@ -34,6 +37,7 @@ import EaselOutlineIcon from '../../n-icons/EaselOutline.svelte'
 import EaselSolidIcon from '../../n-icons/EaselSolid.svelte'
 import ExpandOutlineIcon from '../../n-icons/ExpandOutline.svelte'
 import EyeSolidIcon from '../../n-icons/EyeSolid.svelte'
+import EyeClosedSolidIcon from '../../n-icons/EyeClosedSolid.svelte'
 import GitCompareOutlineIcon from '../../n-icons/Git.svelte'
 import HappyOutlineIcon from '../../n-icons/HappyOutline.svelte'
 import LineChartOutlineIcon from '../../n-icons/LineChartOutline.svelte'
@@ -136,6 +140,12 @@ export const MapOutline = MapOutlineIcon
 
 export const BookOutline = BookOutlineIcon
 
+export const BulbOutline = BulbOutlineIcon
+
+export const CubeOutline = CubeOutlineIcon
+
+export const CubeSolid = CubeSolidIcon
+
 export const CalendarOutline = CalendarOutlineIcon
 
 export const ExpandOutline = ExpandOutlineIcon
@@ -188,6 +198,8 @@ export const SettingsSolid = SettingsSolidIcon
 export const StopSolid = StopSolidIcon
 
 export const EyeSolid = EyeSolidIcon
+
+export const EyeClosedSolid = EyeClosedSolidIcon
 
 export const AlarmOutline = AlarmOutlineIcon
 

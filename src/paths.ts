@@ -77,6 +77,9 @@ const NPaths = {
     goals() {
       return `goals.json`
     },
+    pivots() {
+      return `pivots.json`
+    },
     awards() {
       return `awards.json`
     },

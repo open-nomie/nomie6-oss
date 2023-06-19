@@ -14,6 +14,7 @@ import { InitTrackableStore, TrackableStore } from '../trackable/TrackableStore'
 import { initializeDashStore } from '../dashboard2/DashStore'
 import { initUniboardStore } from '../board/UniboardStore'
 import is from '../../utils/is/is'
+import { navigate } from 'svelte-navigator'
 
 /* Creating a store for the templates. */
 export const TemplateStore = createArrayStore(NPaths.storage.templates(), {
@@ -35,6 +36,10 @@ export const openTemplateManager = () => {
     id: 'template-manager',
     component: TemplateManagerModal,
   })
+}
+
+export const openAnalytics = () => {
+  navigate('/analytics')
 }
 
 /**

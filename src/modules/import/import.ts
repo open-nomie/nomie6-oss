@@ -1,5 +1,6 @@
 import type { DashboardClass } from '../../domains/dashboard2/dashboard-class'
 import type { GoalClass } from '../../domains/goals/goal-class'
+import type { PivotClass } from '../../domains/analytics/pivot-class'
 import type { IPerson } from '../../domains/people/Person.class'
 import { N1ImportNormalizer } from './import.n1'
 import { N2ImportNormalizer } from './import.n2'
@@ -25,6 +26,7 @@ export type INormalizedImport = {
   locations?: Array<Location>
   dashboards?: Array<DashboardClass>
   goals?: Array<GoalClass>
+  pivots?: Array<PivotClass>
   logs?: Array<NLog>
 }
 

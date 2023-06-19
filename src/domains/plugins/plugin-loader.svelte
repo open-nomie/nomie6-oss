@@ -322,7 +322,7 @@
 
       const trackableUsage = await queryToTrackableUsage(trackable, dateRange, $TrackableStore.trackables)
       const usage: any = groupByDay ? trackableUsage.byDay : trackableUsage
-      usage.dates = usage.dates.map((djs) => djs.toDate())
+      usage.dates = usage.dates.map((djs) => djs.toDate()) 
 
       try {
         broadcastPluginMessage(

@@ -87,6 +87,20 @@
       </div>
     </section>
   {/if}
+  {#if template.pivots.length}
+    <section>
+      <Title className="mb-2">Pivots</Title>
+
+      <div class="flex flex-wrap">
+        {#each template.pivots as pivot}
+          <div class="pill">
+            <div class="ntitle">{pivot.emoji}{pivot.tag}</div>
+            <div class="text-xs text-gray-500 whitespace-nowrap" />
+          </div>
+        {/each}
+      </div>
+    </section>
+  {/if}
 </div>
 
 <style scoped>
