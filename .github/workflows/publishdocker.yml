@@ -13,6 +13,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      NODE_OPTIONS: '--max_old_space_size=8192'  
 
     steps:
       - name: Checkout repository
