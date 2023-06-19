@@ -6,7 +6,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
   build-and-push-image:
@@ -34,6 +33,7 @@ jobs:
       
       - name: Build and push Docker image
         run: |
+              export NODE_OPTIONS="--max_old_space_size=8192"
               docker build . --tag ${{ steps.meta.outputs.tags }}
               docker push ${{ steps.meta.outputs.tags }}
         env:
