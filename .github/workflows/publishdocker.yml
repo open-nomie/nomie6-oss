@@ -6,7 +6,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
   build-and-push-image:
@@ -39,3 +38,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+        
