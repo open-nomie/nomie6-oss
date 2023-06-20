@@ -209,7 +209,7 @@
                             rowSpan={j === colAttrs.length - 1 && rowAttrs.length !== 0 ? 2 : 1}
                             on:click={clickable && colKey[j] ? (_) => fold([colKey.slice(0, j + 1)]) : null}
                         >
-                            {colKey[j] ?? "null"}
+                            {colKey[j] ?? "Aggr"} <!-- RdL changed null to Agr -->
                         </th>
                     {/if}
                 {/each}
