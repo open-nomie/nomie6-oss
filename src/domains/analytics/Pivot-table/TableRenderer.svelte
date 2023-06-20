@@ -3,6 +3,7 @@
    import "./pivottable.css";
     import "./grouping.css";
     import { Prefs } from '../../preferences/Preferences'
+  import { stringify } from "postcss"
 
     export let tableColorScaleGenerator = redColorScaleGenerator;
     export let tableOptions = {};
@@ -208,8 +209,11 @@
                             colSpan={xx}
                             rowSpan={j === colAttrs.length - 1 && rowAttrs.length !== 0 ? 2 : 1}
                             on:click={clickable && colKey[j] ? (_) => fold([colKey.slice(0, j + 1)]) : null}
-                        >
-                            {colKey[j] ?? "Aggr"} <!-- RdL changed null to Agr -->
+                        >   {#if grouping && colKey[j]=== undefined }
+                            {colKey[j] ?? "Total"} <!-- RdL changed null to Total -->
+                            {:else}
+                            {colKey[j] ?? "null"} <!-- RdL changed null to Null -->
+                            {/if}
                         </th>
                     {/if}
                 {/each}
