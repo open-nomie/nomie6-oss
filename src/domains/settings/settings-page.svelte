@@ -200,7 +200,7 @@
 
             <List solo className="mt-4">
               <ListItem detail bottomLine={16} on:click={() => openAnalytics()} title="Analytics">
-                <span slot="left">💡</span>
+                <span slot="left">🧊</span>
               </ListItem>
             </List>
 

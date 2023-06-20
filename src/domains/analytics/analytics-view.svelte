@@ -14,7 +14,7 @@
     import Empty from '../../components/empty/empty.svelte'
     import Button from '../../components/button/button.svelte'
     import dayjs from 'dayjs'
-    import { queryToTrackableUsage } from '../ledger/LedgerStore'
+    import { LedgerStore, queryToTrackableUsage } from '../ledger/LedgerStore'
     import { onMount } from 'svelte'
     import PivotSelector from "./Pivot-table/UI/PivotSelector.svelte";
     import debounce from 'lodash/debounce'
@@ -28,7 +28,9 @@
     import { EyeSolid } from '../../components/icon/nicons'
     import { EyeClosedSolid } from '../../components/icon/nicons'
     import IonIcon from "../../components/icon/ion-icon.svelte";
+    import Text from '../../components/text/text.svelte'
 
+    let notenoughdata = false;
     let plotlyRenderers = {};
     let renderers;
     let loaded = false;
@@ -135,10 +137,13 @@
         let trackables;
         var timeout = setInterval(async function() {
             trackables = $AllTrackablesAsArray;
-            if(/[rlc]/.test(trackables[0].id)) {
+            if (trackables.length && $LedgerStore.books) {
+            if(/[#@+]/.test(trackables[0].id)) {
                 clearInterval(timeout);
+                
         tempdata = [];
         var i;
+        
         for (i in trackables) {
             if (trackables[i].id != undefined){
                 let usage = await getUsage(trackables[i].id)
@@ -150,11 +155,16 @@
         loaded = true;
         Interact.stopBlocker()
         }
-        }, 100);
+        }
+        else {
+            clearInterval(timeout);
+            Interact.stopBlocker()
+            notenoughdata = true}}, 100);
     }
 
        
     async function getUsage(tag) { 
+        
         const trackable = tokenToTrackable(strToToken(tag), $TrackableStore.trackables)
         let daysBack =  workingPivotDays;
         let date = new Date()
@@ -360,6 +370,7 @@
 
 
     <Container className="py-1 shadow shadow-black/10 dark:shadow-black/40 bg-white filler dark:bg-black rounded-md" size="xl" >
+        {#if !notenoughdata}
         <div>
             {#if !menushow}
             <Button icon on:click={showMenu}>
@@ -372,11 +383,22 @@
             {/if}
         </div>
         {#if menushow}
-        
+
         <PivotSelector pivots={pivots} on:setdefault={setDefault} on:selectpivot={selectPivot} on:newpivot={createPivot} on:save={savePivot} on:delete={deletePivot} on:edit={editPivot} on:copy={copyPivot}></PivotSelector>
         
         {/if}
+        {/if}
+
     </Container>
+    {#if notenoughdata}
+    <List transparent className="max-w-md mx-auto">
+        <Empty icon={CubeOutline} title="Not Enough Data">
+            <div class="my-0 text-center text-lg font-normal leading-tight text-gray-800 dark:text-gray-50">
+                Not enough Data to create Pivots.
+              </div>
+        </Empty>
+      </List>
+    {/if}
     {#if loaded}
 {#if workingPivotTag === "Initiati0nPiv0t"}
     <List transparent className="max-w-md mx-auto">
