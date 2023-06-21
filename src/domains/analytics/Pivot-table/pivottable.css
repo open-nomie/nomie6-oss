@@ -44,7 +44,7 @@ table.pvtTable .pvtTotalLabel {
 table.pvtTable tbody tr td {
     color: #2a3f5f;
     padding: 5px;
-    background-color: #fff;
+    
     border: 1px solid var(--border,#04A6F9);
     vertical-align: top;
     text-align: right;
