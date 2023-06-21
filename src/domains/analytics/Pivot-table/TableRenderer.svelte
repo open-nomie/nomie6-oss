@@ -1,9 +1,10 @@
 <script>
     import { PivotData } from "./Utilities";
-   import "./pivottable.css";
     import "./grouping.css";
+    import "./groupingdark.css";
+   import "./pivottable.css";
+    
     import { Prefs } from '../../preferences/Preferences'
-  import { stringify } from "postcss"
 
     export let tableColorScaleGenerator = redColorScaleGenerator;
     export let tableOptions = {};
@@ -12,9 +13,11 @@
     export let opts = {};
 
     let pvtValBGPlaceholder ="";
+    let darkPlaceholder ="";
     let theme = $Prefs.theme;
     let cssVarStyles = "";
     if (theme == 'dark') {
+        darkPlaceholder="D"
         if (!opts.heatmapMode) {pvtValBGPlaceholder = ";background-color:black;color:white"};
     let bgdark= '#1D2737';
     let border = '#2A303C';
@@ -251,7 +254,7 @@
             {@const totalAggregator = pivotData.getAggregator(rowKey, [])}
             {@const rowGap = rowAttrs.length - rowKey.length}
 
-            <tr class={rowGap ? "pvtLevel" + rowGap : "pvtData"}>
+            <tr class={rowGap ? "pvtLevel" +darkPlaceholder + rowGap : "pvtData"}>
                 {#each rowKey as txt, j (`rowKeyLabel${i}-${j}`)}
                     {@const clickable = grouping && rowAttrs.length > j + 1}
                     {@const xx = useCompactRows ? 1 : spanSize(rowKeys, i, j, specialCase)}
@@ -284,13 +287,26 @@
                     {@const aggregator = pivotData.getAggregator(rowKey, colKey)}
                     {@const colGap = colAttrs.length - colKey.length}
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    {#if theme == "light" }
                     <td
                         class={"pvtVal" + (colGap ? " pvtLevel" + colGap : "")}
                         on:click={getClickHandler && getClickHandler(aggregator.value(), rowKey, colKey)}
-                        style={valueCellColors(rowKey, colKey, aggregator.value())+pvtValBGPlaceholder}
+                        style={valueCellColors(rowKey, colKey, aggregator.value())}
+                        
                     >
                         {aggregator.format(aggregator.value())}
                     </td>
+                    {:else}
+                    <td
+                        class={"pvtVal" + (colGap ? " pvtLevelD" + colGap : "")}
+                        on:click={getClickHandler && getClickHandler(aggregator.value(), rowKey, colKey)}
+                        style={valueCellColors(rowKey, colKey, aggregator.value())+";color:white"}
+                        
+                    >
+                        {aggregator.format(aggregator.value())}
+                    </td>
+                    {/if}
+                    
                 {/each}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <td
