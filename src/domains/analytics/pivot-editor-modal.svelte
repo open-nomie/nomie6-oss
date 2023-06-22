@@ -27,6 +27,8 @@
   let name: string
   let emoji: string
   let days: number
+  let filters: Object
+  let amountoffilters: number
   let workingPivot: PivotClass
   let emojiselector = false;
 
@@ -36,6 +38,9 @@
     name = workingPivot.tag;
     emoji = workingPivot.emoji;
     days = workingPivot.days;
+    filters = workingPivot.options.valueFilter;
+    amountoffilters = Object.keys(filters).length;
+    
 
   }
 
@@ -72,6 +77,7 @@
       options: workingPivot.options,
     })
     newPivot.options.data = []
+    newPivot.options.valueFilter = filters;
     Interact.blocker(`Saving ${workingPivot.tag} pivot...`)
     await PivotStore.upsert(newPivot)
     Interact.stopBlocker()
@@ -112,6 +118,15 @@
       id:"days-list",
       buttons,
     })
+  }
+
+  const resetfilters = async () =>{
+    const confirmed = await Interact.confirm('Reset all filters?', 'You can always recreate it later.')
+    if (confirmed) {
+      filters = {};
+      amountoffilters = Object.keys(filters).length;
+    }
+    
   }
   
   const close = () => {
@@ -177,6 +192,14 @@
         {:else}
           <span class="text-primary-500">Select</span>
         {/if}
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <ListItem clickable on:click={resetfilters}>
+      <div class="py-2">Reset (all) {amountoffilters} Filters?</div>
+      <div slot="right">
+          <span class="text-primary-500">Reset</span>
+        
       </div>
     </ListItem>
   </List>
