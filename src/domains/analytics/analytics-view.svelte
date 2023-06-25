@@ -1,6 +1,7 @@
 <script lang="ts">
       
-    import PivotTableUI from "./Pivot-table/PivotTableUI.svelte";
+      import escapeRegExp from 'lodash/escapeRegExp'
+      import PivotTableUI from "./Pivot-table/PivotTableUI.svelte";
     import Container from '../../components/container/container.svelte'
     //import TableRenderers from "svelte-pivottable/TableRenderers";
     import TableRenderers from "./Pivot-table/TableRenderers";
@@ -23,12 +24,10 @@
     import { PivotClass } from './pivot-class'
     import { PivotData } from './Pivot-table/Utilities';
     import { showToast } from '../../components/toast/ToastStore'
-    import { BulbOutline } from '../../components/icon/nicons'
     import { CubeOutline } from '../../components/icon/nicons'
     import { EyeSolid } from '../../components/icon/nicons'
     import { EyeClosedSolid } from '../../components/icon/nicons'
     import IonIcon from "../../components/icon/ion-icon.svelte";
-    import Text from '../../components/text/text.svelte'
 
     let notenoughdata = false;
     let plotlyRenderers = {};
@@ -41,6 +40,7 @@
     let workingPivotEmoji = "🐣";
     let workingPivotDefault = false;
     let workingPivotDays = 90;
+    let workingPivotSearchTerm = new Object({"enabled":true,"terms":""})
     let { derivedAttributes, cols, rows, vals, sorters, valueFilter } = PivotData.defaultProps;
     let fontsize = Math.round(16 /(1400/window.innerWidth));
     if (fontsize <9) {fontsize=9}
@@ -52,6 +52,7 @@
         renderers = { ...TableRenderers, ...plotlyRenderers };
         initialzePivotsPage();
         getData();
+        
         
     });
 
@@ -135,8 +136,10 @@
         if (workingPivotDays > 270) {message = `> 270 days, be patience..`}
         Interact.blocker(message)
         let trackables;
+        let searches = workingPivotSearchTerm.terms.split(';');
         var timeout = setInterval(async function() {
             trackables = $AllTrackablesAsArray;
+
             if (trackables.length && $LedgerStore.books) {
             if(/[#@+]/.test(trackables[0].id)) {
                 clearInterval(timeout);
@@ -150,6 +153,11 @@
                 await addUsage2Data(usage,trackables[i].id)
             }
         }
+        if (workingPivotSearchTerm.enabled == true){
+            for (i in searches) {
+                await addSearch2Data(searches[i])
+            }}
+
         data = await bringItTogether(tempdata)
         options.data = data;
         loaded = true;
@@ -225,6 +233,36 @@
         return time
     }
 
+    async function addSearch2Data(term){
+        
+        let daysBack =  workingPivotDays;
+        let date = new Date()
+        let end = dayjs(date || new Date()).endOf('day')
+        let start = dayjs(date).subtract(daysBack, 'days')
+        let results = await LedgerStore.query({ search: escapeRegExp(term), start, end })
+        
+
+        //loop through results and add to array
+        var consolidated = []
+        var i;
+        for (i in results) {
+            results[i].shortdate = results[i].start.toISOString().slice(0,10);
+            var countfortoday  = results.filter(result => result.start.toISOString().slice(0,10) === results[i].start.toISOString().slice(0,10));
+            consolidated = consolidated.filter(consol => consol.shortdate != results[i].start.toISOString().slice(0,10));
+            var shortdate = await determineShortDate(results[i].start)
+            var day = await determineDay(results[i].start)
+            var dayperiod = await determineDayPeriod(results[i].start)
+            var emoji = "🕵🏻‍♂️"
+            var search = emoji+term;
+            consolidated.push({ "Date":results[i].start,[search]:countfortoday.length,"ShortDate":shortdate,"Day":day,"DayPeriod":dayperiod})
+    
+        }  
+        let j;
+        for (j in consolidated){
+            tempdata.push(consolidated[j])
+        }
+    }
+
     async function bringItTogether(data){
         var output = [];
 
@@ -269,6 +307,7 @@
 
     const selectPivot = (pvt) => {
         let historyperiodchanged = true;
+        let searchtermschanged = true;
         workingPivotId = pvt.detail.id;
         workingPivotTag = pvt.detail.tag;
         workingPivotEmoji = pvt.detail.emoji;
@@ -277,6 +316,8 @@
         if (Delta === 0) {
             historyperiodchanged = false}
         workingPivotDays = pvt.detail.days || 90;
+        if (workingPivotSearchTerm.terms == pvt.detail.searchterm.terms && workingPivotSearchTerm.enabled == pvt.detail.searchterm.enabled ) {searchtermschanged = false}
+        workingPivotSearchTerm = pvt.detail.searchterm || {"enabled":false,"terms":""}
         grouping = pvt.detail.grouping;
         compactRows = pvt.detail.compactRows;
         rowGroupBefore = pvt.detail.rowGroupBefore;
@@ -285,7 +326,7 @@
         aggregatorName = pvt.detail.aggregatorName;
         options = pvt.detail.options;
         options.data = data;
-        if (historyperiodchanged == true) {
+        if (historyperiodchanged == true || searchtermschanged == true) {
             getData();
         }
     }
@@ -315,6 +356,7 @@
         workingPivotTag = "Initiati0nPiv0t";
         workingPivotEmoji = "🐣";
         workingPivotDays = 90;
+        workingPivotSearchTerm = {enabled:false,terms:""}
         workingPivotDefault = false;
         let { derivedAttributes, cols, rows, vals, sorters, valueFilter } = PivotData.defaultProps;
         grouping = true;
@@ -433,7 +475,7 @@
     <div class="scrolling-wrapper">
         <div class="px-4 grid grid-cols-1 gap-3">
             <PivotTableUI
-            {...options} {renderers} {grouping} {compactRows} {rowGroupBefore} {colGroupBefore} {rendererName} {aggregatorName} {hiddenAttributes} {hiddenFromAggregators} {hiddenFromDragDrop} {unusedOrientationCutoff} {menuLimit} {workingPivotId} {workingPivotTag} {workingPivotEmoji} {workingPivotDefault} {workingPivotDays} bind:pivotconfig={pivotconfig} bind:getConfig={getConfig}/>
+            {...options} {renderers} {grouping} {compactRows} {rowGroupBefore} {colGroupBefore} {rendererName} {aggregatorName} {hiddenAttributes} {hiddenFromAggregators} {hiddenFromDragDrop} {unusedOrientationCutoff} {menuLimit} {workingPivotId} {workingPivotTag} {workingPivotEmoji} {workingPivotDefault} {workingPivotDays} {workingPivotSearchTerm} bind:pivotconfig={pivotconfig} bind:getConfig={getConfig}/>
         </div>
     </div>
       </Container>

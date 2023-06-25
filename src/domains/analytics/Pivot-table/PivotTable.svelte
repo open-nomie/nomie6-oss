@@ -11,6 +11,7 @@
     export let workingPivotEmoji = "🐣";
     export let workingPivotDefault = false;
     export let workingPivotDays = 90;
+    export let workingPivotSearchTerm = {"enabled":false,terms:""}
     export let renderers;
     
     let aggregators = defaultAggregators;
@@ -24,6 +25,7 @@
       emoji: workingPivotEmoji,
       default: workingPivotDefault,
       days: workingPivotDays,
+      searchterm: workingPivotSearchTerm,
       grouping: config.grouping,
       compactRows: config.compactRows,
       rowGroupBefore: config.rowGroupBefore,

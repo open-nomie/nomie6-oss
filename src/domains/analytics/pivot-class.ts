@@ -18,6 +18,7 @@ export type PivotType = {
   unusedOrientationCutoff? :  number
   menuLimit? : number
   options?: object
+  searchterm?: object
 }
 
 export class PivotClass {
@@ -38,6 +39,7 @@ export class PivotClass {
   unusedOrientationCutoff? :  number
   menuLimit? : number
   options?: object
+  searchterm?: object
 
   constructor(starter: PivotType = {}) {
     this.id = starter.id || nid()
@@ -57,6 +59,7 @@ export class PivotClass {
     this.unusedOrientationCutoff = starter.unusedOrientationCutoff || 85
     this.menuLimit = starter.menuLimit || 500
     this.options = starter.options || {rows: [],cols: [],derivedAttributes: {},vals: [],sorters:{},valueFilter:{}}
+    this.searchterm = starter.searchterm || {enable: false, terms: ""}
   }
 
   get asObject() {
@@ -77,7 +80,8 @@ export class PivotClass {
       hiddenFromDragDrop: this.hiddenFromDragDrop,
       unusedOrientationCutoff: this.unusedOrientationCutoff,
       menuLimit: this.menuLimit,
-      options: this.options
+      options: this.options,
+      searchterm: this.searchterm
     }
   }
 }

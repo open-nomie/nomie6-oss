@@ -20,6 +20,7 @@
         workingPivotEmoji = "🐣",
         workingPivotDefault = false,
         workingPivotDays = 90,
+        workingPivotSearchTerm = {"enabled":false,terms:""},
         menuLimit = 500,
         pivotconfig ,
         getConfig = false;
@@ -152,6 +153,7 @@
         {workingPivotEmoji}
         {workingPivotDefault}
         {workingPivotDays}
+        {workingPivotSearchTerm}
         {renderers}
         bind:pivotconfig={pivotconfig}
         bind:getConfig={getConfig}

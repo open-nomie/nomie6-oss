@@ -5,6 +5,7 @@
   import { closeModal } from '../../components/backdrop/BackdropStore2'
   import Button from '../../components/button/button.svelte'
   import Divider from '../../components/divider/divider.svelte'
+  import ToggleSwitch from '../../components/toggle-switch/toggle-switch.svelte'
   import Input from '../../components/input/input.svelte'
   import ListItem from '../../components/list-item/list-item.svelte'
   import List from '../../components/list/list.svelte'
@@ -27,6 +28,9 @@
   let name: string
   let emoji: string
   let days: number
+  let searchterms = ""
+  let searchenabled = false
+  let countsearchterms = 0
   let filters: Object
   let amountoffilters: number
   let workingPivot: PivotClass
@@ -38,11 +42,22 @@
     name = workingPivot.tag;
     emoji = workingPivot.emoji;
     days = workingPivot.days;
+    searchterms = workingPivot.searchterm.terms || "";
+    searchenabled = workingPivot.searchterm.enabled || false;
     filters = workingPivot.options.valueFilter;
     amountoffilters = Object.keys(filters).length;
+    searchtermcounts()
     
 
   }
+
+  $: if (searchterms != "") {
+    searchtermcounts()
+  }
+
+  function searchtermcounts() {
+    countsearchterms = (searchterms.match(/;/g) || []).length;
+    if (searchterms != "" && searchterms.slice(-1) !=";") {countsearchterms = countsearchterms +1}}
 
   onMount(() => {
     mounted = true
@@ -62,6 +77,7 @@
       tag: name,
       emoji: emoji,
       days:days,
+      searchterm:{"enabled":searchenabled,"terms":searchterms},
       default:workingPivot.default,
       grouping: workingPivot.grouping,
       compactRows: workingPivot.compactRows,
@@ -202,6 +218,29 @@
         
       </div>
     </ListItem>
+    <Divider left={16} />
+    <ListItem bottomLine={52} title={"🕵🏻‍♂️ Enable Search Terms"}>
+      
+      <div slot="right">
+        <ToggleSwitch bind:value={searchenabled} title="Toggle Search Terms" />
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <Input
+      type="text"
+      on:input={(evt) => {searchterms = evt.detail;searchtermcounts;}}
+      value={searchterms}
+      listItem
+      label="Searchterms"
+      placeholder="Search Terms"
+    >
+      <div slot="right" class="flex items-center space-x-2 whitespace-nowrap text-xs">
+       
+        <div class="text-gray-500">{countsearchterms} SearchTerms</div>
+    
+        
+      </div>
+    </Input>
   </List>
 
   <Button clear className="text-red-500 mt-10 mx-auto text-sm" on:click={() => deletePivot()}>Delete Pivot</Button>
