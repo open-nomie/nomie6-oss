@@ -11,8 +11,8 @@
     export let updateValuesInFilter;
 
     let open = false;
-    let fontsize = Math.round(16 /(1400/window.innerWidth));
-    if (fontsize < 11) {fontsize=11}
+    let fontsize = Math.round(14 /(1400/window.innerWidth));
+    if (fontsize < 12) {fontsize=12}
 
     let theme = $Prefs.theme;
     let cssVarStyles = "";
@@ -20,11 +20,13 @@
     let bgdark= '#0D324F';
     let borderdark ='#0D324F'
     let fontcolordark = '#C8C8C8'
+    if (name.includes("🕵🏻‍♂️")) {bgdark= '#6BBFF9';fontcolordark = '#000000'}
 	cssVarStyles = `--btbg:${bgdark};--btborder:${borderdark};--fontcolor:${fontcolordark}`;}
     else {
         let bglight= '#DFF0F8';
         let borderlight = '#CDEEFF'
         let fontcolorlight = '#000000'
+        if (name.includes("🕵🏻‍♂️")) {bglight= '#6BBFF9';}
 	cssVarStyles = `--btbg:${bglight};--btborder:${borderlight};--fontcolor:${fontcolorlight}`;
     }
 

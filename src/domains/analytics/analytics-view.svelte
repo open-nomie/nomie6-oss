@@ -234,7 +234,7 @@
     }
 
     async function addSearch2Data(term){
-        
+        if (term !="") {
         let daysBack =  workingPivotDays;
         let date = new Date()
         let end = dayjs(date || new Date()).endOf('day')
@@ -261,6 +261,7 @@
         for (j in consolidated){
             tempdata.push(consolidated[j])
         }
+    }
     }
 
     async function bringItTogether(data){
