@@ -37,19 +37,15 @@
   <!-- <ListItem bottomLine={16} detail title="Frequently Asked Questions" to="/faq">
     <span slot="right" class="text-inverse-3">FAQ</span>
   </ListItem> -->
-  <ListItem bottomLine={16} detail title="N6 Docs" href="https://docs.nomie.app">
+  <ListItem bottomLine={16} detail title="N6 Docs" href="https://www.dailynomie.com/%f0%9f%93%96-docs/">
     <span slot="right" class="text-inverse-3">Read</span>
   </ListItem>
-  <ListItem bottomLine={16} detail title="Learn More" href="https://nomie.app?s=dap">
-    <span slot="right" class="text-inverse-3">Nomie.app</span>
+  <ListItem bottomLine={16} detail title="Learn More" href="https://www.dailynomie.com">
+    <span slot="right" class="text-inverse-3">DailyNomie.com</span>
   </ListItem>
 
   <ListItem bottomLine={16} title="Reddit r/nomie" detail href="https://reddit.com/r/nomie">
     <span slot="right" class="flex text-inverse-3">/r/nomie</span>
-  </ListItem>
-
-  <ListItem bottomLine={16} title="Nomie on TikTok" detail href="https://www.tiktok.com/@nomieapp">
-    <span slot="right" class="flex text-inverse-3">@nomieapp</span>
   </ListItem>
 
   <!-- <ListItem title="Open Source" detail href="https://github.com/open-nomie/nomie">
