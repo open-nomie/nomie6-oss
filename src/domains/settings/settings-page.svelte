@@ -1,8 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
 
-  import IonIcon from '../../components/icon/ion-icon.svelte'
-
   import SettingsTweakList from './settings-tweak-list.svelte'
 
   import Container from '../../components/container/container.svelte'
@@ -39,7 +37,6 @@
 
   // Components
   import Text from '../../components/text/text.svelte'
-  import Button from '../../components/button/button.svelte'
 
   import SettingsDataList from './settings-data-list.svelte'
   import SettingsAboutList from './settings-about-list.svelte'
@@ -49,7 +46,6 @@
   import AwardsPreviewList from '../awards/components/awards-preview-list.svelte'
   import { enabledBetaFeatures, Prefs } from '../preferences/Preferences'
   import { showImportModal } from '../import-export/ImporterStore'
-  import { MailOutline, MailUnreadOutline } from '../../components/icon/nicons'
   import { deleteEverything } from './settings-functions'
   // import Logo from '../../components/logo/logo.svelte'
   import { showToast } from '../../components/toast/ToastStore'
@@ -65,11 +61,17 @@
   export const style = undefined
 
   let st = 0
+  let showplugins = false;
   async function specialTap() {
     st = st + 1
     if (st > 9) {
       methods.unlockFeatures()
     }
+  }
+
+  const toggleshowplugins = () => {
+    if (showplugins) {showplugins = false}
+    else {showplugins = true}
   }
 
   let methods = {
@@ -136,7 +138,7 @@
           <!-- {#if !hasChatInstalled} -->
           <a
             title="Find a bug? Want to provide feedback?"
-            href="https://airtable.com/shrY9p9UJjC1PMMbI"
+            href={`mailto:${config.support_email}?subject=Nomie ${AppVersion} `}
             class="font-semibold text-black dark:text-white text-sm flex items-center space-x-2"
             target="_blank"
           >
@@ -189,7 +191,21 @@
               <ListItem detail bottomLine={16} on:click={() => openPluginsModal()} title="Plugins">
                 <span slot="left">🔌</span>
               </ListItem>
+              <ListItem clickable on:click={toggleshowplugins}>
+                <span slot="left">🔌</span>
+                <div slot="right">
+                  {#if showplugins}
+                    <span class="text-primary-500">↥</span>
+                  {:else}
+                  <span class="text-primary-500">↧</span>
+                  {/if}
+                </div>
+                <div class="font-semibold leading-tight">Show Plugins</div>
+                <div class="text-xs text-gray-500 line-clamp-2 leading-tight mt-1">Click to show or hide the installed Plugins</div>
+              </ListItem>
+              {#if showplugins}
               <PluginsMoreMenu />
+              {/if}
             </List>
 
             <List solo className="mt-4">
@@ -237,7 +253,7 @@
                 Version v{import.meta.env.PACKAGE_VERSION}
               </div>
               <div class="text-xs text-gray-800 dark:text-gray-500">
-                <strong>Happy Data</strong>, LLC &copy; Copyright 2014 - {dayjs().format('YYYY')}
+                <strong>DailyNomie</strong>; Copyright 2014 - {dayjs().format('YYYY')}
               </div>
             </button>
           </div>
