@@ -61,6 +61,15 @@
   import { PluginStore } from './domains/plugins/PluginStore'
   import Setup from './domains/setup/setup.svelte'
   import locate from './modules/locate/locate'
+  import Plausible from 'plausible-tracker'
+
+  // initialize plausible
+  const { enableAutoPageviews } = Plausible({
+  domain: 'dev.dailynomie.com',
+  apiHost: 'https://plausible.casadelange.nl'
+})
+enableAutoPageviews()
+
 
   // initiailze gestures
   gestures()
