@@ -56,6 +56,10 @@
   import { openAnalytics } from '../templates/templates-svelte-helpers'
   import { openPluginsModal } from '../plugins/PluginStore'
   import PluginsMoreMenu from '../plugins/plugins-more-menu.svelte'
+  import IonIcon from '../../components/icon/ion-icon.svelte'   
+  import ChevronUpOutline from '../../n-icons/ChevronUpOutline.svelte';
+
+  import ChevronDownOutline from '../../n-icons/ChevronDownOutline.svelte'
 
   export const location = undefined
   export const style = undefined
@@ -188,16 +192,16 @@
             <!-- Sign-in and Register Block  -->
 
             <List solo className="mt-4">
-              <ListItem detail bottomLine={16} on:click={() => openPluginsModal()} title="Plugins">
+              <ListItem detail bottomLine={16} on:click={() => openPluginsModal()} title="Manage Plugins">
                 <span slot="left">🔌</span>
               </ListItem>
               <ListItem clickable on:click={toggleshowplugins}>
                 <span slot="left">🔌</span>
                 <div slot="right">
                   {#if showplugins}
-                    <span class="text-primary-500">↥</span>
+                    <span><IonIcon icon={ChevronUpOutline} size={16} /></span>
                   {:else}
-                  <span class="text-primary-500">↧</span>
+                  <span><IonIcon icon={ChevronDownOutline} size={16} /></span>
                   {/if}
                 </div>
                 <div class="font-semibold leading-tight">Show Plugins</div>
