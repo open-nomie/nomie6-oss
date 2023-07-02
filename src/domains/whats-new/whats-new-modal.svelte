@@ -15,6 +15,10 @@
 
   let showFixes = false
   let showUpdates = false
+
+  let newfeatures = whatsNew.features.filter(feature => feature.version == whatsNew.version);
+  let newfixes = whatsNew.fixes.filter(fix => fix.version == whatsNew.version);
+  
 </script>
 
 <BackdropModal>
@@ -36,7 +40,7 @@
   </header>
   {#if whatsNew && !showUpdates}
     <div class="p-6 text-gray-800 dark:text-gray-200">
-      Nomie {import.meta.env.PACKAGE_VERSION} adds {whatsNew.features.length} features, and {whatsNew.fixes.length} bug fixes.
+      Nomie {import.meta.env.PACKAGE_VERSION} adds {newfeatures.length} features, and {newfixes.length} bug fixes.
     </div>
   {/if}
   {#if whatsNew && showUpdates}
@@ -45,7 +49,7 @@
         {#each whatsNew.features as feature}
           <NItem bottomLine={16} className="text-sm py-1" compact>
             <!-- <div slot="left" class="text-faded-2">{feature.version}</div> -->
-            {feature.title}
+            {feature.version} {feature.title}
           </NItem>
         {/each}
       </List>
@@ -55,7 +59,7 @@
         <Button slot="header-right" on:click={() => (showFixes = true)} clear primary size="sm">Show Fixes</Button>
         {#if showFixes}
           {#each whatsNew.fixes as fix}
-            <NItem bottomLine={16} className="text-sm py-1" compact>{fix.title}</NItem>
+            <NItem bottomLine={16} className="text-sm py-1" compact>{fix.version} {fix.title}</NItem>
           {/each}
         {/if}
       </List>
