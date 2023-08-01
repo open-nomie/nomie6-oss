@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  TsvExportRendererProps */
 /** @typedef {typeof __propDef.events}  TsvExportRendererEvents */
 /** @typedef {typeof __propDef.slots}  TsvExportRendererSlots */
-export default class TsvExportRenderer extends SvelteComponentTyped<{
+export default class TsvExportRenderer extends SvelteComponent<{
     [x: string]: any;
 }, {
     [evt: string]: CustomEvent<any>;
@@ -10,7 +10,7 @@ export default class TsvExportRenderer extends SvelteComponentTyped<{
 export type TsvExportRendererProps = typeof __propDef.props;
 export type TsvExportRendererEvents = typeof __propDef.events;
 export type TsvExportRendererSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         [x: string]: any;

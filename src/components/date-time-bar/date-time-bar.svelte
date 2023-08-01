@@ -92,7 +92,7 @@
       />
     </div>
     {#if _opened}
-      <div class="view date" transition:slide={{ delay: 0, duration: 300, easing: quintOut }}>
+      <div class="view date" transition:slide|global={{ delay: 0, duration: 300, easing: quintOut }}>
         <!-- <Calendar4 date={_date.toDate()} on:dateChange={(evt)=>{
           let calDate = dayjs(evt.detail).hour(_date.hour()).minute(_date.minute())
             setDate(calDate)

@@ -41,7 +41,7 @@
 </script>
 
 {#if toast}
-  <div role="dialog" in:fade out:fly={{ y: 100 }} class="toast-wrapper transition-all duration-200">
+  <div role="dialog" in:fade|global out:fly|global={{ y: 100 }} class="toast-wrapper transition-all duration-200">
     {#if toast.type === 'success'}
       <div class="toast-type success">
         <IonIcon icon={CheckmarkCircleOutline} size={24} />

@@ -177,7 +177,7 @@
 
     {#if $UniboardStore.editMode}
       <div
-        transition:slide={{ delay: 250, duration: 300, easing: quintOut }}
+        transition:slide|global={{ delay: 250, duration: 300, easing: quintOut }}
         class="flex bg-white dark:bg-black items-center justify-center space-x-4 px-4 py-2"
       >
         <Button size="sm" shape="round" className="bg-red-500 text-white w-32" on:click={() => toggleBoardEditMode()}>

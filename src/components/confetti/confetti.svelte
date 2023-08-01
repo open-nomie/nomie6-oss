@@ -9,7 +9,7 @@
   })
 </script>
 
-<div class="confetti-wrapper" transition:fade>
+<div class="confetti-wrapper" transition:fade|global>
   <canvas class="confetti" id="confetti" />
 </div>
 

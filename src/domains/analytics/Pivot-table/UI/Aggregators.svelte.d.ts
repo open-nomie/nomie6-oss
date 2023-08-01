@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  AggregatorsProps */
 /** @typedef {typeof __propDef.events}  AggregatorsEvents */
 /** @typedef {typeof __propDef.slots}  AggregatorsSlots */
-export default class Aggregators extends SvelteComponentTyped<{
+export default class Aggregators extends SvelteComponent<{
     onChange: any;
     onUpdate: any;
     aggregatorName: any;
@@ -15,7 +15,7 @@ export default class Aggregators extends SvelteComponentTyped<{
 export type AggregatorsProps = typeof __propDef.props;
 export type AggregatorsEvents = typeof __propDef.events;
 export type AggregatorsSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         onChange: any;

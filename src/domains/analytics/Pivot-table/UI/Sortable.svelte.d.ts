@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  SortableProps */
 /** @typedef {typeof __propDef.events}  SortableEvents */
 /** @typedef {typeof __propDef.slots}  SortableSlots */
-export default class Sortable extends SvelteComponentTyped<{
+export default class Sortable extends SvelteComponent<{
     options?: {};
     items?: any[];
 }, {
@@ -17,7 +17,7 @@ export default class Sortable extends SvelteComponentTyped<{
 export type SortableProps = typeof __propDef.props;
 export type SortableEvents = typeof __propDef.events;
 export type SortableSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         options?: {};

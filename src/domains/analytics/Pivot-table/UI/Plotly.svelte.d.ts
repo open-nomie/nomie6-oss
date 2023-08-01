@@ -2,7 +2,7 @@ export function initPlotly(module: any): void;
 /** @typedef {typeof __propDef.props}  PlotlyProps */
 /** @typedef {typeof __propDef.events}  PlotlyEvents */
 /** @typedef {typeof __propDef.slots}  PlotlySlots */
-export default class Plotly extends SvelteComponentTyped<{
+export default class Plotly extends SvelteComponent<{
     data: any;
     layout: any;
     config: any;
@@ -15,7 +15,7 @@ export default class Plotly extends SvelteComponentTyped<{
 export type PlotlyProps = typeof __propDef.props;
 export type PlotlyEvents = typeof __propDef.events;
 export type PlotlySlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         data: any;

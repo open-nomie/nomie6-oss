@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  PlotlyRendererProps */
 /** @typedef {typeof __propDef.events}  PlotlyRendererEvents */
 /** @typedef {typeof __propDef.slots}  PlotlyRendererSlots */
-export default class PlotlyRenderer extends SvelteComponentTyped<{
+export default class PlotlyRenderer extends SvelteComponent<{
     [x: string]: any;
     onRendererUpdate: any;
     plotlyOptions?: {};
@@ -16,7 +16,7 @@ export default class PlotlyRenderer extends SvelteComponentTyped<{
 export type PlotlyRendererProps = typeof __propDef.props;
 export type PlotlyRendererEvents = typeof __propDef.events;
 export type PlotlyRendererSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         [x: string]: any;

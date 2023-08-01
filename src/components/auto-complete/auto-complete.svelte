@@ -133,7 +133,7 @@
 
 {#if state.results && state.results.length}
   <div style={style}
-    transition:slide={{ duration: 100 }}
+    transition:slide|global={{ duration: 100 }}
     class="{scroller ? 'scroller' : 'no-scroller'} autocomplete-results animate {className}"
   >
     <div class="p-0 tracker-list">

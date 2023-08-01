@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  PivotTableUiProps */
 /** @typedef {typeof __propDef.events}  PivotTableUiEvents */
 /** @typedef {typeof __propDef.slots}  PivotTableUiSlots */
-export default class PivotTableUi extends SvelteComponentTyped<{
+export default class PivotTableUi extends SvelteComponent<{
     [x: string]: any;
     data: any;
     aggregatorName?: string;
@@ -119,7 +119,7 @@ export default class PivotTableUi extends SvelteComponentTyped<{
 export type PivotTableUiProps = typeof __propDef.props;
 export type PivotTableUiEvents = typeof __propDef.events;
 export type PivotTableUiSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         [x: string]: any;

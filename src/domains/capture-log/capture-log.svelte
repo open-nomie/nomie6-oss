@@ -374,7 +374,7 @@
           </div>
 
           <!-- Toolbar for advanced options -->
-          <!-- transition:fly|local={{ y: -47, duration: 200, opacity: 0, easing: quadInOut }} -->
+          <!-- transition:fly={{ y: -47, duration: 200, opacity: 0, easing: quadInOut }} -->
           {#if isFocused || isPopulated}
             <section aria-label="Note tools" class="bottom-section">
               <div class="flex-grow flex items-center space-x-1 py-1 px-0">
@@ -443,7 +443,7 @@
             </section>
           {/if}
           {#if showDateSelector}
-            <div transition:slide={{ delay: 250, duration: 300, easing: quintOut }}>
+            <div transition:slide|global={{ delay: 250, duration: 300, easing: quintOut }}>
               <CaptureDatePicker
                 bind:time={$TodayStore.date}
                 is24Hour={$Prefs.use24hour}
@@ -456,7 +456,7 @@
     </div>
   </Container>
   {#if isFocused || isPopulated}
-    <!-- transition:slide={{ delay: 75, duration: 75, easing: quintOut }} -->
+    <!-- transition:slide|global={{ delay: 75, duration: 75, easing: quintOut }} -->
     <div class="glass absolute -bottom-14 xl:-bottom-8 z-50 h-14 w-full pt-2">
       <Container>
         <div class=" xl:ml-auto xl:w-80 grid grid-cols-2 justify-center gap-4 items-center px-4">

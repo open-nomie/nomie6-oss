@@ -80,7 +80,7 @@
       let hash = md5(JSON.stringify(widget))
       if (widget.token) {
         // Get the Trackable for this widget
-        console.log(widget.token)
+        //console.log(widget.token)
         let trackable = tokenToTrackable(widget.token, trackables)
 
         // Filter out based on the time and trackable

@@ -75,7 +75,7 @@
   {#if $BackdropStore && $BackdropStore.length && $BackdropStore[$BackdropStore.length - 1] == id}
     <div
       id={`bd-${$BackdropStore.length}`}
-      transition:fade={{ duration: 100 }}
+      transition:fade|global={{ duration: 100 }}
       style="--tw-bg-opacity:{opacity}; z-index:4000;"
       class="nui-backdrop open nui-pos-{position}
       {className}"
@@ -91,7 +91,7 @@
     class="nui-backdrop--children nui-pos-{position}
     {className}"
     class:in-background={indexLevel < $BackdropStore.length - 1}
-    transition:fly|local={{ y: 300, duration: 200 }}
+    transition:fly={{ y: 300, duration: 200 }}
   >
     <slot />
     <div class="safe-bottom" />
