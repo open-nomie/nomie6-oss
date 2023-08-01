@@ -57,9 +57,9 @@
     "@commitlint/config-conventional": "^16.0.0",
     "@kazzkiq/svelte-preprocess-scss": "^0.1.3",
     "@netlify/functions": "^0.10.0",
-    "@rgossiaux/svelte-headlessui": "^1.0.0-beta.9",
+    "@rgossiaux/svelte-headlessui": "^1.0.2",
     "@sveltejs/gestures": "0.0.1",
-    "@sveltejs/vite-plugin-svelte": "^2.4.1",
+    "@sveltejs/vite-plugin-svelte": "^2.4.3",
     "@tailwindcss/typography": "^0.4.1",
     "@tsconfig/svelte": "^1.0.2",
     "@types/jest": "^26.0.24",
@@ -105,8 +105,8 @@
     "tributejs": "^5.1.3",
     "ts-md5": "^1.2.7",
     "typescript": "^5.0.0",
-    "vite": "^3.2.5",
-    "vitest": "^0.6.3",
+    "vite": "^4.4.8",
+    "vitest": "^0.34.1",
     "workbox-window": "^6.4.1"
   },
   "supporting": {
@@ -146,8 +146,8 @@
     "textarea-caret": "^3.1.0",
     "tough-cookie": "^4.1.3",
     "vite-plugin-package-version": "^1.0.2",
-    "vite-plugin-pwa": "^0.14.0",
-    "vite-plugin-svelte-svg": "^2.1.0"
+    "vite-plugin-pwa": "^0.16.4",
+    "vite-plugin-svelte-svg": "^2.2.1"
   },
   "license": "MIT"
 }
