@@ -71,7 +71,7 @@
         >
           <div slot="left" class="text-gray-500">
             {#if button.checked}
-              <div in:fly={{ y: 50 }} class="mr-4">
+              <div in:fly|global={{ y: 50 }} class="mr-4">
                 <IonIcon className="text-gray-800 dark:text-gray-200" icon={CheckmarkCircle} />
               </div>
             {/if}

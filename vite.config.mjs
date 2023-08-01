@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import sveltePreprocess from 'svelte-preprocess'
 import { VitePWA } from 'vite-plugin-pwa'
-import loadVersion from 'vite-plugin-package-version'
+// import loadVersion from 'vite-plugin-package-version'
 import manifest from './manifest'
 import path from 'path'
 import svelteSVG from 'vite-plugin-svelte-svg'
@@ -40,7 +40,6 @@ export default defineConfig({
     svelte({
 
     }),
-    loadVersion(),
     svelteSVG({
       svgoConfig: {}, // See https://github.com/svg/svgo#configuration
     }),
@@ -50,4 +49,7 @@ export default defineConfig({
       maximumFileSizeToCacheInBytes: 1000 * 1000 * 4
     }),
   ],
+  define:  {
+    'import.meta.env.PACKAGE_VERSION': JSON.stringify(process.env.npm_package_version)
+  },
 })

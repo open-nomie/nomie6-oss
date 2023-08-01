@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  FilterBoxProps */
 /** @typedef {typeof __propDef.events}  FilterBoxEvents */
 /** @typedef {typeof __propDef.slots}  FilterBoxSlots */
-export default class FilterBox extends SvelteComponentTyped<{
+export default class FilterBox extends SvelteComponent<{
     values: any;
     name: any;
     valueFilter?: {};
@@ -16,7 +16,7 @@ export default class FilterBox extends SvelteComponentTyped<{
 export type FilterBoxProps = typeof __propDef.props;
 export type FilterBoxEvents = typeof __propDef.events;
 export type FilterBoxSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         values: any;

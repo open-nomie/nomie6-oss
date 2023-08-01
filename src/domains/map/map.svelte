@@ -452,7 +452,7 @@
 >
   {#if lock}
     <button
-      transition:slide={{ duration: 200, easing: quintOut }}
+      transition:slide|global={{ duration: 200, easing: quintOut }}
       on:click={() => {
         lock = false
       }}

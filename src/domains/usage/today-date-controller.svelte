@@ -36,7 +36,7 @@
 </script>
 
 <div
-  transition:slide={{ delay: 250, duration: 300, easing: quintOut }}
+  transition:slide|global={{ delay: 250, duration: 300, easing: quintOut }}
   class="date-setting flex items-center justify-center bg-red-500"
 >
   <Scroller

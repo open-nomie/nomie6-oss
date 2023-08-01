@@ -1,7 +1,7 @@
 /** @typedef {typeof __propDef.props}  DnDCellProps */
 /** @typedef {typeof __propDef.events}  DnDCellEvents */
 /** @typedef {typeof __propDef.slots}  DnDCellSlots */
-export default class DnDCell extends SvelteComponentTyped<{
+export default class DnDCell extends SvelteComponent<{
     items: any;
     onChange: any;
     valueFilter: any;
@@ -16,7 +16,7 @@ export default class DnDCell extends SvelteComponentTyped<{
 export type DnDCellProps = typeof __propDef.props;
 export type DnDCellEvents = typeof __propDef.events;
 export type DnDCellSlots = typeof __propDef.slots;
-import { SvelteComponentTyped } from "svelte";
+import { SvelteComponent } from "svelte";
 declare const __propDef: {
     props: {
         items: any;

@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import type { AlertType } from '../../store/interact'
   import { closeModal } from '../backdrop/BackdropStore2'
   import DateTimeBar from '../date-time-bar/date-time-bar.svelte'

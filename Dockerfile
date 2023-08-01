@@ -2,7 +2,7 @@ FROM node:16-buster
 
 WORKDIR /usr/app
 COPY ./package.json ./
-RUN npm install
+RUN npm install --force
 COPY ./ /usr/app
 RUN NODE_OPTIONS=--max-old-space-size=8192 npm run vbuild
 

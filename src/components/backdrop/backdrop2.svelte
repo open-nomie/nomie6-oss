@@ -48,8 +48,8 @@ import type { SvelteComponentDev } from 'svelte/internal';
 
   {#each $BackdropStore2 as modal, index (modal.id)}
     <div
-      in:fly={{ y: 200, duration: 60, easing: quadInOut }}
-      out:fly={{ y: 200, duration: 60, easing: quadInOut }}
+      in:fly|global={{ y: 200, duration: 60, easing: quadInOut }}
+      out:fly|global={{ y: 200, duration: 60, easing: quadInOut }}
       class:in-background={index < $BackdropStore2.length - 1}
       class:in-forground={index == $BackdropStore2.length - 1}
       class="backdrop-modal modal-{modal.position || 'fullscreen'}"
@@ -60,7 +60,7 @@ import type { SvelteComponentDev } from 'svelte/internal';
     </div>
     {#if index < $BackdropStore2.length - 1}
       <div
-        transition:fade
+        transition:fade|global
         class="background-cover pointer-events-none absolute top-0 right-0 left-0 bottom-0 bg-black bg-opacity-10 backdrop-filter backdrop-blur-sm"
         style="z-index:{zIndex + (index + 3)}"
       />
