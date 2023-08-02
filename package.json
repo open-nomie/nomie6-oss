@@ -1,6 +1,6 @@
 {
   "name": "nomie",
-  "version": "6.5.2bdev-dn",
+  "version": "6.5.2cdev-dn",
   "homepage": "https://github.com/dailynomie/nomie-oss",
   "bugs": {
     "url": "https://github.com/dailynomie/nomie-oss/issues",
@@ -119,6 +119,7 @@
     "calculate-correlation": "^1.2.3",
     "canvas-confetti": "^1.6.0",
     "chart.js": "^4.3.2",
+    "chartjs-plugin-annotation": "^3.0.1",
     "crypto-js": "^4.1.1",
     "date-streaks": "^1.2.1",
     "dayjs": "^1.11.9",

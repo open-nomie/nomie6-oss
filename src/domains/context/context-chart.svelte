@@ -139,6 +139,7 @@
     if (contextMap.length === 0) {
       size = 'sm'
     }
+    console.log(contextMap);
   }
 
   onMount(() => {

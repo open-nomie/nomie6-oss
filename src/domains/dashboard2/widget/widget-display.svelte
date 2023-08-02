@@ -198,6 +198,7 @@
     font-weight: 500;
     padding: 8px 16px;
     line-height: 1.1em;
+    @apply text-gray-600 dark:text-gray-400;
   }
   .dashboard-text.widget-size-lg {
     padding: 8px 16px;
@@ -205,6 +206,7 @@
     line-height: 1.7em;
     font-weight: 700;
     padding: 16px;
+    @apply text-gray-600 dark:text-gray-400;
   }
   .dashboard-widget footer button,
   .dashboard-widget .usage-chart-tools button {

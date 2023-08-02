@@ -4,7 +4,7 @@
     import "./groupingdark.css";
    import "./pivottable.css";
     
-    import { Prefs } from '../../preferences/Preferences'
+    import { Prefs } from '../../preferences/Preferences' 
 
     export let tableColorScaleGenerator = redColorScaleGenerator;
     export let tableOptions = {};

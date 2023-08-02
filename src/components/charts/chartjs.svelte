@@ -13,6 +13,7 @@
   } from 'chart.js'
   import type { ChartConfiguration } from 'chart.js'
   import { createEventDispatcher, onMount } from 'svelte'
+  import annotationPlugin from 'chartjs-plugin-annotation';
 
   Chart.register(
     BarElement,
@@ -23,7 +24,8 @@
     LinearScale,
     LogarithmicScale,
     BarController,
-    LineController
+    LineController,
+    annotationPlugin
   )
 
   export let id: string
