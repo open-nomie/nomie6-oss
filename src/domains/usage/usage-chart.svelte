@@ -179,10 +179,12 @@
   const includeContext = async () => {
     if (showContext) {
     let maxvalue = 0;
+    let minvalue = undefined;
 
     for (var usage of usages) {
       for (var value of usage.values) {
        if (value > maxvalue) { maxvalue = value}
+       if (minvalue == undefined || value < minvalue) {minvalue = value}
     }
     }
 
@@ -247,13 +249,20 @@
     
 
     const xstart = context.marks[0].startIndex;
-    const xend = xstart+context.trackable.value;
+    var xend = 0;
+    if (context.trackable.id.startsWith("+")) {
+      xend = xstart+context.trackable.ctx.duration;
+    }
+    else { xend = xstart+context.trackable.value;}
+    let minimum = 0;
+    if (startWithZero) { minimum =0}
+    else {minimum = minvalue}
     contextannotation.annotations[context.trackable.ctx.label] = {
           drawTime: 'beforeDatasetsDraw',
           type: 'box',
           xMin: xstart,
           xMax: xend,
-          yMin: 0,
+          yMin: minimum*0.78,
           yMax: maxvalue*1.1,
           backgroundColor: context.trackable.ctx.color+'50',
           borderColor: context.trackable.ctx.color,
