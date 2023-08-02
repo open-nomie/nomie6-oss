@@ -264,11 +264,9 @@
           xMax: xend,
           yMin: minimum*0.78,
           yMax: maxvalue*1.1,
-          backgroundColor: context.trackable.ctx.color+'50',
-          borderColor: context.trackable.ctx.color,
-          label: {
-        
-        }
+          backgroundColor: context.trackable.ctx.color+'70',
+          borderColor: context.trackable.ctx.color+'80',
+          borderRadius: 5,
         }
     contextannotation.annotations['label_'+context.trackable.ctx.label] = {
           drawTime: 'beforeDatasetsDraw',
@@ -280,7 +278,7 @@
           font: {
             size: 11},
           color: labelcolor,
-          xAdjust: Math.floor((context.trackable.ctx.label.length)*2.9),
+          xAdjust: Math.floor((context.trackable.ctx.label.length)*3),
     }  
     
     
