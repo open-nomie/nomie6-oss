@@ -21,11 +21,6 @@
         Nomie is a super fast, and super private way to journal, collect your life's data, and reflect on your life's
         direction.
       </p>
-      <p style="font-size:0.6rem" class="mt-1  lg:text-sm  text-center text-gray-700 dark:text-gray-400">
-        By continuing, you agree to the
-        <button on:click={openPrivacyPolicy} class="inline-flex  underline">Privacy Policy</button> and
-        <button on:click={openTermsOfService} class="inline-flex  underline">Terms of Service</button>.
-      </p>
     </div>
     <!-- <p class="text-center flex items-center justify-center">
     <button class="text-xs bg-primary-200 dark:bg-primary-800 text-primary rounded-sm px-2 py-px" on:click={()=>showHowItWorks()} className="text-solid bg-primary" pad>How it works</button>
