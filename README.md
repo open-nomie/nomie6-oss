@@ -22,6 +22,8 @@ cd nomie6-oss
 npm install
 npm run dev
 ```
+## Hosted solutions
+We have a hosted version that's located at: (https://open-nomie.github.io/)
 
 ## How Nomie Works
 
