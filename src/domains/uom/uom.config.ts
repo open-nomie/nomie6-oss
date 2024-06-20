@@ -485,6 +485,14 @@ const UOMS: IUOM = {
     symbolAffix: 'post',
     symbolSpace: true,
   },
+  mmoll: {
+    singular: 'Blood Sugar',
+    plural: 'Blood Sugar',
+    symbol: 'mmol/L',
+    type: 'health',
+    symbolAffix: 'post',
+    symbolSpace: true,
+  },
   quart: {
     singular: 'Quart',
     plural: 'Quarts',
