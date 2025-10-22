@@ -2,6 +2,8 @@
 
 Since Closing down nomie (https://nomie.app), I wanted to provide it as an open source project.
 
+A new fork called Daily Nomie is being maintained over here https://github.com/dailynomie/nomie6-oss
+
 ## Open Source Life Tracker / Mood Tracker / Data Journal
 
 ![Nomie 6 Github](https://shareking.s3.amazonaws.com/Screen-Shot-2022-12-31-11-20-09.31-w0qBQwGRkANjPuv5Xtl1xFHYFIg0GgJSYluiKMI5v69Ak7Lgbk5g0mR9bx9QrdiRlUVQrmXGb4T1AwIA02oApD3YfL97thUL0Kl3.png)
