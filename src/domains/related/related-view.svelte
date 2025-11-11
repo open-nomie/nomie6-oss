@@ -303,7 +303,7 @@
     style="min-height:180px;"
   >
     {#if !chartLoading}
-      <UsageChart className="w-full h-32" hideValues id="related-chart" usages={usagesForChart} />
+      <UsageChart className="w-full h-32" hideValues id="related-chart" usages={usagesForChart} isstatsview={true} />
     {:else}
       <div class="w-full h-32" />
     {/if}

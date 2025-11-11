@@ -34,6 +34,7 @@
 
   export let id: string
   export let stacked: boolean = false
+  export let isstatsview: boolean = false
 
   let dateFormats = getDateFormats()
   let usage: TrackableUsage
@@ -85,7 +86,7 @@
   }
 
   const alsoInclude = async (newtrackable: boolean = false) => {
-    
+    if (!isstatsview){
     //remove current also included trackable
     for (var i = 0; i < usages.length; i++) { 
       if (usages.length >1) {
@@ -93,11 +94,18 @@
         return item.trackable.id === "-alsoinclude-";
         }), 1);
       }
-    }
+    }}
+    
     var selected:Trackable
     if (newtrackable == true) {
       selected = await selectTrackable()
       includeAlso = selected}
+    else if (isstatsview == true){
+      if (usages.length >1){
+        selected = $TrackableStore.trackables[usages[1].trackable.id]
+      }
+      //selected = $TrackableStore.trackables["#coffee"]
+    }  
     else {selected = includeAlso}
     if (selected != undefined) {
       includeAlsoLabel = selected.id
@@ -139,6 +147,10 @@
   }
 
   const includeStats = async () => {
+    // do not execute when in statsmode
+    if (isstatsview) {
+      chartStats = "none"
+    }
     //remove current stats data if exist
     if (usages.length >1) {
         usages.splice(_.findIndex(usages, function(item) {
@@ -386,6 +398,10 @@
         },
       },
     ]
+    if (isstatsview){
+      buttons.splice(3, 1)
+      buttons.splice(4, 1)
+    }
     openDropMenu(caller, buttons)
   }
 
