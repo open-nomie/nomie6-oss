@@ -2,7 +2,7 @@
 import NomieApp from './App.svelte'
 import { useRegisterSW } from 'virtual:pwa-register/svelte'
 
-const intervalMS = 60 * 60 * 1000
+const intervalMS = 60 * 60 * 1000 * 24 * 7; // 1 week
 
 /* It's registering a service worker and then updating it every hour. */
 useRegisterSW({
