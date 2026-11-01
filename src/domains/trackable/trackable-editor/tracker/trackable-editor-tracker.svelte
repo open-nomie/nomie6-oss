@@ -462,8 +462,7 @@
       <NInput
         listItem
         className="tracker-default mb-3 error"
-        pattern="[0-9]*"
-        inputmode="numeric"
+        inputmode="decimal"
         type="number"
         inputClass="tracker-default-input"
         label={Lang.t('tracker.value', 'Default Value')}
