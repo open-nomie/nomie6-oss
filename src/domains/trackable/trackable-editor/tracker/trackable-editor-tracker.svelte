@@ -58,6 +58,8 @@
   let tracker: TrackerClass = $state(trackable.tracker)
   let lastTrackerRef = $state<TrackerClass | undefined>(undefined)
   let focusList: Array<string> = $state([])
+  // The default value as typed, so a comma can be entered and kept while typing
+  let defaultText: string = $state('')
 
   // Sync when tracker reference changes or when updateTrigger changes
   $effect(() => {
@@ -66,6 +68,7 @@
       tracker = trackable.tracker
       lastTrackerRef = trackable.tracker
       focusList = [...(tracker?.focus || [])]
+      defaultText = formatDefault(tracker.default)
     }
   })
 
@@ -159,7 +162,27 @@
     if (field !== 'max' && !isNaN(max)) next = Math.min(max, next)
     if (field !== 'min' && !isNaN(min)) next = Math.max(min, next)
     tracker[field] = Math.round(next * 1e6) / 1e6
+    if (field === 'default') defaultText = formatDefault(tracker.default)
     updateTrigger++
+  }
+
+  const formatDefault = (value: any): string => {
+    const n = toNumber(value)
+    return value === undefined || value === null || isNaN(n) ? '' : `${n}`
+  }
+
+  /**
+   * The default field is a text input, so a comma works as the decimal point.
+   * The typed text is kept as it is; the default is stored as a number.
+   */
+  function onDefaultInput(text: string) {
+    defaultText = text
+    if (text.trim() === '') {
+      tracker.default = undefined
+      return
+    }
+    const n = toNumber(text)
+    if (!isNaN(n)) tracker.default = n
   }
 
   async function setType(type: ITrackerType) {
@@ -462,13 +485,11 @@
       <NInput
         listItem
         className="tracker-default mb-3 error"
-        pattern="[0-9]*"
-        inputmode="numeric"
-        type="number"
-        inputClass="tracker-default-input"
+        inputmode="decimal"
         label={Lang.t('tracker.value', 'Default Value')}
         placeholder={Lang.t('tracker.default-value', 'Default Value')}
-        bind:value={tracker.default}
+        value={defaultText}
+        on:input={(evt) => onDefaultInput(evt.detail)}
       >
         <div slot="right" class="flex items-center">
           {#if tracker.default}
@@ -600,14 +621,3 @@
   {/if} -->
   </main>
 {/key}
-
-<style>
-  :global(.tracker-default-input)::-webkit-inner-spin-button,
-  :global(.tracker-default-input)::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  :global(.tracker-default-input) {
-    -moz-appearance: textfield;
-  }
-</style>
