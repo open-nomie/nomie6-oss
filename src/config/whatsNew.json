@@ -312,6 +312,9 @@
   "fixes": [
     {
       "version": "dn6.8.0v20261030",
+      "title": "Range tracker default value accepts a decimal comma and shows a decimal keypad on iPhone"
+    },{
+      "version": "dn6.8.0v20261030",
       "title": "Search: the quick list covers the last 30 days, and Search all notes finds older notes too"
     },{
       "version": "dn6.8.0v20261030",
