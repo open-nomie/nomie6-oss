@@ -311,6 +311,15 @@
   ],
   "fixes": [
     {
+      "version": "dn6.8.0v20261110",
+      "title": "Combo trackers log only what you select; untouched range and value items are greyed out"
+    },{
+      "version": "dn6.8.0v20261110",
+      "title": "A checked context in a combo is logged without a value, so the period set on the context is used"
+    },{
+      "version": "dn6.8.0v20261110",
+      "title": "Range and value items in a combo start at their configured default"
+    },{
       "version": "dn6.8.0v20261030",
       "title": "Range tracker default value accepts a decimal comma and shows a decimal keypad on iPhone"
     },{
