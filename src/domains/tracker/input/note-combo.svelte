@@ -35,6 +35,17 @@
   const dispatch = createEventDispatcher()
 
   let trackables = $state<Array<Trackable>>([])
+  // Trackers the user changed in this input. Only these are tracked.
+  let touched = $state(new Set<string>())
+  const markTouched = (trackable: Trackable) => {
+    if (trackable.tag) touched = new Set([...touched, trackable.tag])
+  }
+  // Selected means the user changed it and it has a value. Anything else is greyed out.
+  const isSelected = (t: Trackable): boolean => {
+    if (t.value === true) return true
+    const n = Number(t.value)
+    return !isNaN(n) && n !== 0 && touched.has(t.tag)
+  }
 
   async function main() {
     const noteElements: Array<Token> = tokenizeLite(tracker.note)
@@ -46,6 +57,12 @@
       }
       if (trackable.tracker?.type == 'tick' && trackable.value == 1) {
         trackable.value = 0
+      }
+      // A #name without a value starts at the tracker's configured default. The editor writes #name(1)
+      // into the template, and a (1) is treated as no value, like the context rule.
+      const givenValue = (token.raw || '').replace('(1)', '').includes('(')
+      if (trackable.tracker && !givenValue && !isNaN(Number(trackable.tracker.default))) {
+        trackable.value = trackable.tracker.default
       }
 
       return trackable
@@ -63,18 +80,18 @@
         // if (f.type == 'tracker' && f.tracker.type == 'tick') {
         //   console.log({ f })
         // }
-        //@ts-ignore
-        if (f.value === true) {
-          return true
-        } else if (f.value >= 0 || f.value < 0) {
-          return true
-        }
-        return false
+        // Only what the user selected is tracked. A range slider starts at its minimum, so an untouched
+        // tracker is left out.
+        return isSelected(f)
       })
       .map((trackable) => {
         //@ts-ignore
         if (trackable.value === true) {
           trackable.value = 1
+        }
+        // A checked context is logged as +name with no value, so the period set on the context is used
+        if (trackable.type === 'context' && Number(trackable.value) === 1) {
+          return trackable.tag
         }
         return trackable.getNoteValue()
       })
@@ -94,7 +111,10 @@
   <List solo>
     {#each trackables as trackable, index}
       <article class="flex flex-col justify-center items-center" />
-      <ListItem bottomLine={64} className="bg-white dark:bg-gray-900">
+      <ListItem
+        bottomLine={64}
+        className="bg-white dark:bg-gray-900 {(trackable.tracker?.type === 'range' || trackable.tracker?.type === 'value') && !isSelected(trackable) ? 'opacity-40' : ''}"
+      >
         <TrackableAvatar slot="left" {trackable} size={46} />
         <main class="filler">
           <header class="flex items-center justify-between">
@@ -107,7 +127,7 @@
             <div class="dark:text-white filler  py-1 text-sm ">Nested Combos are currently not supported</div>
           {/if}
           {#if trackable.tracker?.type === 'range'}
-            <div class="">
+            <div class="" on:pointerdown={() => markTouched(trackable)} on:keydown={() => markTouched(trackable)} role="presentation">
               <InputSlider2
                 {trackable}
                 step={trackable.tracker.step || 1}
@@ -131,9 +151,10 @@
             <div class="flex items-center">
               <input
                 aria-label={trackable.label}
+                on:input={() => markTouched(trackable)}
                 on:change={(evt) => {
                   // trackable.value = evt.target?.value;
-
+                  markTouched(trackable)
                   fireChange()
                 }}
                 on:focus={(evt) => {
@@ -162,6 +183,7 @@
               title={`input`}
               on:change={(evt) => {
                 trackable.value = evt.detail ? 1 : 0
+                markTouched(trackable)
                 fireChange()
               }}
             />
@@ -174,6 +196,7 @@
               title="value"
               on:change={(evt) => {
                 trackable.value = evt.detail ? 1 : 0
+                markTouched(trackable)
                 fireChange()
               }}
             />
