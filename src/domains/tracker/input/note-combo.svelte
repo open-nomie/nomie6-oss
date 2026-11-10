@@ -76,6 +76,10 @@
         if (trackable.value === true) {
           trackable.value = 1
         }
+        // A checked context is logged as +name with no value, so the period set on the context is used
+        if (trackable.type === 'context' && trackable.value === 1) {
+          return trackable.tag
+        }
         return trackable.getNoteValue()
       })
       .join(' ')
