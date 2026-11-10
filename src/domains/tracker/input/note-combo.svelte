@@ -35,9 +35,14 @@
   const dispatch = createEventDispatcher()
 
   let trackables = $state<Array<Trackable>>([])
+  // Contexts that the template gives an explicit value, such as +name(1), keep that value
+  let explicitContexts = new Set<string>()
 
   async function main() {
     const noteElements: Array<Token> = tokenizeLite(tracker.note)
+    explicitContexts = new Set(
+      noteElements.filter((t) => t.type === 'context' && t.value !== undefined && `${t.value}` !== '').map((t) => t.id)
+    )
     trackables = noteElements.map((token) => {
       const trackable = tokenToTrackable(token, $TrackableStore.trackables)
       if (trackable.person) trackable.value = 0
@@ -77,7 +82,7 @@
           trackable.value = 1
         }
         // A checked context is logged as +name with no value, so the period set on the context is used
-        if (trackable.type === 'context' && trackable.value === 1) {
+        if (trackable.type === 'context' && trackable.value === 1 && !explicitContexts.has(trackable.ctx?.tag)) {
           return trackable.tag
         }
         return trackable.getNoteValue()
