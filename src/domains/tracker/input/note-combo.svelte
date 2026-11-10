@@ -63,13 +63,13 @@
         // if (f.type == 'tracker' && f.tracker.type == 'tick') {
         //   console.log({ f })
         // }
+        // Only what is selected is tracked. An unselected item has no value or 0, so it is left out.
         //@ts-ignore
         if (f.value === true) {
           return true
-        } else if (f.value >= 0 || f.value < 0) {
-          return true
         }
-        return false
+        const n = Number(f.value)
+        return !isNaN(n) && n !== 0
       })
       .map((trackable) => {
         //@ts-ignore
