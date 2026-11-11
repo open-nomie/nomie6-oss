@@ -1,6 +1,9 @@
 {
   "features": [
     {
+      "version": "dn6.8.0v20261110",
+      "title": "Combo trackers have an option to log range and value items only when you touch them (off by default)"
+    },{
       "version": "dn6.8.0v20261029",
       "title": "On This Day shows a table of the trackers logged on this day in the previous five years"
     },{
