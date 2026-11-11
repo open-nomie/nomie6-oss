@@ -379,7 +379,14 @@
         )}
       >
         <div slot="right">
-          <NToggle bind:value={tracker.combo_auto_default} />
+          <NToggle
+            value={tracker.combo_auto_default === true}
+            on:change={(evt) => {
+              tracker.combo_auto_default = evt.detail
+              // Re-render from the tracker, so the switch shows the value that was set
+              updateTrigger++
+            }}
+          />
         </div>
       </ListItem>
       <!-- <ListItem
