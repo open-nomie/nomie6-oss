@@ -371,6 +371,24 @@
           }
         }}
       />
+      <ListItem
+        title={Lang.t('tracker.combo-touch-only', 'Only log range and value items when touched')}
+        description={Lang.t(
+          'tracker.combo-touch-only-description',
+          'Off: range and value items log their default when you do not touch them. On: they are only logged once you touch them.'
+        )}
+      >
+        <div slot="right">
+          <NToggle
+            value={tracker.combo_touch_only === true}
+            on:change={(evt) => {
+              tracker.combo_touch_only = evt.detail
+              // Re-render from the tracker, so the switch shows the value that was set
+              updateTrigger++
+            }}
+          />
+        </div>
+      </ListItem>
       <!-- <ListItem
             transparent
             description={Lang.t(

@@ -41,10 +41,14 @@
     if (trackable.tag) touched = new Set([...touched, trackable.tag])
   }
   // Selected means the user changed it and it has a value. Anything else is greyed out.
+  // Range and value items: touched, or (unless the combo is touch only) logged at their default
   const isSelected = (t: Trackable): boolean => {
     if (t.value === true) return true
     const n = Number(t.value)
-    return !isNaN(n) && n !== 0 && touched.has(t.tag)
+    if (isNaN(n) || n === 0) return false
+    if (touched.has(t.tag)) return true
+    const isValueItem = t.tracker?.type === 'range' || t.tracker?.type === 'value'
+    return tracker.combo_touch_only !== true && isValueItem
   }
 
   async function main() {
@@ -72,6 +76,8 @@
     if (tempValue) {
       dispatch('change', parseInt(tempValue))
     }
+    // Send the starting note, so an untouched combo with automatic defaults still logs them
+    fireChange()
   }
 
   const getNote = () => {
