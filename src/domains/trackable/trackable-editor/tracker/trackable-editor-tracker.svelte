@@ -371,6 +371,17 @@
           }
         }}
       />
+      <ListItem
+        title={Lang.t('tracker.combo-auto-default', 'Automatically track default values')}
+        description={Lang.t(
+          'tracker.combo-auto-default-description',
+          'Range and value items log their default when you do not touch them. Off: they are only logged once you touch them.'
+        )}
+      >
+        <div slot="right">
+          <NToggle bind:value={tracker.combo_auto_default} />
+        </div>
+      </ListItem>
       <!-- <ListItem
             transparent
             description={Lang.t(
