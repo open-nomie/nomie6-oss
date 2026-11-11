@@ -45,7 +45,7 @@ export type ITracker = {
   score_calc?: any // Positivity Score calc
   goal?: any // NOT USED
   one_tap?: boolean // One tapper?
-  combo_auto_default?: boolean // Combo: range and value items log their default when not touched
+  combo_touch_only?: boolean // Combo: range and value items are only logged once touched
   include?: string // Content to always include when tracking this tracker
   note?: string // Content to include when a note tracker
   hidden?: boolean // Hidden from All Board
@@ -77,7 +77,7 @@ export default class TrackerClass {
   public score_calc?: Array<ICondition> // Positivity Score calc
   public goal?: any // NOT USED
   public one_tap?: boolean // One tapper?
-  public combo_auto_default?: boolean // Combo: range and value items log their default when not touched
+  public combo_touch_only?: boolean // Combo: range and value items are only logged once touched
   public include?: string // Content to always include when tracking this tracker
   public note?: string // Content to include when a note tracker
   public hidden?: boolean // Hidden from All Board
@@ -137,8 +137,8 @@ export default class TrackerClass {
     this.goal = starter.goal
     // one tap
     this.one_tap = starter.one_tap === true ? true : false
-    // combo: off by default, so a range or value item is only logged once it is touched
-    this.combo_auto_default = starter.combo_auto_default === true ? true : false
+    // combo: off by default, so range and value items log their default when not touched
+    this.combo_touch_only = starter.combo_touch_only === true ? true : false
     // include
     this.include = starter.include || ''
     // Primary NOte

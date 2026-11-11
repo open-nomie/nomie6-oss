@@ -372,17 +372,17 @@
         }}
       />
       <ListItem
-        title={Lang.t('tracker.combo-auto-default', 'Automatically track default values')}
+        title={Lang.t('tracker.combo-touch-only', 'Only log range and value items when touched')}
         description={Lang.t(
-          'tracker.combo-auto-default-description',
-          'Range and value items log their default when you do not touch them. Off: they are only logged once you touch them.'
+          'tracker.combo-touch-only-description',
+          'Off: range and value items log their default when you do not touch them. On: they are only logged once you touch them.'
         )}
       >
         <div slot="right">
           <NToggle
-            value={tracker.combo_auto_default === true}
+            value={tracker.combo_touch_only === true}
             on:change={(evt) => {
-              tracker.combo_auto_default = evt.detail
+              tracker.combo_touch_only = evt.detail
               // Re-render from the tracker, so the switch shows the value that was set
               updateTrigger++
             }}

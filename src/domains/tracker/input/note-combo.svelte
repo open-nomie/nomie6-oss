@@ -41,14 +41,14 @@
     if (trackable.tag) touched = new Set([...touched, trackable.tag])
   }
   // Selected means the user changed it and it has a value. Anything else is greyed out.
-  // Range and value items: touched, or (when the combo has automatic defaults on) logged at their default
+  // Range and value items: touched, or (unless the combo is touch only) logged at their default
   const isSelected = (t: Trackable): boolean => {
     if (t.value === true) return true
     const n = Number(t.value)
     if (isNaN(n) || n === 0) return false
     if (touched.has(t.tag)) return true
     const isValueItem = t.tracker?.type === 'range' || t.tracker?.type === 'value'
-    return tracker.combo_auto_default === true && isValueItem
+    return tracker.combo_touch_only !== true && isValueItem
   }
 
   async function main() {
