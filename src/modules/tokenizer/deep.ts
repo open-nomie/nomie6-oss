@@ -1,8 +1,9 @@
-import { Token, tokenizeLite } from './lite'
+import { type Token, tokenizeLite } from './lite'
 
 export type DeepResults = {
   trackers: Array<any>
   context: Array<any>
+  pointers: Array<any>
   people: Array<any>
   links: Array<any>
   tokens: Array<Token>
@@ -26,6 +27,7 @@ function stats(tokens: Array<Token>): DeepResults {
     trackers: {},
     people: {},
     context: {},
+    pointers: {},
     links: {},
     places: {},
   }
@@ -47,6 +49,7 @@ function stats(tokens: Array<Token>): DeepResults {
   const results: any = {
     trackers: [],
     context: [],
+    pointers: [],
     people: [],
     links: [],
     places: [],

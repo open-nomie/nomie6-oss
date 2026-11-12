@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Logo from '../../components/logo/logo.svelte'
   import { openPrivacyPolicy, openTermsOfService } from '../../components/markdown-modal/MarkdownModalStore'

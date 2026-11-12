@@ -1,0 +1,28 @@
+# Dependencies & build
+node_modules/
+dist/
+build/
+
+# TypeScript files (handled by TypeScript compiler)
+src/**/*.ts
+src/**/*.d.ts
+
+# Vendor code
+src/vendor/
+
+# Data files
+src/components/emoji-selector/data/
+
+# Generated
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

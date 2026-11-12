@@ -1,7 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { TimelineItemType } from './timeline-utils'
 
-  export let item: TimelineItemType
+  const { item } = $props<{ item: TimelineItemType }>()
 </script>
 
 <div class="timeline-item">

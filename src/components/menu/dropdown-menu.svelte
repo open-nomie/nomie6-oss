@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // import { createEventDispatcher } from "svelte";
 
@@ -9,24 +11,29 @@
   import { wait } from '../../utils/tick/tick'
   // import { App } from "../../app.store";
 
-  let caller: Element
-  let top: number | undefined = undefined
-  let bottom: number | undefined = undefined
-  let left: number
-  let right: number
+  let caller: Element = $state()
+  let top: number | undefined = $state(undefined)
+  let bottom: number | undefined = $state(undefined)
+  let left: number = $state()
+  let right: number = $state()
 
-  let showMenu: boolean = false
-  let showMenuFull: boolean = false
+  let showMenu: boolean = $state(false)
+  let showMenuFull: boolean = $state(false)
 
-  $: caller = $DropdownMenuStore.caller
+  let derivedCaller = $derived($DropdownMenuStore.caller)
+  $effect(() => {
+    caller = derivedCaller
+  })
 
-  $: if ($DropdownMenuStore.visible) {
-    left = undefined
-    right = undefined
-    setTimeout(() => {
-      main()
-    }, 10)
-  }
+  $effect(() => {
+    if ($DropdownMenuStore.visible) {
+      left = undefined
+      right = undefined
+      setTimeout(() => {
+        main()
+      }, 10)
+    }
+  })
 
   async function main() {
     showMenu = false

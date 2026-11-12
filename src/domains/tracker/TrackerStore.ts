@@ -20,6 +20,23 @@ export const TrackerStore = createKVStore(NPaths.storage.trackers(), {
 })
 
 /**
+ * Repair Prefixed Keys
+ * The rename bug wrote trackers under a '#' prefixed key next to the original.
+ * Move each one onto its clean key, the prefixed copy holds the latest edits.
+ */
+export const repairPrefixedTrackerKeys = async (trackers: KVStoreState): Promise<KVStoreState> => {
+  const prefixed = Object.keys(trackers).filter((key) => key.startsWith('#'))
+  if (!prefixed.length) return trackers
+  return await TrackerStore.updateSync((s) => {
+    prefixed.forEach((key) => {
+      s[key.replace(/^#+/, '')] = s[key]
+      delete s[key]
+    })
+    return s
+  })
+}
+
+/**
  * Stop and Start a Timer
  * @param tracker
  * @param ss

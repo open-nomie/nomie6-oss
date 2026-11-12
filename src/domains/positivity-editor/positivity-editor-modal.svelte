@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
 
@@ -23,11 +25,8 @@
   import ConditionItem from './condition-item.svelte'
   import type { OpenScoreEditorProps } from './PositivityEditorStore'
 
-  export let id: string
-  export let props: OpenScoreEditorProps
-
-  let workingCalc: Array<ICondition> = []
-  let mounted = false
+  let workingCalc = $state<Array<ICondition>>([])
+  let mounted = $state(false)
 
   const dedupCalcs = (base):Array<ICondition>=>{
     return base.filter((c,index)=>{
@@ -74,17 +73,15 @@
   }
 
   const addCondition = () => {
-    
     let calc: any = {
       is: 'eq',
       sc: 1,
       v: 0,
       if: 'value',
+      key: nid(),
     }
-    calc.key = nid();
-    // calc.key = md5(JSON.stringify(calc))
-    workingCalc.push(calc)
-    workingCalc = workingCalc
+    // Create a plain object to avoid Proxy wrapping
+    workingCalc = [...workingCalc, JSON.parse(JSON.stringify(calc))]
     refresh()
   }
 
@@ -95,6 +92,8 @@
     }
     refresh()
   }
+
+  const { id, props } = $props()
 </script>
 
 <BackdropModal className="bg-gray-200 dark:bg-gray-800 h-full">

@@ -1,10 +1,10 @@
-FROM node:16-buster
+FROM node:20-alpine
 
 WORKDIR /usr/app
 COPY ./package.json ./
-RUN npm install
+RUN npm install --force
 COPY ./ /usr/app
-RUN npm run vbuild
+RUN NODE_OPTIONS=--max-old-space-size=8192 npm run vbuild
 
 FROM nginx
 WORKDIR /usr/app

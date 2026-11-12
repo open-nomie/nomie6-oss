@@ -1,16 +1,14 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../vendor/svelte-navigator'
 
   import { Device } from '../../store/device-store'
   import { Lang } from '../../store/lang'
 
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import { ArrowBack } from '../icon/nicons'
-
-  export let to: string | undefined = undefined
-  export let back: Function | undefined = undefined
-  export let label: string | undefined = undefined
 
   const dispatch = createEventDispatcher()
   const onClick = (event) => {
@@ -23,6 +21,8 @@
     }
     dispatch('click', event)
   }
+
+  const { to, back, label } = $props()
 </script>
 
 <button

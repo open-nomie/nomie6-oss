@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -6,7 +8,7 @@
   import ProgressBar from '../../../components/progress-bar/progress-bar.svelte'
   import Spinner from '../../../components/spinner/spinner.svelte'
   import { getDatePopButtons } from '../../../modules/pop-buttons/pop-buttons'
-  
+
   import { Interact } from '../../../store/interact'
   import math from '../../../utils/math/math'
   import { wait } from '../../../utils/tick/tick'
@@ -18,26 +20,28 @@
   import type { GoalClass, GoalScoreType } from '../goal-class'
   import { getGoalComparisonSymbol } from '../goal-utils'
 
-  export let goal: GoalClass
+  let { goal = $bindable() } = $props<{ goal: GoalClass }>()
 
-  let usage: TrackableUsage
+  let usage: TrackableUsage | undefined = $state(undefined)
 
-  let scores: Array<GoalScoreType> = []
-  let loading: boolean = true
-  let showLoading: boolean = true
+  let scores: Array<GoalScoreType> = $state([])
+  let loading: boolean = $state(true)
+  let showLoading: boolean = $state(true)
 
-  let weeks: Array<Array<GoalScoreType>> = []
+  let weeks: Array<Array<GoalScoreType>> = $state([])
 
-  let totalDays: number
-  let totalSuccess: number
+  let totalDays: number | undefined = $state(undefined)
+  let totalSuccess: number | undefined = $state(undefined)
 
-  let startDate: Date = new Date()
+  let startDate: Date = $state(new Date())
 
-  let trackable: Trackable
+  let trackable: Trackable | undefined = $state(undefined)
 
-  $: if (goal && goal.tag) {
-    trackable = $TrackableStore.trackables[goal.tag]
-  }
+  $effect(() => {
+    if (goal && goal.tag) {
+      trackable = $TrackableStore.trackables[goal.tag]
+    }
+  })
 
   const generateWeeksFromScores = () => {
     
@@ -97,12 +101,14 @@
   }
 
   const dateFormats = getDateFormats()
-  let lastDate: any
-  $: if (startDate && startDate !== lastDate) {
-    
-    lastDate = startDate
-    getPast()
-  }
+  let lastDate: any = $state(undefined)
+
+  $effect(() => {
+    if (startDate && startDate !== lastDate) {
+      lastDate = startDate
+      getPast()
+    }
+  })
 
   const getPad = (num: number): number => {
     // let fixed: number = num

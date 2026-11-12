@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Prefs } from './../preferences/Preferences'
 
@@ -25,47 +27,71 @@
   import { importStorage } from '../storage/import-export'
   import DownloadOutline from '../../n-icons/DownloadOutline.svelte'
 
-  export let id: string
-  export let fileData: any = undefined
-
   // let fileInput // holder of dom element self
 
-  let version = undefined // version we're dealing with
-  let importingAll = false
+  let { id, fileData = $bindable() } = $props()
+
+  let version = $state(undefined) // version we're dealing with
+  let importingAll = $state(false)
 
   // Status of imports
-  let importing = {
+  let importing = $state({
     boards: { running: false, done: false },
     locations: { running: false, done: false },
     goals: { running: false, done: false },
+    pivots: { running: false, done: false },
     logs: { running: false, done: false, progress: 0 },
     trackers: { running: false, done: false },
     people: { running: false, done: false },
     dashboards: { running: false, done: false },
     context: { running: false, done: false },
+    pointers: { running: false, done: false },
+    plugins: { running: false, done: false },
     all: { running: false, done: false },
-  }
+  })
 
   const importLoader = new ImportLoader()
 
-  let initialized = false
-  $: if (fileData && !initialized) {
-    methods.init()
-  }
+  let initialized = $state(false)
+  $effect(() => {
+    if (fileData && !initialized) {
+      methods.init()
+    }
+  })
 
   const methods = {
     // Initialze once we have data.
     init() {
+      console.log('[importer.init] Initializing import')
+      console.log('[importer.init] fileData keys:', Object.keys(fileData || {}))
       initialized = true
-      if (fileData.hasOwnProperty('nomie')) {
+      // Support both old format (with 'nomie') and new format (with 'files')
+      if (fileData.hasOwnProperty('nomie') || (fileData.files && fileData.version)) {
         // const importer = new Importer(fileData);
         try {
+          console.log('[importer.init] Calling importLoader.openPayload')
           importLoader.openPayload(fileData)
+          console.log('[importer.init] openPayload completed')
+          console.log('[importer.init] importLoader.normalized:', importLoader.normalized)
           version = importLoader.importer.version
+          console.log('[importer.init] Version:', version)
+
+          // Normalize fileData to always have nomie property for template
+          if (!fileData.nomie && fileData.version) {
+            fileData = {
+              ...fileData,
+              nomie: {
+                number: fileData.version,
+                created: fileData.created,
+              }
+            }
+          }
         } catch (e) {
-          console.error(e.message)
+          console.error('[importer.init] Error:', e.message)
           Interact.alert('Error', e.message)
         }
+      } else {
+        console.log('[importer.init] File data format not recognized')
       }
     },
     async finish() {
@@ -99,6 +125,7 @@
     // Confirm Import Trackers
 
     async run(type: string, func: Function, prompt: boolean = false) {
+      console.log(`[importer.run] Starting import for: ${type}`)
       importing[type].running = true
       try {
         let proceed = true
@@ -106,17 +133,21 @@
           proceed = await Interact.confirm(`Import ${type}?`, 'This action cannot be undone')
           await wait(200)
           if (proceed !== true) {
+            console.log(`[importer.run] ${type} import cancelled by user`)
             importing[type].running = false
             importing[type].done = false
           }
         }
         if (proceed) {
-          await func()
+          console.log(`[importer.run] Executing import function for ${type}`)
+          const result = await func()
+          console.log(`[importer.run] Import function completed for ${type}`, result)
           importing[type].running = false
           importing[type].done = true
+          console.log(`[importer.run] ${type} import completed successfully`)
         }
       } catch (e) {
-        console.error(type, e.message)
+        console.error(`[importer.run] Error importing ${type}:`, e)
         Interact.alert('Error', e.message)
         importing[type].running = false
         importing[type].done = false
@@ -190,6 +221,15 @@
         confirmation
       )
     },
+    async importPointers(confirmation: boolean = false) {
+      return await methods.run(
+        'pointer',
+        async () => {
+          return await importLoader.importPointers()
+        },
+        confirmation
+      )
+    },
 
     async importLocations(confirmation: boolean = false) {
       return await methods.run(
@@ -200,10 +240,27 @@
         confirmation
       )
     },
+    async importPlugins(confirmation: boolean = false) {
+      return await methods.run(
+        'plugins',
+        async () => {
+          return await importLoader.importPlugins()
+        },
+        confirmation
+      )
+    },
     // Confirm Import All
     async importAll() {
       let confirmed = await Interact.confirm('Confirm', 'Are you sure? Importing cannot be undone.')
       if (confirmed === true) {
+        // Items that exist on this device and in the backup keep the device's version, unless the user picks the backup's
+        const useBackup = await Interact.confirm(
+          'Items already on this device',
+          "Some items exist on this device and in the backup. Keep this device's version (recommended), or use the version from the backup? Items only in the backup are always added.",
+          'Use backup version',
+          'Keep this device (recommended)'
+        )
+        importLoader.keepDevice = !useBackup
         await wait(300)
         importingAll = true
         importing.all.running = true
@@ -321,7 +378,7 @@
       />
     {:else if fileData}
       <NItem className="item-divider compact bg-faded">
-        From Nomie {fileData.nomie.number}
+        From Nomie {fileData?.nomie?.number || fileData?.version || 'Unknown'}
       </NItem>
 
       {#if (importLoader.normalized.logs || []).length > 0}
@@ -364,9 +421,26 @@
       {/if}
 
       <!-- Importable Items -->
+      {#if importLoader.normalized.pivots?.length > 0}
+        <ImporterItem
+          emoji="📈"
+          title="Pivots"
+          count={importLoader.normalized.pivots?.length.toLocaleString()}
+          bind:status={importing.pivots}
+          on:import={() => {
+            // methods.importTrackers(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title={Lang.t('general.pivots', 'Pivots')}>
+          <div slot="left">🏆</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+      <!-- Importable Items -->
       {#if importLoader.normalized.goals?.length > 0}
         <ImporterItem
-          emoji="🤪"
+          emoji="🏆"
           title="Goals"
           count={importLoader.normalized.goals?.length.toLocaleString()}
           bind:status={importing.goals}
@@ -454,6 +528,41 @@
       {:else}
         <ListItem bottomLine={48} title={Lang.t('general.context', 'Context')}>
           <div slot="left">💭</div>
+          <div slot="right" class="text-gray-500 pr-4">No Data</div>
+        </ListItem>
+      {/if}
+     <!-- Pointers -->
+      {#if (importLoader.normalized.pointers || []).length > 0}
+      <ImporterItem
+        emoji="📍"
+        title={Lang.t('general.pointers', 'Pointers')}
+        count={(importLoader.normalized.pointers || []).length.toLocaleString()}
+        bind:status={importing.pointers}
+        on:import={() => {
+          methods.importPointers(true)
+        }}
+      />
+    {:else}
+      <ListItem bottomLine={48} title={Lang.t('general.pointers', 'Pointers')}>
+        <div slot="left">📍</div>
+        <div slot="right" class="text-gray-500 pr-4">No Data</div>
+      </ListItem>
+    {/if}
+
+      <!-- Plugins -->
+      {#if (importLoader.normalized.plugins || []).length > 0}
+        <ImporterItem
+          emoji="🔌"
+          title="Plugins"
+          count={(importLoader.normalized.plugins || []).length.toLocaleString()}
+          bind:status={importing.plugins}
+          on:import={() => {
+            methods.importPlugins(true)
+          }}
+        />
+      {:else}
+        <ListItem bottomLine={48} title="Plugins">
+          <div slot="left">🔌</div>
           <div slot="right" class="text-gray-500 pr-4">No Data</div>
         </ListItem>
       {/if}

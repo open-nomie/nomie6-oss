@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
   import Divider from '../../components/divider/divider.svelte'
@@ -6,7 +8,8 @@
   import { showTrackablePopmenu } from '../board/boardActions'
   import type { UsageComparedType } from './TrendingModalStore'
 
-  export let uct: UsageComparedType
+
+  const { uct } = $props()
 </script>
 
 <ListItem

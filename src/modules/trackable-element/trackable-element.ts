@@ -5,9 +5,9 @@
  * that is parsed out and used for stats or other UX
  * things (like clickable links)
  *
- * Trackable - a Trackable is the high level object that wraps a Person, a Tracker or a Context.
+ * Trackable - a Trackable is the high level object that wraps a Person, a Tracker a Pointer or a Context.
  * Trackables are then passed around without having to always determine the type of thing we're tracking
- * - people, context, and trackers for examples
+ * - people, context, pointers and trackers for examples
  *
  * Future Trackables might be location, and lifemarker
  */
@@ -22,7 +22,7 @@ import TrackerClass from '../tracker/TrackerClass'
 import { Trackable } from '../../domains/trackable/Trackable.class'
 // import { strToTokens } from '../tokenizer/lite'
 
-export type ITrackableElementType = 'tracker' | 'person' | 'context' | 'generic' | 'line-break' | 'link'
+export type ITrackableElementType = 'tracker' | 'person' | 'context' | 'pointer' | 'generic' | 'line-break' | 'link'
 export interface ITrackableElement {
   id?: string
   type?: ITrackableElementType
@@ -52,7 +52,7 @@ export default class TrackableElement {
   constructor(starter: ITrackableElement) {
     if (typeof starter == 'object') {
       this.id = starter.id // brandon of @brandon, meet of #meet, home of +home
-      this.type = starter.type // tracker, person, context
+      this.type = starter.type // tracker, person, context, pointer
       this.raw = starter.raw // the raw string
       this.value = starter.value // any value passed or 1
       this.prefix = starter.prefix // @ # or +
@@ -90,6 +90,10 @@ export default class TrackableElement {
           this.prefix = '+'
           this.type = 'context'
           break
+        case '^':
+          this.prefix = '^'
+          this.type = 'pointer'
+          break  
         case '@':
           this.prefix = '@'
           this.type = 'person'
@@ -99,12 +103,12 @@ export default class TrackableElement {
   }
 
   /**
-   * Converts tracker, people and context trackable elements into a Trackable
+   * Converts tracker, people, pointers and context trackable elements into a Trackable
    * @param trackables
    * @returns
    */
   toTrackable(trackables: ITrackables = {}): Trackable | undefined {
-    if (['tracker', 'person', 'context'].indexOf(this.type) > -1) {
+    if (['tracker', 'person', 'context', 'pointer'].indexOf(this.type) > -1) {
       // Get Trackables as Array
       let found: Trackable | undefined = trackables[this.toTrackableId()]
 
@@ -138,6 +142,13 @@ export default class TrackableElement {
           found.value = this.value
 
           // Return trackable
+        } else if (this.type === 'pointer') {
+          // Create a new pointer trackable
+          found = new Trackable({ type: 'pointer', pointer: this.id })
+          // Pass a value - this is for a new feature
+          found.value = this.value
+
+          // Return trackable
         }
       }
       return found
@@ -157,6 +168,9 @@ export default class TrackableElement {
 
       case 'context':
         return '+'
+
+      case 'pointer':
+        return '^'  
 
       default:
         return ''

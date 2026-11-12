@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   /** Timer.svelte
    *
@@ -22,9 +24,9 @@
   const dispatch = createEventDispatcher()
 
   // Props
-  export let value: number
-  export let tracker: TrackerClass
-  export let manual: boolean = false
+
+
+  const { value, tracker, manual } = $props()
 </script>
 
 <div class="n-timer-input w-full">

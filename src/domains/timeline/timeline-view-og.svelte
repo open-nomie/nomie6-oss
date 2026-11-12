@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type NLog from '../nomie-log/nomie-log'
   import { logsToTimeline, TimelineItemType } from './timeline-utils'
@@ -22,35 +24,41 @@
   import type { PopMenuButton } from '../../components/pop-menu/usePopmenu'
   import { openDropMenu } from '../../components/menu/useDropmenu'
 
-  export let logs: Array<NLog> = []
+  const { logs = [] } = $props<{ logs?: Array<NLog> }>()
 
   const dispatch = createEventDispatcher()
-  let timeline: Array<TimelineItemType> = []
-  let dateFormats = getDateFormats()
+  let timeline = $state<Array<TimelineItemType>>([])
+  let dateFormats = $state(getDateFormats())
 
-  let listStartIndex: number
-  let listEndIndex: number
+  let listStartIndex = $state<number | undefined>(undefined)
+  let listEndIndex = $state<number | undefined>(undefined)
 
-  $: if ($TrackableStore) {
-    timeline = logsToTimeline(logs, $TrackableStore.trackables)
-  }
+  $effect(() => {
+    if ($TrackableStore) {
+      timeline = logsToTimeline(logs, $TrackableStore.trackables)
+    }
+  })
 
-  let topItem: TimelineItemType | undefined = undefined
+  let topItem = $state<TimelineItemType | undefined>(undefined)
 
-  $: if (listStartIndex && timeline) {
-    topItem = timeline[listStartIndex]
-    dispatch('scrollItem', topItem)
-  } else if (listStartIndex === 0 && timeline) {
-    topItem = timeline[listStartIndex]
-    dispatch('scrollItem', topItem)
-  }
+  $effect(() => {
+    if (listStartIndex && timeline) {
+      topItem = timeline[listStartIndex]
+      dispatch('scrollItem', topItem)
+    } else if (listStartIndex === 0 && timeline) {
+      topItem = timeline[listStartIndex]
+      dispatch('scrollItem', topItem)
+    }
+  })
 
-  let lastEndIndex = 0
-  $: if (lastEndIndex !== listEndIndex && listEndIndex === timeline.length && timeline.length > 0) {
-    lastEndIndex = listEndIndex
+  let lastEndIndex = $state(0)
+  $effect(() => {
+    if (lastEndIndex !== listEndIndex && listEndIndex === timeline.length && timeline.length > 0) {
+      lastEndIndex = listEndIndex
 
-    dispatch('endOfItems')
-  }
+      dispatch('endOfItems')
+    }
+  })
 
   const showNoteSelectMenu = (evt: any, logs: Array<NLog> = []) => {
     const menu: Array<PopMenuButton> = logs.map((log) => {

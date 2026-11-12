@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
@@ -34,22 +36,14 @@
 
   import WhenView from './when-view.svelte'
 
-  export let id: string
+  const { id } = $props()
 
-  let loading: boolean = false
-  let showRelated: boolean = false
+  let loading = $state(false)
+  let showRelated = $state(false)
   // let activeIndex: number = 0
 
-  /**
-   * On TimeSpan Change
-   * */
-  let lastTimeSpan = ''
-  let lastTrackable: Trackable
-  $: if ($Stats2Store.time !== lastTimeSpan || lastTrackable !== $Stats2Store.trackable) {
-    lastTrackable = $Stats2Store.trackable
-    lastTimeSpan = $Stats2Store.time
-    initStats()
-  }
+  let lastTimeSpan = $state('')
+  let lastTrackable = $state<Trackable | undefined>(undefined)
 
   const initStats = async () => {
     loading = true
@@ -60,9 +54,14 @@
     loading = false
   }
 
-  /**
-   * Close The Moda
-   */
+  $effect(() => {
+    if ($Stats2Store.time !== lastTimeSpan || lastTrackable !== $Stats2Store.trackable) {
+      lastTrackable = $Stats2Store.trackable
+      lastTimeSpan = $Stats2Store.time
+      initStats()
+    }
+  })
+
   const close = () => {
     closeModal(id)
   }

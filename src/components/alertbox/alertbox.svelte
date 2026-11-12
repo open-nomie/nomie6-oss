@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Button from '../button/button.svelte'
   import Text from '../text/text.svelte'
@@ -5,9 +7,6 @@
   import KeyDown from '../../modules/keyDown/keyDown.svelte'
   import { closeModal } from '../backdrop/BackdropStore2'
 import Markdown from '../markdown/markdown.svelte'
-
-  export let payload: AlertType
-  export let id: string
 
   let hasSlot = false
 
@@ -28,7 +27,17 @@ import Markdown from '../markdown/markdown.svelte'
         closeModal(id)
       }
     },
+    // Optional third button: the result is the string 'discard'
+    onDiscard() {
+      if (payload.onInteract) {
+        payload.value = 'discard'
+        payload.onInteract(payload)
+        closeModal(id)
+      }
+    },
   }
+
+  const { payload, id } = $props()
 </script>
 
 <KeyDown
@@ -61,7 +70,6 @@ import Markdown from '../markdown/markdown.svelte'
   <slot />
   </div>
 
-
   <div class="footer">
     <button
       id="alert-ok"
@@ -80,6 +88,11 @@ import Markdown from '../markdown/markdown.svelte'
         on:click={methods.onCancel}
       >
         {payload.cancel}
+      </button>
+    {/if}
+    {#if payload.discard}
+      <button id="alert-discard" aria-label={payload.discard} class="cancel" on:click={methods.onDiscard}>
+        {payload.discard}
       </button>
     {/if}
   </div>

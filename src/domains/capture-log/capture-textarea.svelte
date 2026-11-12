@@ -1,6 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Textarea from '../../components/textarea/textarea.svelte'
   import {
+    AllPointersTrackables,
     AllContextTrackables,
     AllPeopleTrackables,
     AllTrackerTrackables,
@@ -15,12 +18,12 @@
   import { wait } from '../../utils/tick/tick'
 
   let textarea: any
-  export let value: string
-  export let id: string
+  let { value = $bindable(), id, class: classAttr = '', placeholder = '' } = $props<{ value?: string; id: string; class?: string; placeholder?: string }>()
   const emit = createEventDispatcher()
 </script>
 
 <Textarea
+  bind:this={textarea}
   aria-label="Note entry field"
   {id}
   on:inserted={async (evt) => {
@@ -38,7 +41,7 @@
       if (inputValue) {
         let note = replaceTextAt(value, tag, inputValue.raw, cursorPos)
         let newCursor = evt.detail.cursor.end + (inputValue.raw.length - tag.length)
-        value = `${note} `
+        textarea.setValue(note)
         await wait(20)
         textarea.setSelectionRange(newCursor, newCursor)
         emit('input', evt.detail)
@@ -81,10 +84,19 @@
           }
         }),
       },
+      {
+        trigger: '^',
+        values: $AllPointersTrackables.map((trackable) => {
+          return {
+            key: trackable.tag,
+            value: trackable.tag?.replace('^', ''),
+          }
+        }),
+      },
     ],
   }}
-  class={$$restProps.class || ''}
-  placeholder={$$restProps.placeholder || ''}
+  class={classAttr}
+  placeholder={placeholder}
   bind:value
   bind:this={textarea}
   on:input={(e) => emit('input', e.detail)}
@@ -92,5 +104,4 @@
   on:focus={(e) => emit('focus', e.detail)}
   on:blur={(e) => emit('blur', e.detail)}
   on:paste={(e) => emit('paste', e.detail)}
-  {...$$restProps}
 />

@@ -5,4 +5,10 @@ module.exports = {
       postcss: true
     }),
   ],
+  compilerOptions: {
+    compatibility: {
+      componentApi: 4
+    },
+    runes: false
+  }
 };

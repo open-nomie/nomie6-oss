@@ -1,9 +1,9 @@
+<svelte:options runes={true} />
+
 <script type="ts">
   import { onMount } from 'svelte'
   // import Chart from 'chart.js/auto'
   import nid from '../../modules/nid/nid'
-
-  export let data: Array<IPieData> = []
 
   const chartId = `chart-${nid()}`
 
@@ -41,6 +41,8 @@
     // })
   }
   onMount(createDoughnut)
+
+  const { data } = $props()
 </script>
 
 <canvas id={chartId} width="150" height="150" />

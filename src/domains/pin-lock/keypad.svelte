@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   //svelte
   import { createEventDispatcher } from 'svelte'
@@ -5,10 +7,10 @@
   import Button from '../../components/button/button.svelte'
 
   // Props
-  export let value = ''
 
   // Consts
   const dispatch = createEventDispatcher()
+  let { value = $bindable() } = $props()
 
   // Methods
   const select = (num) => () => (value += num)

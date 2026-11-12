@@ -1,10 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-
-  export let emoji: any
-  export let className: string = ''
-  export let style: string = ''
-  export let title: string | undefined = undefined
 
   const dispatch = createEventDispatcher()
 
@@ -19,6 +16,8 @@
   function onMouseOut() {
     dispatch('emojihover', null)
   }
+
+  const { emoji, className, style, title } = $props()
 </script>
 
 <button

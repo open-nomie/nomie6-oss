@@ -1,21 +1,18 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import LetterTicker from '../letter-ticker/letter-ticker.svelte'
   import { onMount } from 'svelte'
 
-  export let started = undefined
-  export let initialDuration = 0
-  export let lg = undefined
-  export let className = ''
-  export let color = 'var(--color-red)'
-  export let filled = false
+  const { started, initialDuration, lg, className, color, filled } = $props()
+
+  let value = $state('00:00:00')
 
   onMount(() => {
     if (started) {
       methods.init()
     }
   })
-
-  $: value = '00:00:00'
 
   const methods = {
     init() {

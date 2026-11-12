@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../components/list-item/list-item.svelte'
   import Spinner from '../../components/spinner/spinner.svelte'
@@ -8,12 +10,11 @@
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import { CheckmarkCircle } from '../../components/icon/nicons'
 
-  export let emoji = '🙃'
-  export let title = 'Unknown'
-  export let status
-  export let count = '0'
+
 
   const dispatch = createEventDispatcher()
+
+  const { emoji, title, status, count } = $props()
 </script>
 
 <ListItem bottomLine={48}>

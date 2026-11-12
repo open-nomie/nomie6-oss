@@ -1,19 +1,9 @@
 //@ts-ignore
 import NomieApp from './App.svelte'
-import { useRegisterSW } from 'virtual:pwa-register/svelte'
+import { pwService } from './modules/pwa/PWAService'
 
-const intervalMS = 60 * 60 * 1000
-
-/* It's registering a service worker and then updating it every hour. */
-useRegisterSW({
-  onRegistered(r) {
-    if (r) r.update()
-    r &&
-      setInterval(() => {
-        r.update()
-      }, intervalMS)
-  },
-})
+/* Initialize PWA service - handles service worker registration and update checks */
+pwService.initialize()
 
 /**
  * Setup Day JS

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import SvelteMarkdown from 'svelte-markdown'
@@ -15,11 +17,8 @@
   import ToolbarGrid from '../toolbar/toolbar-grid.svelte'
   import { composeEmail } from '../../utils/text/text'
 
-  let loading: boolean = true
-  let content: string
-
-  export let id: string
-  export let props: MarkdownModalStoreProps
+  let loading = $state(true)
+  let content = $state<string>(undefined)
 
   const getContent = async () => {
     loading = true
@@ -36,6 +35,8 @@
   const close = () => {
     closeModal(id)
   }
+
+  const { id, props } = $props()
 </script>
 
 <BackdropModal className="min-h-75vh">

@@ -2,7 +2,7 @@
 import logFilter from './log-filter'
 import NomieLog from '../nomie-log'
 import { it, describe, expect } from 'vitest'
-import { strToToken, Token } from '../../../modules/tokenizer/lite'
+import { strToToken, type Token } from '../../../modules/tokenizer/lite'
 
 let log1 = new NomieLog({ note: 'Tracker #cheese for Brandon 1' })
 let log2 = new NomieLog({ _id: 'brandontest', note: 'Tracker #cheese for @brandon, 2' })

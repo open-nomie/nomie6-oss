@@ -32,6 +32,7 @@ export function N3ImportNormalizer(importer: any): INormalizedImport {
     logs: getLogs(importer),
     people: {},
     context: [],
+    pointers: [],
     locations: [],
     dashboards: [],
   }

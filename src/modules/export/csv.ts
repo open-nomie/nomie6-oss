@@ -26,8 +26,15 @@ export const logsToCSV = async (
       resolve(data);
     }
 
+    // Convert Proxy objects to plain objects for Worker serialization
+    const plainLogs = JSON.parse(JSON.stringify(logs))
+    const plainIncludeTrackables = JSON.parse(JSON.stringify(includeTrackables))
+    const plainKnownTrackables = JSON.parse(JSON.stringify(knownTrackables))
+
     csvWorker.postMessage({
-      logs, includeTrackables, knownTrackables
+      logs: plainLogs,
+      includeTrackables: plainIncludeTrackables,
+      knownTrackables: plainKnownTrackables
     })
   })
 

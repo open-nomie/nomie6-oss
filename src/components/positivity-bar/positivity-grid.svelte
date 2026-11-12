@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 
   import { onMount } from 'svelte'
@@ -6,27 +8,29 @@
   import { TrackerStore } from '../../domains/tracker/TrackerStore'
   import { positivityFromLogs } from '../../utils/positivity/positivity'
 
-  export let logs: Array<NLog> = []
-  export let className:string = "";
+  let mounted = $state(false)
+  let byHour = $state<Array<any>>([])
+  let score = $state(0)
 
-  let mounted = false
-  let byHour: Array<any> = []
-  let score: number = 0
+  const { logs, className } = $props()
 
-  $: if (logs && mounted) {
-    let pos = positivityFromLogs(logs, $TrackerStore)
-    score = 0
-    byHour = pos.byHour.map((number) => {
-      score = score + number
-      if (number > 0) {
-        return 'positive'
-      } else if (number < 0) {
-        return 'negative'
-      } else {
-        return 'neutral'
-      }
-    })
-  }
+  $effect(() => {
+    if (logs && mounted) {
+      let pos = positivityFromLogs(logs, $TrackerStore)
+      let totalScore = 0
+      byHour = pos.byHour.map((number) => {
+        totalScore = totalScore + number
+        if (number > 0) {
+          return 'positive'
+        } else if (number < 0) {
+          return 'negative'
+        } else {
+          return 'neutral'
+        }
+      })
+      score = totalScore
+    }
+  })
 
   onMount(() => {
     mounted = true

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   // import ListItem from '../../../components/list-item/list-item.svelte'
@@ -10,8 +12,6 @@
   // import { saveTrackable, TrackableStore } from '../../trackable/TrackableStore'
 
   const dispatch = createEventDispatcher()
-
-  export let tracker: TrackerClass
 
   let selected = []
   let mode: 'view' | 'edit' = 'view'
@@ -42,6 +42,8 @@
   //     mode = 'edit'
   //   }
   // }
+
+  const { tracker } = $props()
 </script>
 
 <div class="picker-input-wrapper filler overflow-y-auto max-h-full min-h-0">

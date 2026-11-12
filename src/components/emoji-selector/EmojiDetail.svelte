@@ -1,5 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let emoji
+
+
+  const { emoji } = $props()
 </script>
 
 <div class="svelte-emoji-picker__emoji-detail">

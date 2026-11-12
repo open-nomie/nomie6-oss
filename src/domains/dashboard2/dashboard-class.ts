@@ -48,6 +48,7 @@ export class DashboardClass {
     let latest: Dayjs = dayjs().subtract(100, 'years')
 
     this.widgets.forEach((w: WidgetClass) => {
+      if (!w.timeframe || !w.timeframe.start || !w.timeframe.end) return
       if (w.timeframe.start.toDate().getTime() < earliest?.toDate()?.getTime()) {
         earliest = w.timeframe?.start
       }

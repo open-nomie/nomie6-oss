@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import EaselOutline from '../../n-icons/EaselOutline.svelte'
 
@@ -11,12 +13,18 @@
 
   import AppsOutline from '../../n-icons/AppsOutline.svelte'
   import AppsSolid from '../../n-icons/AppsSolid.svelte'
+  //import BarChartSolid from '../../n-icons/BarChartSolid.svelte'
+  //import BarChartOutline from '../../n-icons/BarChartOutline.svelte'
+  import CubeOutline from '../../n-icons/CubeOutline.svelte'
+  import CubeSolid from '../../n-icons/CubeSolid.svelte'
 
+  import QRCode from '../../n-icons/QRCode.svelte'
+  import QRCodeSolid from '../../n-icons/QRCodeSolid.svelte'
   import EaselSolid from '../../n-icons/EaselSolid.svelte'
   import RibbonSolid from '../../n-icons/RibbonSolid.svelte'
   import CalendarSolid from '../../n-icons/CalendarSolid.svelte'
 
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../vendor/svelte-navigator'
   import { Device } from '../../store/device-store'
   import SearchIcon from '../../n-icons/SearchIcon.svelte'
   import Dot from '../../components/dot/dot.svelte'
@@ -33,9 +41,25 @@
   import CalendarNumberSolid from '../../n-icons/CalendarNumberSolid.svelte'
   import CalendarNumberOutline from './../../n-icons/CalendarNumberOutline.svelte'
 
-  export let loggedIn: boolean = false
+  const { loggedIn = false } = $props<{ loggedIn?: boolean }>()
 
-  let goalPercentage: number | undefined = undefined
+  let goalPercentage: number | undefined = $state(undefined)
+  let isDarkMode = $state(false)
+
+  $effect(() => {
+    isDarkMode = document.documentElement.classList.contains('mode-dark')
+
+    const observer = new MutationObserver(() => {
+      isDarkMode = document.documentElement.classList.contains('mode-dark')
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
+  })
 
   type NavType = {
     id: string
@@ -49,12 +73,14 @@
     }
   }
 
-  $: if ($GoalScoreStore[1]) {
-    const _goalPercent = Math.round(($GoalScoreStore[0] / $GoalScoreStore[1]) * 100)
-    if (!isNaN(_goalPercent)) {
-      goalPercentage = _goalPercent
+  $effect(() => {
+    if ($GoalScoreStore[1]) {
+      const _goalPercent = Math.round(($GoalScoreStore[0] / $GoalScoreStore[1]) * 100)
+      if (!isNaN(_goalPercent)) {
+        goalPercentage = _goalPercent
+      }
     }
-  }
+  })
 
   const navigation: Array<NavType> = [
     {
@@ -92,6 +118,27 @@
       icon: RibbonOutline,
       activeIcon: RibbonSolid,
     },
+    {
+      id: 'analytics',
+      path: '/analytics',
+      title: Lang.t('tabs.analytics', 'Analytics'),
+      icon: CubeOutline,
+      activeIcon: CubeSolid,
+    },
+    // {
+    //   id: 'afternomie',
+    //   path: '/afternomie',
+    //   title: Lang.t('tabs.afternomie', 'AfterNomie'),
+    //   icon: QRCode,
+    //   activeIcon: QRCodeSolid,
+    // },
+    {
+      id: 'blockly',
+      path: '/nomie-blockly',
+      title: 'Nomie Blockly',
+      icon: QRCode,
+      activeIcon: QRCodeSolid,
+    },
     // {
     //   id: 'awards',
     //   path: '/awards',
@@ -110,14 +157,14 @@
 </script>
 
 <aside
-  class="desktop-sidebar bg-white dark:bg-gray-900 px-4 shadow-xl z-50"
+  class="desktop-sidebar bg-white dark:bg-gray-900 px-4 shadow-xl z-50 not-printable"
   role="menu"
   aria-hidden="false"
   title="Nomie Navigation"
 >
-  <div class="p-4 flex justify-start items-center space-x-3 my-4">
+  <div class="logo-container">
     {#if loggedIn}
-      <img src="/app-icons/nomie6-head-72.png" class="rounded-xl h-12 w-12" alt="app-logo" />
+      <img src={isDarkMode ? '/images/nomie-splash-dark.svg' : '/images/nomie-splash-light.svg'} alt="app-logo" class="nomie-logo" />
       <!-- <Logo size={22} className="-mt-2" /> -->
     {/if}
   </div>
@@ -185,6 +232,9 @@
 </aside>
 
 <style lang="postcss" global>
+  @media print {
+      .not-printable { display: none; }
+  }
   .desktop-sidebar .nav-item {
     @apply px-4 py-2;
     @apply mb-2;
@@ -246,5 +296,26 @@
     @apply fixed top-0;
     @apply flex flex-col;
     @apply h-screen;
+  }
+
+  .logo-container {
+    @apply mt-2 mb-1;
+    /* Responsive height that maintains aspect ratio */
+    height: auto;
+    min-height: 5.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Ensure logo always has priority and doesn't get crushed */
+  }
+
+  .nomie-logo {
+    max-width: 100%;
+    max-height: 5.25rem;
+    height: auto;
+    width: auto;
+    display: block;
+    object-fit: contain;
   }
 </style>

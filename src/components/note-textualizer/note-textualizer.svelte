@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   // Components
@@ -10,20 +12,17 @@
 
   
   // Props
-  export let note: string = ''
-  export let trackers = {}
-  export let className: string | undefined = undefined
-  export let tokenClass: undefined | string = undefined
-  
+
 
   const dispatch = createEventDispatcher()
+  const { note, trackers, className, tokenClass } = $props()
 
-  const state = {
+  const state = $state({
     words: [],
     note: ``
-  }
+  })
 
-  let actual = 0
+  let actual = $state(0)
 
   const toggleCheckbox = (index) => {
      const check = state.words[index];
@@ -55,15 +54,16 @@
     note_to_array(str) {
       let parsed = extractor.parse(str, { includeGeneric: true }) || [];
       let matches = parsed.filter((trackableElement) => {
-        return ['person', 'context', 'generic'].indexOf(trackableElement.type) > -1
+        return ['person', 'context', 'pointer', 'generic'].indexOf(trackableElement.type) > -1
       })
       actual = matches.length
       return parsed
     },
   }
 
-  $: state.words = methods.note_to_array(note)
-  
+  $effect(() => {
+    state.words = methods.note_to_array(note)
+  })
 </script>
 
 {#if actual}
@@ -95,6 +95,16 @@
           {` ${word.raw} `}
         </button>
       {:else if word.type == 'context'}
+        <button
+          type="button"
+          class="context token {tokenClass || 'default-token-class'}"
+          on:click={() => {
+            methods.textElementClick(word)
+          }}
+        >
+          {` ${word.raw} `}
+        </button>
+        {:else if word.type == 'pointer'}
         <button
           type="button"
           class="context token {tokenClass || 'default-token-class'}"
@@ -137,7 +147,6 @@
 
 <style lang="postcss" global> 
 
-
   .n-note-textualized input[type=checkbox] {
     @apply cursor-pointer;
     /* @apply appearance-none; */
@@ -155,7 +164,8 @@
   }
   .n-note-textualized .tracker,
   .n-note-textualized .person,
-  .n-note-textualized .context {
+  .n-note-textualized .context,
+  .n-note-textualized .pointer {
     padding-right: 3px;
     flex-shrink: 0;
   }

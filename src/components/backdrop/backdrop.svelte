@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { fade, fly } from 'svelte/transition'
@@ -8,21 +10,14 @@
   import ScrollStopper from './scroll-stopper.svelte'
   // import { pan } from "svelte-hammer";
 
-  export let visible: boolean = true
-  export let stopPropagation: boolean = true
-  export let tappable: boolean = true
-  export let opacity: number = 0.75
-  export let className: string = ''
-  export let position: 'center' | 'bottom' | 'top' | 'bottom-center' = 'center'
-  export let id: string
-
   const dispatch = createEventDispatcher()
+  const { visible, stopPropagation, tappable, opacity, className, position, id } = $props()
 
-  let activeId: string
-
-  let indexLevel: number = 0
-  let scale: number = 100
-  let translateY: number = 0
+  let activeId = $state(undefined)
+  let indexLevel = $state(0)
+  let scale = $state(100)
+  let translateY = $state(0)
+  let windowChangeListener = $state(false)
 
   function remove() {
     BackdropStore.remove(activeId)
@@ -42,31 +37,31 @@
     }
   }
 
-  let windowChangeListener: boolean = false
-
-  $: if (visible && !activeId) {
-    activeId = id
-    BackdropStore.add(id)
-    if (!windowChangeListener) {
-      window.addEventListener('popstate', windowPathChanged)
-      windowChangeListener = true
-    }
-  } else if (!visible && activeId) {
-    remove()
-  } else if (!visible && !activeId) {
-    window.removeEventListener('popstate', windowPathChanged)
-    windowChangeListener = false
-  }
-
   const windowPathChanged = () => {
     remove()
   }
 
-  $: {
+  $effect(() => {
+    if (visible && !activeId) {
+      activeId = id
+      BackdropStore.add(id)
+      if (!windowChangeListener) {
+        window.addEventListener('popstate', windowPathChanged)
+        windowChangeListener = true
+      }
+    } else if (!visible && activeId) {
+      remove()
+    } else if (!visible && !activeId) {
+      window.removeEventListener('popstate', windowPathChanged)
+      windowChangeListener = false
+    }
+  })
+
+  $effect(() => {
     indexLevel = $BackdropStore.findIndex((b) => b == id)
     scale = (98 - (indexLevel + 2)) / 100
     translateY = -20 / scale
-  }
+  })
 </script>
 
 {#if activeId}
@@ -75,7 +70,7 @@
   {#if $BackdropStore && $BackdropStore.length && $BackdropStore[$BackdropStore.length - 1] == id}
     <div
       id={`bd-${$BackdropStore.length}`}
-      transition:fade={{ duration: 100 }}
+      transition:fade|global={{ duration: 100 }}
       style="--tw-bg-opacity:{opacity}; z-index:4000;"
       class="nui-backdrop open nui-pos-{position}
       {className}"
@@ -91,7 +86,7 @@
     class="nui-backdrop--children nui-pos-{position}
     {className}"
     class:in-background={indexLevel < $BackdropStore.length - 1}
-    transition:fly|local={{ y: 300, duration: 200 }}
+    transition:fly={{ y: 300, duration: 200 }}
   >
     <slot />
     <div class="safe-bottom" />

@@ -1,20 +1,23 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Button from '../../components/button/button.svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import { AddIcon, CheckmarkCircle, ChevronForwardOutline, RibbonOutline } from '../../components/icon/nicons'
   import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
+  import ButtonGroup from '../../components/button-group/button-group.svelte'
 
   import { Lang } from '../../store/lang'
   import List from '../../components/list/list.svelte'
   import Layout from '../layout/layout.svelte'
 
-  import { GoalClass, GoalDurationType } from './goal-class'
+  import { GoalClass, type GoalDurationType } from './goal-class'
 
   import {
     getGoalUsage,
     GoalScoreStore,
     GoalStore,
-    GoalUsageResponseType,
+    type GoalUsageResponseType,
     openGoalDetail,
     openGoalEditor,
   } from './GoalStore'
@@ -37,19 +40,18 @@
   import CreateOutline from '../../n-icons/CreateOutline.svelte'
 
   import { onDestroy, onMount } from 'svelte'
-  // import Toolbar from '../../components/toolbar/toolbar.svelte'
+  import Toolbar from '../../components/toolbar/toolbar.svelte'
   // import DateRangeController from '../../components/date-range-controller/date-range-controller.svelte'
   import dayjs from 'dayjs'
   import { LedgerStore } from '../ledger/LedgerStore'
-  import UpgradeMessage from '../../components/upgrade-message/upgrade-message.svelte'
 
-  let view: GoalDurationType = 'day'
-  let goals: Array<GoalClass> = []
-  let goalUsages: Array<GoalUsageResponseType> = []
-  let loading: boolean = true
-  let mounted = false
-  let activeDate = dayjs()
-  let allowOpen: boolean = true
+  let view: GoalDurationType = $state('day')
+  let goals: Array<GoalClass> = $state([])
+  let goalUsages: Array<GoalUsageResponseType> = $state([])
+  let loading: boolean = $state(true)
+  let mounted = $state(false)
+  let activeDate = $state(dayjs())
+  let allowOpen: boolean = $state(true)
 
   const blockOpen = () => {
     allowOpen = false
@@ -73,17 +75,23 @@
       loading = false
     }
     goalUsages = [...goalUsages]
+    
   }, 1000)
 
-  let lastGoalStore = ''
-  $: if ($GoalScoreStore.join(',') !== lastGoalStore && mounted) {
-    lastGoalStore = $GoalScoreStore.join(',')
-    initialzeGoalPage()
-  }
+  let lastGoalStore = $state('')
 
-  $: if ($GoalStore) {
-    initialzeGoalPage()
-  }
+  $effect(() => {
+    if ($GoalScoreStore.join(',') !== lastGoalStore && mounted) {
+      lastGoalStore = $GoalScoreStore.join(',')
+      initialzeGoalPage()
+    }
+  })
+
+  $effect(() => {
+    if ($GoalStore) {
+      initialzeGoalPage()
+    }
+  })
 
   const createGoal = () => {
     const goal = new GoalClass({ duration: view })
@@ -103,9 +111,9 @@
     }
   }
 
-  let editMode: boolean = false
+  let editMode: boolean = $state(false)
 
-  let newPostListener
+  let newPostListener: any = $state(undefined)
 
   onMount(() => {
     mounted = true
@@ -117,6 +125,7 @@
   onDestroy(() => {
     if (newPostListener) newPostListener()
   })
+
 </script>
 
 <Layout pageTitle={Lang.t('goals.goals', 'Goals')}>
@@ -162,22 +171,23 @@
         dateClass="text-xl font-bold text-center dark:text-white"
       />
     </div> -->
-    <!-- <Toolbar>
+    <Toolbar>
       <ButtonGroup
         bind:value={view}
         className="max-w-sm mx-auto"
         buttons={[
           { label: Lang.t('general.daily', 'Daily'), value: 'day' },
-          // { label: Lang.t('general.weekly', 'Weekly'), value: 'week' },
+          { label: Lang.t('general.weekly', 'Weekly'), value: 'week' },
           { label: Lang.t('general.monthly', 'Monthly'), value: 'month' },
         ]}
       />
-    </Toolbar> -->
+    </Toolbar>
   </header>
   <main class="py-4 relative z-10 px-2 lg:px-4">
     {#if goals.length}
       <List solo className="max-w-screen-lg mx-auto">
         {#each goalUsages as item, index (item.id)}
+        {#if item.goal.duration == view}
           <ListItem
             clickable
             bottomLine={72}
@@ -275,10 +285,20 @@
               {/if}
             </div>
           </ListItem>
+          {/if}
         {/each}
         <ListItem on:click={createGoal}>
-          <div class="text-center text-primary">Add Goal</div>
+          {#if view === 'day'}
+          <div class="text-center text-primary">Add Daily Goal</div>
+          {:else if view === 'week'}
+          <div class="text-center text-primary">Add Weekly Goal</div>
+          {:else if view === 'month'}
+          <div class="text-center text-primary">Add Monthly Goal</div>
+          {:else if view === 'year'}
+          <div class="text-center text-primary">Add Yearly Goal</div>
+          {/if}
         </ListItem>
+       
       </List>
     {/if}
 
@@ -291,6 +311,8 @@
             <Button on:click={createGoal} className="mt-2" clear primary>Create a Weekly Goal →</Button>
           {:else if view === 'month'}
             <Button on:click={createGoal} className="mt-2" clear primary>Create a Monthly Goal →</Button>
+            {:else if view === 'year'}
+            <Button on:click={createGoal} className="mt-2" clear primary>Create a Yearly Goal →</Button>
           {/if}
         </Empty>
       {:else if loading}

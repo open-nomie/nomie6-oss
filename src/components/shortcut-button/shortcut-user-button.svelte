@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ShortcutButton from './shortcut-button.svelte'
 
@@ -5,14 +7,10 @@
 
   import type Person from 'domains/people/Person.class'
   import TrackableAvatar from '../avatar/trackable-avatar.svelte'
-  export let compact: boolean = false
-  export let id: string
-  export let color: string
-  export let person: Person
-  export let hoursUsed: any | undefined = undefined
-  export let value: string | number | undefined = undefined
-  export let subtitle: string | number | undefined = undefined
+
   const dispatch = createEventDispatcher()
+
+  const { compact, id, color, person, hoursUsed, value, subtitle } = $props()
 </script>
 
 {#if person}

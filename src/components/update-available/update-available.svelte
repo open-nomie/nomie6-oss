@@ -1,26 +1,41 @@
-<script lang="ts">
-  import { useRegisterSW } from 'virtual:pwa-register/svelte'
+<svelte:options runes={true} />
 
-  const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegistered(swr: ServiceWorkerRegistration) {
-      console.log(`Nomie Service Worker registered`, {
-        installing: swr.installing,
-        active: swr.active,
-        scope: swr.scope,
-      })
-    },
-    onRegisterError(error) {
-      console.error('Nomie Service Worker registration error', error)
-    },
-  })
+<script lang="ts">
+  import { pwService } from '../../modules/pwa/PWAService'
+
+  const offlineReady = pwService.offlineReady
+  const needRefresh = pwService.needRefresh
+  const isCheckingForUpdates = pwService.isCheckingForUpdates
+  const lastCheckTimeMs = pwService.lastCheckTimeMs
 
   function close() {
-    offlineReady.set(false)
-    needRefresh.set(false)
+    pwService.dismissOfflineNotification()
+    pwService.dismissUpdateNotification()
   }
 
-  $: toast = $needRefresh
-  // let toast = true
+  async function handleUpdate() {
+    await pwService.applyUpdate()
+  }
+
+  async function handleManualCheck() {
+    await pwService.manualCheckForUpdates()
+  }
+
+  let toast = $derived($needRefresh || $offlineReady)
+
+  // Format last check time
+  let lastCheckDisplay = $derived.by(() => {
+    if (!$lastCheckTimeMs) return null
+    const now = Date.now()
+    const diffMs = now - $lastCheckTimeMs
+    const diffMin = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+
+    if (diffMin < 1) return 'just now'
+    if (diffMin < 60) return `${diffMin}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    return 'earlier'
+  })
 </script>
 
 {#if toast}
@@ -35,15 +50,39 @@
         {/if}
       </div>
 
+      <div class="text-xs text-gray-600 px-2 pb-2">
+        {#if lastCheckDisplay}
+          Last checked: {lastCheckDisplay}
+        {/if}
+      </div>
+
       <div class="flex items-center justify-end space-x-4">
-        <button class="px-4 py-2 filler font-bold bg-white shadow-sm rounded-xl text-primary-600" on:click={close}>
+        {#if $offlineReady}
+          <button
+            disabled={$isCheckingForUpdates}
+            class="px-4 py-2 filler font-bold bg-white shadow-sm rounded-xl text-primary-600 disabled:opacity-50"
+            title="Check for updates manually"
+            on:click={handleManualCheck}
+          >
+            {#if $isCheckingForUpdates}
+              Checking...
+            {:else}
+              Check Now
+            {/if}
+          </button>
+        {/if}
+
+        <button
+          class="px-4 py-2 filler font-bold bg-white shadow-sm rounded-xl text-primary-600"
+          on:click={close}
+        >
           Later
         </button>
 
         {#if $needRefresh}
           <button
             aria-label="Update the App"
-            on:click={() => updateServiceWorker(true)}
+            on:click={handleUpdate}
             class="px-4 py-2 font-bold filler bg-white shadow-sm rounded-xl text-primary-600"
           >
             Update Now

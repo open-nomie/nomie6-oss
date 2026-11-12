@@ -1,45 +1,57 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs, { Dayjs } from 'dayjs'
   import { createEventDispatcher } from 'svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import { ChevronBackOutline, ChevronForwardOutline } from '../../components/icon/nicons'
 
+  import { Prefs } from '../preferences/Preferences'
   import { Lang } from '../../store/lang'
   import { parseNumber } from '../../utils/parseNumber/parseNumber'
   import type { TrackableUsage } from '../usage/trackable-usage.class'
 
-  export let date: Date = new Date()
-  export let weekStarts: 'monday' | 'sunday' = 'sunday'
-  export let trackableUsage: TrackableUsage | undefined = undefined
-  export let size: 'sm' | 'base' = 'base'
-  export let loading: boolean
-  export let hidePrevNext: boolean = false;
+  let { date = $bindable(), weekStarts: weekStartsProp, trackableUsage = $bindable(), size, loading = $bindable(), hidePrevNext } = $props()
+  // Use the week start passed in, or the preference when none is passed (the calendar modal passes none)
+  let weekStarts = $derived(weekStartsProp ?? $Prefs.weekStarts)
 
   let now = dayjs().format('YYYY-MM-DD')
 
   const dispatch = createEventDispatcher()
 
-  let weekDays = [
-    Lang.t('days.monday', 'Monday'),
-    Lang.t('days.tuesday', 'Tuesday'),
-    Lang.t('days.wednesday', 'Wednesday'),
-    Lang.t('days.thursday', 'Thursday'),
-    Lang.t('days.friday', 'Friday'),
-    Lang.t('days.saturday', 'Saturday'),
-    Lang.t('days.sunday', 'Sunday'),
-  ]
+  // Weekday headers for the chosen week start. Derived, so the headers and the day grid always match.
+  let weekDays = $derived(
+    weekStarts === 'sunday'
+      ? [
+          Lang.t('days.sunday', 'Sunday'),
+          Lang.t('days.monday', 'Monday'),
+          Lang.t('days.tuesday', 'Tuesday'),
+          Lang.t('days.wednesday', 'Wednesday'),
+          Lang.t('days.thursday', 'Thursday'),
+          Lang.t('days.friday', 'Friday'),
+          Lang.t('days.saturday', 'Saturday'),
+        ]
+      : [
+          Lang.t('days.monday', 'Monday'),
+          Lang.t('days.tuesday', 'Tuesday'),
+          Lang.t('days.wednesday', 'Wednesday'),
+          Lang.t('days.thursday', 'Thursday'),
+          Lang.t('days.friday', 'Friday'),
+          Lang.t('days.saturday', 'Saturday'),
+          Lang.t('days.sunday', 'Sunday'),
+        ]
+  )
 
-  $: datejs = dayjs(date).startOf('month')
-  $: daysInMonth = datejs.daysInMonth()
-  $: daysInPreviousMonth = datejs.subtract(1, 'month').daysInMonth()
-  $: firstDayColumn = datejs.day() - (weekStarts === 'monday' ? 1 : 0)
-  $: lastDayColumn = datejs.endOf('month').day() + (weekStarts === 'monday' ? 0 : 1)
-  $: month = datejs.month()
-  $: year = parseNumber(datejs.format('YYYY'))
-  $: if (weekStarts == 'sunday') {
-    const sunday = weekDays.pop()
-    weekDays.unshift(sunday)
-  }
+  // Column (0 to 6) of a day in the chosen week: the same rule for the leading and trailing blank cells
+  const columnOf = (day: number) => (weekStarts === 'monday' ? (day + 6) % 7 : day)
+
+  let datejs = $derived(dayjs(date).startOf('month'))
+  let daysInMonth = $derived(datejs.daysInMonth())
+  let daysInPreviousMonth = $derived(datejs.subtract(1, 'month').daysInMonth())
+  let firstDayColumn = $derived(columnOf(datejs.day()))
+  let lastDayColumn = $derived(columnOf(datejs.endOf('month').day()))
+  let month = $derived(datejs.month())
+  let year = $derived(parseNumber(datejs.format('YYYY')))
 
   const nextPrev = (dir: 'next' | 'previous') => {
     if (dir === 'next') {
@@ -130,6 +142,8 @@
           class="nselect "
           on:click={() => {
             date = new Date()
+            // Same event as the arrows, so the parent updates its title and reloads the data
+            dispatch('dateChange', date)
           }}>Today</button
         >
         {#if !hidePrevNext}
@@ -182,7 +196,7 @@
         {/each}
 
         <!-- Loop over month end days -->
-        {#each Array(7 - lastDayColumn).fill(0) as c, index}
+        {#each Array(6 - lastDayColumn).fill(0) as c, index}
           <button
             class="next-month day d-{datejs.format('YYYY-MM-DD')}"
             class:today={datejs.format('YYYY-MM-DD') == now}

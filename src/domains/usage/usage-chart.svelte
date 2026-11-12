@@ -1,8 +1,10 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import _ from "lodash"
+  import dayjs from 'dayjs'
   import type { ChartConfiguration, ChartDataset } from 'chart.js'
   import type { Dayjs } from 'dayjs'
-  import { onMount } from 'svelte'
   import usageStats from "./usage-stats";
   import Chartjs from '../../components/charts/chartjs.svelte'
   import { openDropMenu } from '../../components/menu/useDropmenu'
@@ -19,58 +21,92 @@
 
   import type { Trackable } from '../trackable/Trackable.class'
   import { TrackableStore } from '../trackable/TrackableStore'
-  import { saveChartOptions, getChartOption } from './ChartOptionsStore'
+  import { saveChartOptions, getChartOption, ChartOptionsStore } from './ChartOptionsStore'
+  import type { WidgetClass } from '../dashboard2/widget/widget-class'
 
   import type { TrackableUsage } from './trackable-usage.class'
-  import { openDateOptionPopMenu, openPopMenu, PopMenuButton } from '../../components/pop-menu/usePopmenu'
+  import { openDateOptionPopMenu, openPopMenu, type PopMenuButton } from '../../components/pop-menu/usePopmenu'
   import CloseOutline from '../../n-icons/CloseOutline.svelte'
+  import { getContextOn } from '../context/context-utils'
+  import { Prefs } from '../preferences/Preferences'
 
-  export let usages: Array<TrackableUsage> = []
-  export let style: string = ''
-  export let className: string = ''
-  export let type: 'bar' | 'line' = 'bar'
-  export let hideLabels: boolean = false
-  export let hideValues: boolean = false
+  const { usages = [], style = '', className = '', type = 'bar', hideLabels = false, hideValues = false, id, stacked = false, isstatsview = false, showcontext = false, dualAxis = false, widget } = $props<{
+    usages?: Array<TrackableUsage>
+    style?: string
+    className?: string
+    type?: 'bar' | 'line'
+    hideLabels?: boolean
+    hideValues?: boolean
+    id: string
+    stacked?: boolean
+    isstatsview?: boolean
+    showcontext?: boolean
+    dualAxis?: boolean
+    widget?: WidgetClass
+  }>()
 
-  export let id: string
-  export let stacked: boolean = false
+  let dateFormats = $state(getDateFormats())
+  let usage = $state<TrackableUsage | undefined>(undefined)
+  let reverseUsage = $state<TrackableUsage | undefined>(undefined)
 
-  let dateFormats = getDateFormats()
-  let usage: TrackableUsage
-  let reverseUsage: TrackableUsage
+  let activeDate = $state<Dayjs | undefined>(undefined)
+  let activeFormatedValue = $state<string | undefined>(undefined)
+  let contextannotation = $state({})
+  let theme = $state($Prefs.theme)
+  let labelcolor = $state($Prefs.theme === 'dark' ? '#ffffff' : '#000000')
 
-  let activeDate: Dayjs | undefined = undefined
-  let activeFormatedValue: string
-
-  $: if (usages && usages.length) {
-    usage = usages[0].backfill()
-  }
-
-  onMount(() => {
-    initChartOptions()
+  $effect(() => {
+    if (usages && usages.length) {
+      usage = usages[0].backfill()
+    }
   })
 
-  let localType: 'bar' | 'line' = type
-  let showChart: boolean = true
-  let chartScale: 'linear' | 'logarithmic' = 'linear'
-  let chartStats: 'none' | "avg" | 'sma-7' | 'sma-15' | 'sma-30' | 'ema-7' | 'ema-15' | 'ema-30' | 'split-11' | 'split-12' | 'split-13' | 'cumm' = 'none'
-  let startWithZero: boolean = true
-  let includeAlso: Trackable
-  let includeAlsoLabel = "None"
+  $effect(async () => {
+    // Subscribe to ChartOptionsStore updates so we reload when options change on other devices
+    $ChartOptionsStore
+    await initChartOptions()
+  })
 
-  const setChartType = async (type, swz, stats, include, save: boolean = true) => {
+  interface ContextMapWrapper {
+    usage: TrackableUsage
+    startDate: Date
+    endDate: Date
+    startIndex: number
+    endIndex: number
+    value: number
+  }
+
+  interface ContextTrackableUsage {
+    trackable: Trackable
+    marks: Array<ContextMapWrapper>
+  }
+
+  let localType = $state<'bar' | 'line'>(type)
+  let showChart = $state(true)
+  let chartScale = $state<'linear' | 'logarithmic'>('linear')
+  let chartStats = $state<'none' | "avg" | 'sma-7' | 'sma-15' | 'sma-30' | 'ema-7' | 'ema-15' | 'ema-30' | 'split-11' | 'split-12' | 'split-13' | 'cumm'>('none')
+  let startWithZero = $state(true)
+  let ignoreZero = $state(true)
+  let showContext = $state(false)
+  let includeAlso = $state<Trackable | undefined>(undefined)
+  let includeAlsoLabel = $state("None")
+
+  const setChartType = async (type, swz, iz,stats, include, showcontext,save: boolean = true) => {
     showChart = false
     localType = type
     startWithZero = swz
+    ignoreZero = iz
+    showContext = showcontext
     chartStats = stats
     includeAlso = include
     if (save) {
-      saveChartOptions(id, { type, startWithZero, stats, include})
+      await saveChartOptions(id, { type, startWithZero, ignoreZero, stats, include, showContext})
     }
     await wait(60)
     await alsoInclude()
     await wait(60)
     await includeStats()
+    await includeContext()
     showChart = true
   }
 
@@ -79,25 +115,40 @@
 
     let t = (options.type || type) == 'line' ? 'line' : 'bar'
     let swz = options.startWithZero === undefined || options.startWithZero === false ? false : true
+    let iz = options.ignoreZero === undefined || options.ignoreZero === false ? false : true
     let st = options.stats || 'none'
-    let incl = options.include || undefined
-    setChartType(t, swz, st, incl, false)
+    let showcontext = options.showContext
+
+    // Convert trackable ID back to Trackable object
+    let incl = undefined
+    if (options.include && typeof options.include === 'string') {
+      incl = $TrackableStore.trackables[options.include]
+    }
+
+    setChartType(t, swz, iz,st, incl, showcontext, false)
   }
 
   const alsoInclude = async (newtrackable: boolean = false) => {
-    
+    if (!isstatsview){
     //remove current also included trackable
-    for (var i = 0; i < usages.length; i++) { 
+    for (var i = 0; i < usages.length; i++) {
       if (usages.length >1) {
         usages.splice(_.findIndex(usages, function(item) {
         return item.trackable.id === "-alsoinclude-";
         }), 1);
       }
-    }
+    }}
+
     var selected:Trackable
     if (newtrackable == true) {
       selected = await selectTrackable()
       includeAlso = selected}
+    else if (isstatsview == true){
+      if (usages.length >1){
+        selected = $TrackableStore.trackables[usages[1].trackable.id]
+      }
+      //selected = $TrackableStore.trackables["#coffee"]
+    }  
     else {selected = includeAlso}
     if (selected != undefined) {
       includeAlsoLabel = selected.id
@@ -131,6 +182,7 @@
         usages.slice(0, -1)
       }
       else {usages.push(reverseUsage)}
+
       return usage
     }
     else {
@@ -138,12 +190,136 @@
     }
   }
 
+  const includeContext = async () => {
+    if (showContext) {
+    let maxvalue = 0;
+    let minvalue = undefined;
+
+    // Use only the primary tracker's (first tracker's) scale for context positioning
+    // This ensures context aligns correctly with the tracker's visual scale in dual-axis mode
+    const primaryUsage = usages[0]
+    if (primaryUsage) {
+      for (var value of primaryUsage.values) {
+       if (value > maxvalue) { maxvalue = value}
+       if (minvalue == undefined || value < minvalue) {minvalue = value}
+    }
+    }
+
+    let start: Date   //for now static, must make dynamic
+    let end: Date  //for now static, must make dynamic
+    let date = new Date()
+    let contextItems: Array<TrackableUsage> = []
+    let contextMap: Array<ContextTrackableUsage> = []
+    //start = dayjs(date).subtract(90, 'day').toDate()
+    //end = dayjs(date).add(30, 'day').toDate()
+    start = dayjs(usages[0].dates[0]).toDate()
+    end = dayjs(usages[0].dates[usages[0].dates.length-1]).toDate()
+    
+
+
+    const trackables = $TrackableStore.trackables
+    const frameStart = dayjs(start)
+    const frameEnd = dayjs(end)
+
+    const res: any = await getContextOn(date, trackables,start,end)
+
+    contextItems = res
+      ? Object.keys(res).map((id: string) => {
+          return res[id]
+        })
+      : []
+
+    const final: Array<ContextTrackableUsage> = []
+    // Loop over context items  (1 per trackable)
+    contextItems.forEach((contextUsage: TrackableUsage) => {
+      const node: ContextTrackableUsage = {
+        trackable: contextUsage.trackable,
+        marks: [],
+      }
+      const trackable = contextUsage.trackable
+      ;(contextUsage.dates || []).forEach((loopDate, index) => {
+        // Get Reverb Days
+        let parsedValue =
+          trackable.ctx.duration > trackable.value ? trackable.ctx.duration : trackable.value || trackable.ctx.duration
+
+        let contextItem: ContextMapWrapper = {
+          startDate: loopDate.toDate(),
+          usage: contextUsage,
+          endDate: dayjs(loopDate)
+            .add(parsedValue || 1)
+            .toDate(),
+          startIndex: dayjs(loopDate).diff(frameStart, 'day'),
+          endIndex: frameEnd.diff(dayjs(loopDate), 'day'),
+          value: parsedValue,
+        }
+        node.marks.push(contextItem)
+      })
+      final.push(node)
+    })
+
+    contextMap = final.sort((a, b) => {
+      const avalue = a.marks[0].endDate.getTime() + a.marks[0].value
+      const bvalue = b.marks[0].endDate.getTime() + b.marks[0].value
+      return avalue < bvalue ? 1 : -1
+    })
+    contextannotation["annotations"] = {}
+    for (var context of contextMap) {
+    
+
+    const xstart = context.marks[0].startIndex;
+    var xend = 0;
+    if (context.trackable.id.startsWith("+")) {
+      xend = xstart+context.trackable.ctx.duration;
+    }
+    else { xend = xstart+context.trackable.value;}
+    let minimum = 0;
+    if (startWithZero) { minimum =0}
+    else {minimum = minvalue}
+    // Use context color if available, fallback to a default blue color
+    const contextColor = context.trackable.ctx.color || '#04A6F9';
+    contextannotation.annotations[context.trackable.ctx.label] = {
+          drawTime: 'beforeDatasetsDraw',
+          type: 'box',
+          xMin: xstart,
+          xMax: xend,
+          yMin: minimum*0.78,
+          yMax: maxvalue*1.1,
+          backgroundColor: contextColor+'70',
+          borderColor: contextColor+'80',
+          borderRadius: 5,
+        }
+    contextannotation.annotations['label_'+context.trackable.ctx.label] = {
+          drawTime: 'beforeDatasetsDraw',
+          type: 'label',
+          xValue: xstart,
+          yValue: maxvalue,
+          backgroundColor: 'transparent',
+          content: [context.trackable.ctx.label],
+          font: {
+            size: 11},
+          color: labelcolor,
+          xAdjust: Math.floor((context.trackable.ctx.label.length)*3),
+    }  
+    
+    
+  }
+}
+else {contextannotation.annotations ={}}
+}
+
   const includeStats = async () => {
+    // do not execute when in statsmode
+    if (isstatsview) {
+      chartStats = "none"
+    }
     //remove current stats data if exist
-    if (usages.length >1) {
-        usages.splice(_.findIndex(usages, function(item) {
+    if (usages.length > 1) {
+        const statsIndex = _.findIndex(usages, function(item) {
         return item.trackable.id === "-statistics-";
-        }), 1);
+        })
+        if (statsIndex >= 0) {
+          usages.splice(statsIndex, 1);
+        }
     }
     //define new if applicable
     var statusage = usages.find(x=>x!==undefined);
@@ -167,14 +343,14 @@
         title: Lang.t('general.line-chart', 'Line Chart'),
         icon: localType === 'line' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('line', startWithZero, chartStats, includeAlso)
+          setChartType('line', startWithZero, ignoreZero,chartStats, includeAlso, showContext)
         },
       },
       {
         title: Lang.t('general.bar-chart', 'Bar Chart'),
         icon: localType === 'bar' ? CheckmarkCircle : undefined,
         click() {
-          setChartType('bar', startWithZero, chartStats, includeAlso)
+          setChartType('bar', startWithZero, ignoreZero,chartStats, includeAlso,showContext)
         },
       },
       {
@@ -217,7 +393,7 @@
                 chartStats = 'none'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -228,7 +404,7 @@
                 chartStats = 'avg'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -239,7 +415,7 @@
                 chartStats = 'split-11'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -250,7 +426,7 @@
                 chartStats = 'split-12'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -261,7 +437,7 @@
                 chartStats = 'split-13'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -272,7 +448,7 @@
                 chartStats = 'sma-7'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -283,7 +459,7 @@
                 chartStats = 'sma-15'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -294,7 +470,7 @@
                 chartStats = 'sma-30'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -305,7 +481,7 @@
                 chartStats = 'ema-7'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -316,7 +492,7 @@
                 chartStats = 'ema-15'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -327,7 +503,7 @@
                 chartStats = 'ema-30'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -338,7 +514,7 @@
                 chartStats = 'cumm'
                 await wait(10)
                 await includeStats()
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
 
@@ -352,7 +528,26 @@
         divider: true,
         click() {
           startWithZero = !startWithZero
-          setChartType(localType, startWithZero, chartStats, includeAlso)
+          setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
+        },
+      },
+      {
+        title: Lang.t('general.ignore-zero', 'Ignore Zero'),
+        icon: ignoreZero ? CheckmarkCircle : undefined,
+        divider: true,
+        click() {
+          ignoreZero = !ignoreZero
+          setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
+          
+        },
+      },
+      {
+        title: 'Show Context',
+        icon: showContext ? CheckmarkCircle : undefined,
+        divider: true,
+        click() {
+          showContext = !showContext
+          setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
         },
       },
       {
@@ -368,7 +563,7 @@
                 includeAlso = undefined
                 includeAlsoLabel = "None"
                 await alsoInclude(false)
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
             {
@@ -378,7 +573,7 @@
               async click() {
                 //await wait(10)
                 await alsoInclude(true)
-                setChartType(localType, startWithZero, chartStats, includeAlso)
+                setChartType(localType, startWithZero, ignoreZero,chartStats, includeAlso,showContext)
               },
             },
           ]
@@ -386,17 +581,29 @@
         },
       },
     ]
+    if (isstatsview){
+      buttons.splice(3, 1)
+      buttons.splice(4, 1)
+    }
     openDropMenu(caller, buttons)
   }
 
   const usageToDataset = (_usage: TrackableUsage): ChartDataset => {
     const usageByDay = _usage
-    // Generate the Chart Data
     const dates = usageByDay.dates
     const values = usageByDay.values
-
+    let valuestemp =[]
+    if (ignoreZero){
+    for (var j = 0; j < values.length; j++) {
+        if (values[j] == 0) {
+            valuestemp[j] = NaN;
+        }
+        else {valuestemp[j] = values[j];}
+    }}
+    else {valuestemp = values}
+    
     const data = dates.map((date, index) => {
-      return values[index]
+      return valuestemp[index]
     })
     let dataset: ChartDataset = {
       label: usageByDay.trackable.label,
@@ -453,9 +660,65 @@
 
   const generateChartConfig = (): ChartConfiguration => {
     // Get usage by day and backfill it
-    const datasets = usages.map((usage) => {
-      return usageToDataset(usage)
+    const datasets = usages.map((usage, index) => {
+      const dataset = usageToDataset(usage)
+      // Map secondary tracker to right axis if in dual-axis mode
+      // Only put "-alsoinclude-" (secondary tracker) on y1, not statistics
+      if (dualAxis && usage.trackable?.id === '-alsoinclude-') {
+        dataset.yAxisID = 'y1'
+      } else {
+        dataset.yAxisID = 'y'
+      }
+      return dataset
     })
+
+    // Setup scales configuration
+    const scales: any = {
+      x: {
+        display: !hideLabels,
+        ticks: {
+          autoSkip: true,
+          maxRotation: 0,
+          font: {
+            size: 10,
+          },
+        },
+      },
+      y: {
+        stacked: stacked,
+        display: !hideValues,
+        beginAtZero: startWithZero,
+        type: chartScale,
+        ticks: {
+          font: {
+            size: 10,
+          },
+          callback: function (value: any, index, ticks) {
+            return usage.trackable.formatValue(value)
+          },
+        },
+      },
+    }
+
+    // Add second y-axis if in dual-axis mode
+    if (dualAxis && usages.length > 1) {
+      scales.y1 = {
+        position: 'right',
+        stacked: stacked,
+        display: !hideValues,
+        beginAtZero: startWithZero,
+        type: chartScale,
+        ticks: {
+          font: {
+            size: 10,
+          },
+          callback: function (value: any, index, ticks) {
+            return usages[1].trackable.formatValue(value)
+          },
+        },
+      }
+    }
+
     // Setup Config
     const config: ChartConfiguration = {
       type: localType,
@@ -474,10 +737,13 @@
           tooltip: {
             callbacks: {
               label: function (tooltipItem) {
-                return usage.trackable.formatValue(parseNumber(`${tooltipItem.raw}`))
+                const datasetIndex = tooltipItem.datasetIndex
+                const trackable = usages[datasetIndex]?.trackable || usage.trackable
+                return trackable.formatValue(parseNumber(`${tooltipItem.raw}`))
               },
             },
           },
+          annotation: contextannotation,
         },
         layout: {
           padding: 6,
@@ -485,32 +751,7 @@
         responsive: true,
         maintainAspectRatio: false,
 
-        scales: {
-          x: {
-            display: !hideLabels,
-            ticks: {
-              autoSkip: true,
-              maxRotation: 0,
-              font: {
-                size: 10,
-              },
-            },
-          },
-          y: {
-            stacked: stacked,
-            display: !hideValues,
-            beginAtZero: startWithZero,
-            type: chartScale,
-            ticks: {
-              font: {
-                size: 10,
-              },
-              callback: function (value: any, index, ticks) {
-                return usage.trackable.formatValue(value)
-              },
-            },
-          },
-        },
+        scales: scales,
       },
       data: {
         labels: usages[0].dates.map((d) => d.format(dateFormats.tinyNumber)),

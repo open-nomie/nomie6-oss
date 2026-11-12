@@ -9,11 +9,12 @@ import {
   SparklesOutline,
   TextOutline,
   ThermometerIcon,
+  TagOutline,
 } from '../../../components/icon/nicons'
 import CheckmarkCircleOutlineSvelte from '../../../n-icons/CheckmarkCircleOutline.svelte'
 import type { PluginClass } from '../../plugins/plugin-helpers'
 
-export type IWidgetTypeUnit = 'timeframe' | 'cond-style' | 'token' | 'tokens'
+export type IWidgetTypeUnit = 'timeframe' | 'cond-style' | 'token' | 'tokens' | 'pointer'
 
 export type IWidgetType = {
   id: string
@@ -104,6 +105,20 @@ export const widgetTypes: Array<IWidgetType> = [
     image: '/images/widget-types/latest-note.svg',
     icon: CheckmarkCircleOutlineSvelte,
   },
+  {label: 'Habits',
+    id: 'habit',
+    requires: ['timeframe', 'token'],
+    optional: [],
+    image: '/images/widget-types/display-value.svg',
+    icon: PieChartOutline,
+  },
+  {label: 'Pointers',
+    id: 'pointer',
+    requires: ['timeframe','token', 'pointer'],
+    optional: [],
+    image: '/images/widget-types/display-value.svg',
+    icon: TagOutline,
+  },
   {
     label: 'Mind, Body, Spirit',
     id: 'focus',
@@ -144,5 +159,13 @@ export const widgetTypes: Array<IWidgetType> = [
     optional: [],
     image: '/images/widget-types/just-text.svg',
     icon: TextOutline,
+  },
+  {
+    label: 'Nomie Insights',
+    id: 'insight',
+    requires: ['timeframe'],
+    optional: [],
+    icon: SparklesOutline,
+    emoji: '💡',
   },
 ]

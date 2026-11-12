@@ -142,10 +142,27 @@ export default {
             data=  this.calculateCummulativeSum(maindata)
         }
 
-        let statsqueryresult = this.statsQuery(source,data)
+        let statsqueryresult = this.statsQuery(source,data,showstats)
         return statsqueryresult;
     },
-    statsQuery(source,data){
+    statsQuery(source,data,statType){
+        // Create human-readable label for the statistic type
+        let statLabel = "stats"
+        if (statType === "avg") {
+            statLabel = "average"
+        } else if (statType.includes("sma")) {
+            const window = parseInt(statType.split("-")[1])
+            statLabel = `${window} days SMA`
+        } else if (statType.includes("ema")) {
+            const window = parseInt(statType.split("-")[1])
+            statLabel = `${window} days EMA`
+        } else if (statType.includes("split")) {
+            const split = parseInt(statType.split("-")[1])
+            statLabel = `${split}-split average`
+        } else if (statType === "cumm") {
+            statLabel = "cumulative sum"
+        }
+
         let result = {
             "values":data,
             "dates":source.dates,
@@ -154,11 +171,12 @@ export default {
             "positivity": source.positivity,
             "trackable": {
                 "id": "-statistics-",
-                "label":source.trackable.label +" stats",
+                "label":statLabel,
                 "type":source.trackable.type,
                 "color":"#50B0EF",
                 "tracker": {
-                    "color":"#50B0EF"
+                    "color":"#50B0EF",
+                    "emoji":"📊"
                 }
             }
         }

@@ -190,9 +190,26 @@ export const PouchDBEngine: IStorage = {
   },
   async getFullDoc(path) {
     let doc = null
+    const db = this.db
     try {
-      doc = await this.db.get(path)
-    } catch (e) { }
+      doc = await db.get(path)
+    } catch (e) {
+      if (e.toString().includes("Failed to execute 'transaction' on 'IDBDatabase'")) {
+        if (this.db === db) {
+          this.db = new PouchDB(dbKey, {
+            auto_compaction: true,
+            ajax: { cache: false },
+          })
+        }
+        try {
+          doc = await this.db.get(path)
+        } catch (retryError) {
+          console.log('getFullDoc retry failed', path, retryError)
+        }
+      } else if (e.status !== 404) {
+        console.log('getFullDoc error found: ', e)
+      }
+    }
     return doc
   },
   async get(path, onChange) {
@@ -204,8 +221,17 @@ export const PouchDBEngine: IStorage = {
     try {
       let fullDoc = await this.getFullDoc(path)
       doc = fullDoc ? fullDoc.data : null
-    } catch (e) { }
+    } catch (e) {console.log("get error") }
     return doc
+  },
+  async getStrict(path) {
+    try {
+      const doc = await this.db.get(path)
+      return doc.data ?? null
+    } catch (e) {
+      if (e.status === 404) return null
+      throw e
+    }
   },
   async list() {
     let docs = await this.db.allDocs()

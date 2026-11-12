@@ -1,15 +1,12 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { createEventDispatcher, SvelteComponentDev } from 'svelte/internal'
+  import { createEventDispatcher } from 'svelte'
   import Button from '../../components/button/button.svelte'
   import Stepper from '../../components/stepper/stepper.svelte'
   import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
 
-  export let activeIndex: number = 0
-  export let totalSlides: number = 0
-  export let nextTitle: string = 'Next'
-  export let nextDisabled: boolean = false
-  export let hideBack: boolean = false
-  export let component: SvelteComponentDev
+  const { activeIndex = 0, totalSlides = 0, nextTitle = 'Next', nextDisabled = false, hideBack = false, component = $bindable() } = $props()
 
   const emit = createEventDispatcher()
 </script>
@@ -18,11 +15,9 @@
   <slot name="header" />
   <svelte:component
     this={component}
-    on:next={() => {
-      console.log(' On Next')
-    }}
+    on:next={() => emit('next')}
   />
-  <div class="fixed bottom-0 w-full">
+  <div class="fixed bottom-0 w-full z-40">
     <ToolbarGrid className="mx-auto max-w-xl py-1">
       <Button
         slot="left"

@@ -9,6 +9,10 @@ export function canSaveWidget(testWidget: WidgetClass, widgetTypes:Array<IWidget
       console.info('Select a trackable element to display')
       return false
     }
+    if (required.indexOf('pointer') > -1 && !testWidget.pointer) {
+      console.info('This widget requires a pointer')
+      return false
+    }
     // @ts-ignore
     if (required.indexOf('element') > -1 && !testWidget.token) {
       console.info('Select a trackable element to display')

@@ -1,21 +1,26 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
-  export let variable: Object
+  const { variable } = $props()
 
-  let type: string = 'string'
-  $: if (variable) {
-    if (variable instanceof Array) {
-      type = 'array'
+  let type = $state('string')
+
+  $effect(() => {
+    if (variable) {
+      if (variable instanceof Array) {
+        type = 'array'
+      }
+      if (variable instanceof Date) {
+        type = 'date'
+      } else if (typeof variable === 'object') {
+        type = 'object'
+      } else {
+        type = typeof variable
+      }
     }
-    if (variable instanceof Date) {
-      type = 'date'
-    } else if (typeof variable === 'object') {
-      type = 'object'
-    } else {
-      type = typeof variable
-    }
-  }
+  })
 </script>
 
 <div class="nd-object my-px text-xs  bg-gray-500 bg-opacity-20 border-gray-400 py-1 px-2 rounded-md {type}">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Lang } from '../../../../store/lang'
 
@@ -12,19 +14,26 @@
 import { onLogNoteChange } from '../../../ledger/LedgerStore';
 import type NLog from '../../../nomie-log/nomie-log';
 
-  export let widget: WidgetClass
-  export let logs:Array<NLog> = [];
+  const { widget = $bindable(), logs = $bindable([]), trackable = $bindable(undefined), usage = $bindable(undefined) } = $props()
   // export let trackable: Trackable
   // export let usage: TrackableUsage
 
-  let activeIndex: number = -1
-  let dateFormats = getDateFormats()
+  let activeIndex = $state<number>(-1)
+  let dateFormats = $state(getDateFormats())
 
-  let todoLogs:Array<NLog> = []
+  let todoLogs = $state<Array<NLog>>([])
 
-  $: if (todoLogs.length > 0) {
-    activeIndex = 0
-  }
+  $effect(() => {
+    todoLogs = logs.filter((l)=>{
+      return l.hasTodo
+    })
+  })
+
+  $effect(() => {
+    if (todoLogs.length > 0) {
+      activeIndex = 0
+    }
+  })
 
   const previousNote = () => {
     if (activeIndex == 0) {
@@ -40,12 +49,6 @@ import type NLog from '../../../nomie-log/nomie-log';
     } else {
       activeIndex = activeIndex + 1
     }
-  }
-
-  $: {
-    todoLogs = logs.filter((l)=>{
-      return l.hasTodo
-    })
   }
 </script>
 

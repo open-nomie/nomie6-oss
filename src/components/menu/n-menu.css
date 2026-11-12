@@ -1,4 +1,27 @@
 .n-menu {
+  /* Position menu relative to parent based on y-top/y-bottom */
+}
+
+.n-menu.y-top {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 8px;
+}
+
+.n-menu.y-bottom {
+  bottom: auto;
+  top: 100%;
+  margin-top: 8px;
+}
+
+.n-menu.x-left {
+  left: 0;
+  right: auto;
+}
+
+.n-menu.x-right {
+  right: 0;
+  left: auto;
 }
 .n-menu .pop-button {
   @apply z-20 relative;

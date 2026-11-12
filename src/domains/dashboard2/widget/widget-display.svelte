@@ -1,7 +1,10 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import nid from '../../../modules/nid/nid'
   import type { WidgetClass } from './widget-class'
+  import { WidgetClass } from './widget-class'
   import { showTrackablePopmenu } from '../../board/boardActions'
 
   import TrackablePill from '../../trackable/trackable-pill.svelte'
@@ -11,6 +14,7 @@
   import type { Trackable } from '../../trackable/Trackable.class'
   import type { TrackableUsage } from '../../usage/trackable-usage.class'
   import { showWidgetPopmenu, upsertWidget } from '../DashStore'
+  import { IncludedTrackableStore } from './types/included-trackable-store'
   import Spinner from '../../../components/spinner/spinner.svelte'
   import type NLog from '../../nomie-log/nomie-log'
   import { MoreVertical } from '../../../components/icon/nicons'
@@ -20,22 +24,57 @@
   import { Interact } from '../../../store/interact'
   import { Lang } from '../../../store/lang'
   import { showToast } from '../../../components/toast/ToastStore'
-  import { PluginStore } from "../../plugins/PluginStore";
+  import { PluginStore } from "../../plugins/PluginStore"
+  import dayjs from 'dayjs'
+  import relativeTime from 'dayjs/plugin/relativeTime'
+  import { saveDashboard, DashStore } from '../DashStore'
+  import { triggerInsightClear } from './types/insightClearSignal'
+  import NomieAiButton from '../../../components/aibutton2/NomieAiButton2.svelte'
+
+  dayjs.extend(relativeTime)
 
   const dispatch = createEventDispatcher()
   const id = nid()
-  export let widget: WidgetClass
-  export let trackable: Trackable
-  export let loaded: boolean
-  export let usage: TrackableUsage
-  export let logs: Array<NLog>
-  export let hideTools: boolean = false
+  const { widget, trackable, loaded = $bindable(), usage, logs, hideTools = false } = $props<{
+    widget: WidgetClass
+    trackable: Trackable
+    loaded: boolean
+    usage: TrackableUsage
+    logs: Array<NLog>
+    hideTools?: boolean
+  }>()
+
+  // Ensure widget is a WidgetClass instance
+  let widgetInstance = $state<WidgetClass>(widget instanceof WidgetClass ? widget : new WidgetClass(widget))
+  let updateTrigger = $state(0)
+
+  $effect(() => {
+    if (widget && !(widget instanceof WidgetClass)) {
+      widgetInstance = new WidgetClass(widget)
+    } else if (widget) {
+      widgetInstance = widget
+    }
+  })
+
+  // Update widgetInstance when updateTrigger changes to reflect mutations
+  $effect(() => {
+    const _ = updateTrigger
+    if (widget instanceof WidgetClass) {
+      widgetInstance = widget
+    } else if (widget) {
+      widgetInstance = new WidgetClass(widget)
+    }
+  })
 
   function widgetActions() {
     showTrackablePopmenu(trackable, {
       title: trackable.label,
     })
   }
+
+  function titleCase(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
 
   const showSizeMenu = (htmlTarget) => {
     const buttons = [
@@ -46,8 +85,9 @@
       return {
         title: b.label,
         click() {
-          //@ts-ignore
+          // Mutate widget and force re-render via updateTrigger
           widget.size = b.id
+          updateTrigger = updateTrigger + 1
           upsertWidget(widget)
         },
       }
@@ -60,7 +100,9 @@
       return {
         title: tf.label,
         async click() {
+          // Mutate widget and force re-render via updateTrigger
           widget.timeRange = tf.id
+          updateTrigger = updateTrigger + 1
           try {
             await upsertWidget(widget)
             showToast({ message: Lang.t('general.saved', 'Saved') })
@@ -81,14 +123,14 @@
    * Generate a Class Name for this widget
    * @param widget
    */
-  function getClass(widget: WidgetClass): string {
+  function getClass(widget: WidgetClass, _updateTrigger?: number): string {
     let classes = [`type-${widget.type}`]
     let value
-    if (widget.stats) {
+    if (usage) {
       if (widget.type == 'last-used') {
-        value = widget.stats.daysPast
+        value = new Date().getTime() - usage.lastDate.getTime()
       } else {
-        value = widget.math !== 'sum' ? widget.stats.avg : widget.stats.sum
+        value = usage.displayValue;
       }
     }
     value = value || 0
@@ -104,29 +146,79 @@
     return classes.join(' ')
   }
 
-  let label:string = 'loading';
+  let label: string = $state('loading')
 
-  $: if(widget.type == 'plugin') {
-      let plugin = $PluginStore.find(p=>p.id == widget.data.pluginId);
-      if(plugin) {
-        label = `${plugin.emoji} ${plugin.name}`;
+  let includedTrackable = $derived.by(() => {
+    return $IncludedTrackableStore.get(widget?.id || '')
+  })
+
+  $effect(() => {
+    if (widget.type == 'plugin') {
+      const plugin = $PluginStore.find(p => p.id == widget.data.pluginId)
+      if (plugin) {
+        label = `${plugin.emoji} ${plugin.name}`
       } else {
         label = "Unknown Plugin"
       }
     }
-  
+  })
+
+  function getInsightRefreshTime(): string {
+    if (!widget.data?.cachedDate) return 'N/A'
+    const today = dayjs().format('YYYY-MM-DD')
+    if (widget.data.cachedDate === today) {
+      const tomorrow = dayjs().add(1, 'day').startOf('day')
+      const hoursUntilRefresh = tomorrow.diff(dayjs(), 'hour')
+      return `${hoursUntilRefresh}h`
+    }
+    return 'Soon'
+  }
+
+  function clearInsightCache() {
+    if (widget?.data) {
+      widget.data.cachedInsight = undefined
+      widget.data.cachedDate = undefined
+      widget.data.cachedAt = undefined
+      // Trigger the insight widget to refetch
+      triggerInsightClear()
+      updateTrigger = updateTrigger + 1
+      const currentDashboard = $DashStore.activeDashboard
+      if (currentDashboard) {
+        saveDashboard(currentDashboard)
+      }
+    }
+  }
+
 
 </script>
 
 {#if widget && widget.type !== 'text'}
-  <div class="dashboard-widget {getClass(widget)}" {id}>
-    <div class="flex widget-header px-2 py-1">
-      {#if trackable}
-        <TrackablePill hideValue size={30} transparent {trackable} on:click={widgetActions} />
+  <div class="dashboard-widget {getClass(widget, updateTrigger)}" {id}>
+    <div class="flex widget-header px-2 py-1 items-center gap-1">
+      {#if trackable && widget.type != 'pointer'}
+        <div class="flex items-center gap-1">
+          {#if includedTrackable && ['barchart', 'linechart'].includes(widget.type)}
+            <span style="color: {trackable.color}; font-size: 0.9rem; font-weight: bold;">|</span>
+          {/if}
+          <TrackablePill hideValue size={30} transparent {trackable} on:click={widgetActions} />
+        </div>
+        {#if includedTrackable && ['barchart', 'linechart'].includes(widget.type)}
+          <div class="flex items-center gap-1">
+            <span style="color: {includedTrackable.color}; font-size: 0.9rem; font-weight: bold;">|</span>
+            <TrackablePill hideValue size={30} transparent trackable={includedTrackable} on:click={widgetActions} />
+          </div>
+        {/if}
+        {:else if widget.type == 'pointer'}
+        <p style="font-size: 90%"><b>🏷 {titleCase(widget.pointer.id)}</b></p><TrackablePill hideValue size={20} transparent {trackable} on:click={widgetActions}/>
       {:else if widget.type == 'plugin'}
         {label}
+      {:else if widget.type == 'insight'}
+        <div class="flex items-center gap-1.5">
+          <NomieAiButton size="18px" />
+          <span class="capitalize text-xs font-semibold pt-1">{widgetInstance.getTitle()}</span>
+        </div>
       {:else}
-        <span class="capitalize text-xs font-semibold pt-1 pl-1">{widget.getTitle()}</span>
+        <span class="capitalize text-xs font-semibold pt-1 pl-1">{widgetInstance.getTitle()}</span>
       {/if}
       <div class="filler" />
       {#if !hideTools}
@@ -157,7 +249,7 @@
     <footer class="px-1 flex widget-footer space-x-2 justify-between">
       {#if widget.timeRange &&  widget.type !== 'plugin'}
         <button on:click={(evt) => showTimeframeMenu(evt)} class="">
-          {widget.getLabel().replace('days', '')}
+          {updateTrigger, widgetInstance.getLabel().replace('days', '')}
         </button>
       {/if}
       {#if !hideTools}
@@ -174,10 +266,22 @@
           <rect x="3" width="10" height="10" fill="#868686" fill-opacity="0.31"/>
           <rect x="3.5" y="0.5" width="9" height="9" stroke="white" stroke-opacity="0.34"/>
           </svg>
-          
+
         </button>
       {/if}
       <div class="filler pointer-events-none" />
+      {#if widget.type === 'insight' && widget.data?.cachedDate}
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-gray-600 dark:text-gray-400">Will refresh in {getInsightRefreshTime()}</span>
+          <button
+            class="text-xs px-1"
+            on:click={clearInsightCache}
+            title="Clear cache and fetch fresh insight"
+          >
+            ↻
+          </button>
+        </div>
+      {/if}
     </footer>
   </div>
 {:else}
@@ -198,6 +302,7 @@
     font-weight: 500;
     padding: 8px 16px;
     line-height: 1.1em;
+    @apply text-gray-600 dark:text-gray-400;
   }
   .dashboard-text.widget-size-lg {
     padding: 8px 16px;
@@ -205,6 +310,7 @@
     line-height: 1.7em;
     font-weight: 700;
     padding: 16px;
+    @apply text-gray-600 dark:text-gray-400;
   }
   .dashboard-widget footer button,
   .dashboard-widget .usage-chart-tools button {

@@ -1,7 +1,8 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
-  import { onMount } from 'svelte'
   import { quintOut } from 'svelte/easing'
   import { slide } from 'svelte/transition'
   import HScroller from '../../components/h-scroller/h-scroller.svelte'
@@ -11,8 +12,9 @@
   import { TrackableStore } from '../trackable/TrackableStore'
   import { loadToday, TodayStore } from './today/TodayStore'
 
-  let dateFormats = getDateFormats()
-  let daysBack: number = 30
+  let dateFormats = $state(getDateFormats())
+  let daysBack = $state(30)
+
   const backInTime = (daysBack: number) => {
     loadToday({
       knownTrackables: $TrackableStore.trackables,
@@ -28,15 +30,15 @@
     })
   }
 
-  onMount(() => {
+  $effect(() => {
     setTimeout(() => {
-      document.querySelector('.date-setting .time-wrapper').scrollTo({ left: 1000000 })
+      document.querySelector('.date-setting .time-wrapper')?.scrollTo({ left: 1000000 })
     }, 100)
   })
 </script>
 
 <div
-  transition:slide={{ delay: 250, duration: 300, easing: quintOut }}
+  transition:slide|global={{ delay: 250, duration: 300, easing: quintOut }}
   class="date-setting flex items-center justify-center bg-red-500"
 >
   <Scroller

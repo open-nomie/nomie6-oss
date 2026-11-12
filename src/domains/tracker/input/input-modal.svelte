@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import NoteCombo from './note-combo.svelte'
 
@@ -19,6 +21,7 @@
   import SliderInput from './slider.svelte'
   import PickerInput from './picker.svelte'
   import NTimer from './timer.svelte'
+  import HabitInput from './habit.svelte'
 
   import NCalculator from '../../../components/calculator/calculator.svelte'
 
@@ -45,22 +48,13 @@
   import type { TrackerInputResponseType } from './tracker-input-utils'
 
   // Props
-  export let value = undefined // If a valid is provided
 
-  export let saveLabel = Lang.t('general.save', 'Save') // The label of the save Button
-  export let nextLabel = Lang.t('general.next', 'Next') // The label of the save Button
+  let tracker = $state<TrackerClass | undefined>(undefined)
+  let manual = $state(false)
+  let nextLabel = $state(undefined)
+  let saveLabel = $state('Save')
 
-  let tracker: TrackerClass | undefined = undefined
-  let manual: boolean = false
-
-  export let id: string
-  export let payload: TrackerInputProps
-
-  $: {
-    nextLabel = payload?.nextLabel
-  }
-
-  let data = {
+  let data = $state({
     value: null, // holds current value
     ready: false,
     suffix: '',
@@ -68,7 +62,13 @@
     editing: false,
     saving: false,
     note: undefined as undefined | string,
-  }
+  })
+
+  let { value = $bindable(), id, payload } = $props()
+
+  $effect(() => {
+    nextLabel = payload?.nextLabel
+  })
 
   // Set up the Methods
   const methods = {
@@ -247,6 +247,15 @@
                 }}
               />
             </div>
+          {:else if tracker.type === 'habit'}
+          <HabitInput
+          {tracker}
+          value={data.value}
+          on:change={(value) => {
+            data.value = value.detail
+          }}
+          
+        />
           {:else}
             <div id="keypad-holder">
               <NCalculator

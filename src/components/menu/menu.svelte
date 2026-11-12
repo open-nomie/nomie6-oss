@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -13,41 +15,42 @@
 
   type Sizes = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
-  export let buttons: Array<PopMenuButton> = []
-  export let size: Sizes = 'lg'
-  export let className: string = ''
-  export let style: string = ''
-  export let id: string = ''
-
   const dispatch = createEventDispatcher()
-  let buttonGroup: Array<Array<PopMenuButton>> = []
-  let accessorySize: number = 24
+  let accessorySize = $state(24)
 
-  $: if (buttons) {
-    buttonGroup = [[]]
-    let current: number = buttonGroup.length - 1
-    buttons.forEach((button: PopMenuButton) => {
-      if (button.divider) {
-        buttonGroup.push([])
-        current = buttonGroup.length - 1
-      }
-      buttonGroup[current].push(button)
-    })
-  }
+  const { buttons, size, className, style, id } = $props()
 
-  $: if (size) {
-    if (size == 'xs') {
-      accessorySize = 14
-    } else if (size == 'sm') {
-      accessorySize = 18
-    } else if (size == 'md') {
-      accessorySize = 22
-    } else if (size == 'lg') {
-      accessorySize = 26
-    } else if (size == 'xl') {
-      accessorySize = 32
+  const buttonGroup = $derived.by(() => {
+    if (buttons) {
+      const groups: Array<Array<PopMenuButton>> = [[]]
+      let current = groups.length - 1
+      buttons.forEach((button: PopMenuButton) => {
+        if (button.divider) {
+          groups.push([])
+          current = groups.length - 1
+        }
+        groups[current].push(button)
+      })
+      return groups
     }
-  }
+    return []
+  })
+
+  $effect(() => {
+    if (size) {
+      if (size == 'xs') {
+        accessorySize = 14
+      } else if (size == 'sm') {
+        accessorySize = 18
+      } else if (size == 'md') {
+        accessorySize = 22
+      } else if (size == 'lg') {
+        accessorySize = 26
+      } else if (size == 'xl') {
+        accessorySize = 32
+      }
+    }
+  })
 </script>
 
 <div role="menu" {id} class="n-menu size-{size} {className}" {style}>

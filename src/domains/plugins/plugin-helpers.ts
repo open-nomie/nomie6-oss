@@ -23,6 +23,8 @@ export type PluginType = {
   uses: Array<PluginUseTypes>
   error?: string;
   locked?: boolean;
+  buildin?: boolean;
+  setupComplete?: boolean;
 }
 
 export class PluginClass {
@@ -39,6 +41,8 @@ export class PluginClass {
   uses: Array<PluginUseTypes>
   error?: string;
   locked?: boolean;
+  buildin?: boolean;
+  setupComplete?: boolean;
 
   constructor(starter: PluginType) {
     this.id = starter.id || uid();
@@ -54,6 +58,8 @@ export class PluginClass {
     this.uses = starter.uses || [];
     this.error = undefined;
     this.locked = starter.locked;
+    this.buildin = starter.buildin;
+    this.setupComplete = starter.setupComplete;
   }
 
   hasError(message: string) {

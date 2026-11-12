@@ -1,17 +1,21 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let positivity = 0
-  export let score = 0
+  const { positivity, score } = $props()
 
-  let changed = false
+  let changed = $state(false)
+  let lastScore = $state(undefined)
 
-  let lastScore
-  $: if (score !== lastScore) {
-    lastScore = score
-    changed = true
-    setTimeout(() => {
-      changed = false
-    }, 200)
-  }
+  $effect(() => {
+    if (score !== lastScore) {
+      lastScore = score
+      changed = true
+      const timer = setTimeout(() => {
+        changed = false
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  })
 </script>
 
 <div

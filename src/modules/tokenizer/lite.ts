@@ -1,9 +1,10 @@
 import time from '../time/time'
-import { Parser } from 'expr-eval'
+import Mexp from 'math-expression-evaluator'
 
-const prefixes: any = { context: '+', person: '@', tracker: '#' }
+const prefixes: any = { context: '+', person: '@', tracker: '#', pointer: '^' }
+let mexp: any
 
-export type TokenTypes = 'person' | 'link' | 'generic' | 'tracker' | 'context' | 'place' | 'line-break'
+export type TokenTypes = 'person' | 'link' | 'generic' | 'tracker' | 'context' | 'pointer' | 'place' | 'line-break'
 export interface Token {
   id: string
   raw: string // Raw word
@@ -50,8 +51,9 @@ function parseStringValue(valueStr: string): ParsedStringValue {
   if (valueStr.match(/\+|-|\/|\*|Mod|\(|\)/)) {
     valueStr = valueStr.replace(/[a-z]+/gi, '')
     try {
+      if (!mexp) mexp = new Mexp()
       return {
-        value: Parser.evaluate(valueStr),
+        value: mexp.eval(valueStr),
         uom,
       }
     } catch (e) {
@@ -99,7 +101,7 @@ function scrub(word: string): WordPart {
  * toToken
  * Creates a payload that can be turned into a
  *
- * @param {String} type tracker,context,person,generic
+ * @param {String} type tracker,context,pointer,person,generic
  * @param {String} word
  * @param {String} value
  * @param {String} remainder
@@ -230,6 +232,18 @@ export const tokenizeLite = (str: string = ''): Array<Token> => {
            */
           return toToken({
             type: 'context',
+            word: scrubbed.word,
+            raw: word.trim(),
+            value: parsedValueString.value,
+            remainder: scrubbed.remainder,
+            uom: parsedValueString.uom,
+          })
+        } else if (firstChar === '^' && word.length > 1) {
+          /**
+           * It's a Pointer Match
+           */
+          return toToken({
+            type: 'pointer',
             word: scrubbed.word,
             raw: word.trim(),
             value: parsedValueString.value,

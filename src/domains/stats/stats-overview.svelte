@@ -1,12 +1,11 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../components/list-item/list-item.svelte'
   import math from '../../utils/math/math'
   import { Lang } from '../../store/lang'
   import type { Trackable } from '../trackable/Trackable.class'
   import type { IStats } from './stats-types'
-
-  export let stats: IStats
-  export let trackable: Trackable
 
   function formatValue(value: number, includeUnit?: boolean) {
     if (trackable) {
@@ -18,6 +17,8 @@
     let score = stats._stats.getScore()
     return `${score.score} ${score.emoji}`
   }
+
+  const { stats, trackable } = $props()
 </script>
 
 {#if stats}

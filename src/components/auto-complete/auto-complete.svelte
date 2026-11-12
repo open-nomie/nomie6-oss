@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import tick from '../../utils/tick/tick'
   import { createEventDispatcher } from 'svelte'
@@ -12,18 +14,14 @@
   import { slide } from 'svelte/transition'
 
   const dispatch = createEventDispatcher()
+  const { input, scroller, className, style } = $props()
 
-  export let input = null
-  export let scroller = false
-  export let className = ''
-  export let style = ''
-
-  let state = {
+  let state = $state({
     partialTag: null,
     results: [],
     tag: null,
     cursorIndex: 0,
-  }
+  })
 
   // function close() {
   //   state.results = []
@@ -31,7 +29,7 @@
 
   /**
    * Auto Complete Search
-   * Searches trackers, people and context
+   * Searches trackers, people, context and pointers
    * THIS IS A MESS
    *
    **/
@@ -39,11 +37,10 @@
   const autoCompleteSearch = (searchTag: string, type: string = 'tracker'): Array<Trackable> => {
     // Search for Trackers
     state.tag = searchTag
-
     try {
       return toTrackableArray($TrackableStore.trackables).filter((t) => {
         const term = removePrefix(searchTag)
-        return t.tag.search(encodeRegex(term)) > -1
+        return t.id?.search(encodeRegex(term)) > -1
       })
     } catch (e) {
       console.error(e)
@@ -66,6 +63,8 @@
     } else if (trackable.type == 'person') {
       note = trackable.tag
     } else if (trackable.type == 'context') {
+      note = trackable.tagWithValue()
+    } else if (trackable.type == 'pointer') {
       note = trackable.tagWithValue()
     }
 
@@ -106,6 +105,10 @@
         } else if (tag.charAt(0) === '+' && tag.length > 1) {
           state.partialTag = tag
           state.results = autoCompleteSearch(tag, 'context')
+           // If it's pointer
+        } else if (tag.charAt(0) === '^' && tag.length > 1) {
+          state.partialTag = tag
+          state.results = autoCompleteSearch(tag, 'pointer')
         } else {
           state.partialTag = null
           state.results = null
@@ -121,19 +124,23 @@
    * Main Mount
    */
 
-  let lastInput
-  $: if (lastInput !== input) {
-    lastInput = input
-    onInput(input)
-  }
-  $: if (!input) {
-    state.results = undefined
-  }
+  let lastInput = $state(undefined)
+  $effect(() => {
+    if (lastInput !== input) {
+      lastInput = input
+      onInput(input)
+    }
+  })
+  $effect(() => {
+    if (!input) {
+      state.results = undefined
+    }
+  })
 </script>
 
 {#if state.results && state.results.length}
   <div style={style}
-    transition:slide={{ duration: 100 }}
+    transition:slide|global={{ duration: 100 }}
     class="{scroller ? 'scroller' : 'no-scroller'} autocomplete-results animate {className}"
   >
     <div class="p-0 tracker-list">

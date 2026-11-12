@@ -1,6 +1,6 @@
-<script lang="ts">
-  import { onMount } from 'svelte'
+<svelte:options runes={true} />
 
+<script lang="ts">
   // modules
 
   // components
@@ -25,7 +25,7 @@
 
   import { wait } from '../../utils/tick/tick'
 
-  const state = {
+  let state = $state({
     ready: false,
     showMore: false,
     activeSlide: 0,
@@ -35,7 +35,7 @@
     redirecting: false,
     timeFormat: $Prefs.use24hour,
     theme: $Prefs.theme,
-  }
+  })
 
   let slides = [WelcomeSlide]
   if (Device.iOS() && !$Device.pwa) {
@@ -49,7 +49,7 @@
   // slides.push(LocationSlide)
   // slides.push(NomieCloudSlide)
 
-  onMount(() => {
+  $effect(() => {
     setTimeout(() => {
       if (window.document.body.offsetHeight < 640) {
         state.isTiny = true
@@ -57,25 +57,29 @@
     }, 12)
   })
 
-  let nextEnabled = true
-  let nextTitle: string = 'Next'
-  let activeSlide: any
-  $: {
+  let activeSlide = $state<any>(null)
+  $effect(() => {
     activeSlide = slides[state.activeSlide]
-    nextTitle = 'Next'
+  })
+
+  let { nextEnabled, nextTitle } = $derived.by(() => {
+    let enabled = true
+    let title = 'Next'
 
     if (activeSlide == StorageSlide && !$Prefs.storageType) {
-      nextEnabled = false
+      enabled = false
     } else if (activeSlide == PWASlide) {
-      nextTitle = 'Skip'
+      title = 'Skip'
     } else if (activeSlide == StorageSlide && !$Prefs.storageType) {
-      nextEnabled = false
+      enabled = false
     } else if (activeSlide == SlideTemplate) {
-      nextTitle = 'Begin'
+      title = 'Begin'
     } else {
-      nextEnabled = true
+      enabled = true
     }
-  }
+
+    return { nextEnabled: enabled, nextTitle: title }
+  })
 </script>
 
 {#if activeSlide}

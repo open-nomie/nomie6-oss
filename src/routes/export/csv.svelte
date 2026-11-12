@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { CheckmarkCircle, CircleOutline } from '../../components/icon/nicons'
   import { dedupArray } from '../../utils/array/array_utils'
@@ -35,7 +37,7 @@
     required: Array<string>
   }
 
-  let csvTypes: Array<CSVExportType> = [
+  let csvTypes: Array<CSVExportType> = $state([
     {
       type: 'column',
       required: ['trackables'],
@@ -48,54 +50,56 @@
       label: 'Note View',
       description: `Each Note containing any matching trackables`,
     },
-  ]
+  ])
 
-  let csvType: CSVExportType = csvTypes[0]
-  let generating = false
-  let canSave: boolean = false
-  let useAllTrackables: boolean = true
+  let csvType: CSVExportType = $state(csvTypes[0])
+  let generating = $state(false)
+  let canSave: boolean = $state(false)
+  let useAllTrackables: boolean = $state(true)
 
   // Set state
-  let state = {
+  let state = $state({
     trackables: [],
     start: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
     end: dayjs().format('YYYY-MM-DD'),
-  }
+  })
 
-  // Prepare Dynamic values
-  let startDate, endDate
+  let startDate: any = $state(dayjs(state.start, 'YYYY-MM-DD'))
+  let endDate: any = $state(dayjs(state.end, 'YYYY-MM-DD'))
+  let doc: Array<any> = $state([])
+  let lastUseAllTrackables = $state(!useAllTrackables)
 
-  // If start Changes, make sure end date is the same year
-  // Searching only works year by year.
-  $: if (state.start && dayjs(state.start, 'YYYY-MM-DD') !== startDate) {
-    startDate = dayjs(state.start, 'YYYY-MM-DD')
-    doc = []
-  }
+  $effect(() => {
+    if (state.start && state.start !== startDate?.format('YYYY-MM-DD')) {
+      startDate = dayjs(state.start, 'YYYY-MM-DD')
+      doc = []
+    }
+  })
 
-  $: if (state.end && dayjs(state.end, 'YYYY-MM-DD') !== endDate) {
-    endDate = dayjs(state.end, 'YYYY-MM-DD')
-    doc = []
-  }
+  $effect(() => {
+    if (state.end && state.end !== endDate?.format('YYYY-MM-DD')) {
+      endDate = dayjs(state.end, 'YYYY-MM-DD')
+      doc = []
+    }
+  })
 
-  $: {
+  $effect(() => {
     let needsTrackables = csvType.required.indexOf('trackables') > -1 ? true : false
     let meetsNeeds = needsTrackables ? state.trackables.length > 0 : true
     canSave = !generating && meetsNeeds
-  }
+  })
 
-  // Monitor if the user needs all known trackables or not
-  let lastUseAllTrackables = !useAllTrackables
-  $: if (useAllTrackables !== lastUseAllTrackables) {
-    lastUseAllTrackables = useAllTrackables
+  $effect(() => {
+    if (useAllTrackables !== lastUseAllTrackables) {
+      lastUseAllTrackables = useAllTrackables
 
-    if (useAllTrackables) {
-      state.trackables = $AllTrackablesAsArray
-    } else {
-      state.trackables = []
+      if (useAllTrackables) {
+        state.trackables = $AllTrackablesAsArray
+      } else {
+        state.trackables = []
+      }
     }
-  }
-
-  let doc: Array<any> = []
+  })
 
   const methods = {
     async generateCSV(): Promise<Array<any>> {
@@ -121,7 +125,7 @@
     async download() {
       let filename = `export-${startDate.format('YYYY-M-D')}-${endDate.format('YYYY-M-D')}.${nid(6)}.${
         import.meta.env.PACKAGE_VERSION
-      }.csv`
+      }`
 
       download.csv(filename, doc.join('\r\n'))
       await tick(120)
@@ -143,7 +147,7 @@
 
 <NLayout pageTitle="Export your Data" className="Export">
   <ToolbarGrid slot="header">
-    <NBackButton slot="left" to="/" />
+    <NBackButton slot="left" to="/settings" />
     <h1 class="ntitle">Export to CSV</h1>
   </ToolbarGrid>
 

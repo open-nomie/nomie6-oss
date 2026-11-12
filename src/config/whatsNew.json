@@ -1,6 +1,125 @@
 {
   "features": [
     {
+      "version": "dn6.8.0v20261110",
+      "title": "Combo trackers have an option to log range and value items only when you touch them (off by default)"
+    },{
+      "version": "dn6.8.0v20261029",
+      "title": "On This Day shows a table of the trackers logged on this day in the previous five years"
+    },{
+      "version": "dn6.8.0v20261029",
+      "title": "Range trackers accept decimal steps such as 0.5, with plus and minus buttons for min, max and default"
+    },{
+      "version": "dn6.8.0v20261014",
+      "title": "What's New is grouped per version, with features and fixes expandable"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Added some additional counters in the settings page"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Long unfinished template builder....finished!"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Warning added when multiple Blockly plugins are installed"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Blockly added as standard integration instead of seperate plugin"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Plugin Database Cleanup function added"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "API Key encryption using PIN option"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Nomie Insight Widget - AI-powered analytics on your dashboard"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "AI Chat Component - Ask Claude about your tracking data, goals, and patterns"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "Dual-Axis Charting - Compare two trackers in line and bar charts with secondary axis"
+    },
+    {
+      "version": "6.7.4-dn",
+      "title": "Introducing pointers"
+    },
+    {
+      "version": "6.7.4-dn",
+      "title": "Introducing Reminders"
+    },
+    {
+      "version": "6.7.4-dn",
+      "title": "Introducing Pointer Widget"
+    },
+    {
+      "version": "6.7.3-dn",
+      "title": "Introducing a habit widget"
+    },
+    {
+      "version": "6.7.3-dn",
+      "title": "Introducing a habit tracker"
+    },
+    {
+      "version": "6.7.3-dn",
+      "title": "Added weekly and monthly goals"
+    },{
+      "version": "6.7.2-dn",
+      "title": "Ignore zero in dashboard chart"
+    },{
+      "version": "6.7.0-dn",
+      "title": "AfterNomie integration introduced"
+    },{
+      "version": "6.6.0-dn",
+      "title": "Context in Dashboard Charts Introduced"
+    },
+    {
+      "version": "6.6.0-dn",
+      "title": "Location Manager added"
+    },
+    {
+      "version": "6.5.0-dn",
+      "title": "Analytics Platform added"
+    },
+    {
+      "version": "6.5.0-dn",
+      "title": "Award Reset Option added"
+    },
+    {
+      "version": "6.4.1-dn",
+      "title": "Tracker Library Added"
+    },
+    {
+      "version": "6.4.0-dn",
+      "title": "stats option for line bar charts"
+    },
+    {
+      "version": "6.3.0",
+      "title": "option to have multiple widgets for a single plugin"
+    },
+    {
+      "version": "6.3.0",
+      "title": "resumable timers"
+    },
+    {
+      "version": "6.3.0",
+      "title": "keep capture log input when switching tabs on desktop (should have no effect on mobile)"
+    },
+    {
+      "version": "6.2.0",
+      "title": "reduce compress/increase quality of user uploaded images"
+    },
+    {
+      "version": "6.2.0",
+      "title": "remove feature restrictions requiring awards"
+    },
+    {
+      "version": "6.2.0",
+      "title": "automatically create a patch release and trigger app deploy to GH pages"
+    },
+    {
       "version": "6.0.17",
       "title": "adding support for plugins to open trackable editor"
     },
@@ -194,6 +313,234 @@
     }
   ],
   "fixes": [
+    {
+      "version": "dn6.8.0v20261110",
+      "title": "Combo trackers log only what you select; untouched range and value items are greyed out"
+    },{
+      "version": "dn6.8.0v20261110",
+      "title": "A checked context in a combo is logged without a value, so the period set on the context is used"
+    },{
+      "version": "dn6.8.0v20261110",
+      "title": "Range and value items in a combo start at their configured default"
+    },{
+      "version": "dn6.8.0v20261030",
+      "title": "Range tracker default value accepts a decimal comma and shows a decimal keypad on iPhone"
+    },{
+      "version": "dn6.8.0v20261030",
+      "title": "Search: the quick list covers the last 30 days, and Search all notes finds older notes too"
+    },{
+      "version": "dn6.8.0v20261030",
+      "title": "Timeline keeps loading older entries past quiet periods, for tags and searches"
+    },{
+      "version": "dn6.8.0v20261030",
+      "title": "Tracker tiles show the right 'ago' time when a value was logged for an earlier day, such as by a plugin or the API"
+    },{
+      "version": "dn6.8.0v20261030",
+      "title": "Last used and streak data is rebuilt once after an update, so earlier wrong values are corrected"
+    },{
+      "version": "dn6.8.0v20261029",
+      "title": "Entries of a tag or search keep loading older entries when you scroll back, instead of stopping after the most recent"
+    },{
+      "version": "dn6.8.0v20261029",
+      "title": "Calendar: the days line up with their weekday for Monday weeks, and Today shows the current month"
+    },{
+      "version": "dn6.8.0v20261029",
+      "title": "Backups cover all versions"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Restoring a backup keeps your current version of items that exist on both sides, unless you choose the backup's"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Older backup files (Nomie 4, 5 and Export format) ask the same restore question"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Installing a template only adds what is missing and reports when something fails"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Restoring a backup keeps plugins installed after the backup was made"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Backups report files they cannot read instead of leaving them out silently"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Main board shows all trackers and is always the last tab"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Empty boards offer to add existing trackers, browse the library or create a tracker"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Deleted trackers no longer leave empty entries on boards"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Backups include everything again: templates, awards, units, plugins and settings"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Backups from August and September 2026 restore again, including their logs"
+    },{
+      "version": "dn6.8.0v20261017",
+      "title": "Restoring a backup no longer duplicates board items and widgets"
+    },{
+      "version": "dn6.8.0v20261015",
+      "title": "Long notes fill the whole editor when edited"
+    },{
+      "version": "dn6.8.0v20261015",
+      "title": "Tracker values picked in the note capture are added to the note"
+    },{
+      "version": "dn6.8.0v20261014",
+      "title": "Saving a new or edited pivot works when CouchDB sync is enabled"
+    },{
+      "version": "dn6.8.0v20261014",
+      "title": "Adding a widget to the dashboard works when CouchDB sync is enabled"
+    },{
+      "version": "dn6.8.0v20261014",
+      "title": "Saving a pivot works when CouchDB sync is enabled"
+    },{
+      "version": "dn6.8.0v20261014",
+      "title": "App no longer restarts when a CouchDB read fails in Safari"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "Tracker rename and delete bug fixed"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "Person rename bug fixed"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "Pointer rename bug fixed"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "Duplicate people and pointers from renames cleaned up on startup"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "Pivot columns drop area fixed"
+    },{
+      "version": "dn6.8.0v20261013",
+      "title": "CouchDB sync toggle now switches off"
+    },{
+      "version": "dn6.8.0v20261011",
+      "title": "Real time sync bug for Pivots fixed"
+    },{
+      "version": "dn6.8.0v20261011",
+      "title": "Chart Widget statistics view bug fixed"
+    },{
+      "version": "dn6.8.0v20261010",
+      "title": "Pivot preferences real time sync added"
+    },{
+      "version": "dn6.8.0v20261010",
+      "title": "Plugin preferences real time sync added"
+    },{
+      "version": "dn6.8.0v20261010",
+      "title": "Plugin import/export bug fixed"
+    },{
+      "version": "dn6.8.0v20261010",
+      "title": "Couchdb double axe chart bug fixed"
+    },{
+      "version": "dn6.8.0v20261007",
+      "title": "People import fixed"
+    },{
+      "version": "dn6.8.0v20261007",
+      "title": "Tracker renaming fixed"
+    },{
+      "version": "dn6.8.0v20260928",
+      "title": "Pick List value bug fixed"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "Ignore zero in dashboard chart fixed"
+    },{
+      "version": "dn6.8.0v20260813",
+      "title": "AI State Validation - Insight widget and chat properly disable when AI is not configured"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "Input Auto-focus in Chat - Chat input automatically focuses after receiving a response"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "Insight Widget Caching - Fixed caching behavior with daily refresh for optimal performance"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "Plugin Theme Synchronization - Fixed plugins not respecting the auto theme setting"
+    },
+    {
+      "version": "dn6.8.0v20260813",
+      "title": "Chart Rendering - Improved rendering and responsiveness of line and bar charts with dual-axis"
+    },
+    {
+      "version": "6.7.4.2-dn",
+      "title": "Prepared for Nomie Server"
+    },{
+      "version": "6.7.4.1-dn",
+      "title": "Fixed combo tracker range-0-value bug"
+    },{
+      "version": "6.7.4-dn",
+      "title": "Fixed template builder"
+    },{
+      "version": "6.7.4-dn",
+      "title": "Fixed auto search function"
+    },
+    {
+      "version": "6.7.1-dn",
+      "title": "Fixed dashboard value widget coloring"
+    },{
+      "version": "6.7.0-dn",
+      "title": "Fixed dashboard printing"
+    },
+    {
+      "version": "6.6.0-dn",
+      "title": "Location config fix"
+    },
+    {
+      "version": "6.6.0-dn",
+      "title": "Full year Statistics bug fixed"
+    },
+    {
+      "version": "6.6.0-dn",
+      "title": "Vulnerabilities solved"
+    },
+    {
+      "version": "6.4.2a-dn",
+      "title": "Reload Database fix when transaction on'IDBDatabase' fails"
+    },
+    {
+      "version": "6.4.0-dn",
+      "title": "fix option to compare trackables in statistics settings"
+    },
+    {
+      "version": "6.4.0-dn",
+      "title": "dashboard editor widget delete fixed"
+    },
+    {
+      "version": "6.4.0-dn", 
+      "title": "timeframe bugs for last-7days & last week"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fixes a particular case where the tracking board doesn't load after initial onboarding"
+    },
+    {
+      "version": "6.3.0",
+      "title": "plugin titles visible on db editor"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fetch and cache location on app startup"
+    },
+    {
+      "version": "6.3.0",
+      "title": "fixes bug where previous text overwrites capture field when using trackers consecutively"
+    },
+    {
+      "version": "6.2.0",
+      "title": "active board doesn't load/show trackables on page load"
+    },
+    {
+      "version": "6.2.0",
+      "title": "timeframe always being reset to Today in widget editor modal on save"
+    },
+    {
+      "version": "6.2.0",
+      "title": "remove auto focus on what's up text area"
+    },
     {
       "version": "6.0.18",
       "title": "tally trackers also include ignored by typeahead"
@@ -519,6 +866,11 @@
       "title": "allowing multiple note modals open at one time"
     }
   ],
-  "chores": [],
+  "chores": [
+    {
+      "version": "dn6.8.0v20261014",
+      "title": "Removed analytics tracking"
+    }
+  ],
   "build_date": "2022-09-21T14:06:29.915Z"
 }

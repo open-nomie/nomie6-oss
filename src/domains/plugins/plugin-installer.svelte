@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import { createEventDispatcher } from 'svelte'
@@ -20,26 +22,28 @@
   import { wait } from '../../utils/tick/tick'
 
   import { randomEmoji } from '../tracker/editor/TrackerEditorStore'
-  import { trackEvent } from '../usage/stat-ping'
-  import { PluginClass, PluginType } from './plugin-helpers'
+  import { PluginClass, type PluginType } from './plugin-helpers'
   import { broadcastPluginMessage, PluginStore } from './PluginStore'
 
-  export let url: string
-  let id: string
-  let pluginDetails: any | PluginType = {}
-  let loading: boolean = false
+  let id = $state<string>(undefined)
+  let pluginDetails = $state<any | PluginType>({})
+  let loading = $state(false)
+  let lastURL = $state('')
+  let showInstallCard = $state(false)
+  let showIframe = $state(false)
 
-  let lastURL: string
-  let showInstallCard: boolean = false
+  let { url = $bindable() } = $props()
 
-  $: if (url && url !== lastURL && is.url(url)) {
-    lastURL = url
-    id = nid(url)
-    pluginDetails.id = id
-    pluginDetails.url = url
-    pluginDetails.name = undefined
-    showIframe = false
-  }
+  $effect(() => {
+    if (url && url !== lastURL && is.url(url)) {
+      lastURL = url
+      id = nid(url)
+      pluginDetails.id = id
+      pluginDetails.url = url
+      pluginDetails.name = undefined
+      showIframe = false
+    }
+  })
 
   const clearPluginDetail = (clearURL: boolean = false) => {
     if (clearURL) {
@@ -49,8 +53,6 @@
     pluginDetails = {}
     showInstallCard = false
   }
-
-  let showIframe: boolean = false
 
   const messageListener = (evt) => {
     if (evt.data.action === 'register') {
@@ -94,7 +96,6 @@
 
   const installPluginDetails = async () => {
     const plugin = new PluginClass(pluginDetails)
-    trackEvent(`in-plugin-${plugin.url}`)
     if (plugin.name) {
       PluginStore.upsert(plugin)
       let confirmEnabled = await Interact.confirm(

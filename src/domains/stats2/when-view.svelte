@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ChartjsEle from '../../components/charts/chartjs.svelte'
   import TimeGrid from '../../components/day-time-grid/time-grid.svelte'
@@ -7,23 +9,16 @@
 
   import type NLog from '../nomie-log/nomie-log'
   import { Prefs } from '../preferences/Preferences'
-  import DayOfWeek, { IDow } from './day-of-week'
+  import DayOfWeek, { type IDow } from './day-of-week'
   import type { Trackable } from '../trackable/Trackable.class'
   import type { TrackableUsage } from '../usage/trackable-usage.class'
 
-  export let logs: Array<NLog>
-  export let usage: TrackableUsage
-  export let trackable: Trackable
+  const { logs = $bindable(), usage, trackable } = $props()
 
-  let dayOfWeek: IDow
-  let loading: boolean = true
-
-  let logHash = ''
-  $: if (objectHash(logs) !== logHash) {
-    logHash = objectHash(logs)
-
-    main()
-  }
+  let dayOfWeek = $state<IDow | undefined>(undefined)
+  let loading = $state(true)
+  let logHash = $state('')
+  let rendering = $state(false)
 
   const getDowChartData = () => {
     return {
@@ -44,21 +39,20 @@
           borderRadius: 100,
           minBarLength: 10,
           data: [
-            $Prefs.weekStarts == 'sunday' ? dayOfWeek.sun.percent : null,
-            dayOfWeek.mon.percent,
-            dayOfWeek.tue.percent,
-            dayOfWeek.wed.percent,
-            dayOfWeek.thu.percent,
-            dayOfWeek.fri.percent,
-            dayOfWeek.sat.percent,
-            $Prefs.weekStarts == 'monday' ? dayOfWeek.sun.percent : null,
-          ].filter((d) => d),
+            $Prefs.weekStarts == 'sunday' ? dayOfWeek?.sun.percent : null,
+            dayOfWeek?.mon.percent,
+            dayOfWeek?.tue.percent,
+            dayOfWeek?.wed.percent,
+            dayOfWeek?.thu.percent,
+            dayOfWeek?.fri.percent,
+            dayOfWeek?.sat.percent,
+            $Prefs.weekStarts == 'monday' ? dayOfWeek?.sun.percent : null,
+          ].filter((d) => d !== null),
         },
       ],
     }
   }
 
-  let rendering: boolean = false
   const main = async () => {
     if (!rendering) {
       rendering = true
@@ -71,6 +65,13 @@
       rendering = false
     }
   }
+
+  $effect(() => {
+    if (objectHash(logs) !== logHash) {
+      logHash = objectHash(logs)
+      main()
+    }
+  })
 </script>
 
 {#if loading}

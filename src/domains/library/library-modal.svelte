@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Stores
 
@@ -32,26 +34,31 @@
   import ListItem from '../../components/list-item/list-item.svelte'
   import type { Trackable } from '../trackable/Trackable.class'
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
-
+  import {
+    getAllLibraryTrackers
+  } from './library-manager/LibraryManagerStore'
   import AvailableTemplatesList from '../templates/available-templates-list.svelte'
 
-  export let id: string
+  const { id } = $props()
 
-  let ready = false
-  let libraryTrackers: Array<LibraryTrackerType> = []
-  let searchResults: Array<Trackable> = []
-  let searchTerm: string
+  let ready = $state(false)
+  let libraryTrackers = $state<Array<LibraryTrackerType>>([])
+  let searchResults = $state<Array<Trackable>>([])
+  let searchTerm = $state<string>(undefined)
   onMount(() => {
     ready = true
   })
 
-  $: if ($TrackerLibrary && !libraryTrackers.length && ready) {
-    // getAllLibraryTrackers().then((lts: Array<LibraryTrackerType>) => {
-    //   libraryTrackers = lts.sort((a, b) => (a?.title.toLowerCase() > b?.title.toLowerCase() ? 1 : -1))
-    // })
-    libraryTrackers = []
-  }
-  let activeId: any
+  $effect(() => {
+    if ($TrackerLibrary && !libraryTrackers.length && ready) {
+      getAllLibraryTrackers().then((lts: Array<LibraryTrackerType>) => {
+         libraryTrackers = lts.sort((a, b) => (a?.title.toLowerCase() > b?.title.toLowerCase() ? 1 : -1))
+       })
+      libraryTrackers = []
+    }
+  })
+
+  let activeId = $state<any>(undefined)
 
   /**
    * Toggle the Active Category
@@ -122,9 +129,11 @@
     }
   }
 
-  $: if (searchTerm) {
-    searchResults = searchTrackables(searchTerm)
-  }
+  $effect(() => {
+    if (searchTerm) {
+      searchResults = searchTrackables(searchTerm)
+    }
+  })
 
   const searchTrackables = (term): Array<Trackable> => {
     const matches: Array<Trackable> = []
@@ -154,11 +163,11 @@
     <SearchBar bind:searchTerm />
     <div class="h-1">&nbsp;</div>
   </header>
-  <!-- {#if libraryTrackers.length == 0}
+   {#if libraryTrackers.length == 0}
     <div class="flex-grow flex-shrink justify-center items-center flex h-75vh">
       <Spinner size={32} />
     </div>
-  {/if} -->
+  {/if}
 
   {#if searchTerm}
     <List className="mb-6">
@@ -194,7 +203,7 @@
     <AvailableTemplatesList />
   </List>
 
-  <!-- <List solo outside title="Individual Trackers">
+  <List solo outside title="Individual Trackers">
     {#each libraryTrackers as libraryTracker, index}
       <LibraryTrackerItem
         {libraryTracker}
@@ -217,7 +226,7 @@
         </div>
       {/if}
     {/each}
-  </List> -->
+  </List>
 </BackdropModal>
 
 <style global lang="postcss">

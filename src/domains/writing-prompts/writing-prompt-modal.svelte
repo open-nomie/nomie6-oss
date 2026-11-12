@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Divider from './../../components/divider/divider.svelte'
 
@@ -8,7 +10,7 @@
   import { closeModal } from '../../components/backdrop/BackdropStore2'
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
   import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
-  import { closeWritingPromptModal, openWritingPrompt, StaticWritingPrompts, WritingPrompt, WritingPromptStore, WritingPromptType } from './useWritingPrompts'
+  import { closeWritingPromptModal, openWritingPrompt, StaticWritingPrompts, WritingPrompt, WritingPromptStore, type WritingPromptType } from './useWritingPrompts'
   import Toolbar from '../../components/toolbar/toolbar.svelte'
   import ButtonGroup from '../../components/button-group/button-group.svelte'
   import List from '../../components/list/list.svelte'
@@ -26,26 +28,25 @@
   import Textarea from '../../components/textarea/textarea.svelte'
   import CreateOutline from '../../n-icons/CreateOutline.svelte'
 
-  export let id: string
+  let { id, editMode = $bindable(), onSelect } = $props()
 
-  export let editMode: boolean = false
-  export let onSelect: (wp: WritingPrompt) => void | undefined
-  let activeTimeframe: DayPartUnit | 'any' = 'any'
+  let activeTimeframe = $state<DayPartUnit | 'any'>('any')
 
-  let editing: WritingPrompt | undefined
-  let canSave: boolean = false
-
-  $: canSave = editing?.text?.length > 1 && editing?.time ? true : false
+  let editing = $state<WritingPrompt | undefined>(undefined)
+  let canSave = $derived(editing?.text?.length > 1 && editing?.time ? true : false)
 
   const editPrompt = (prompt: WritingPromptType) => {
     editing = new WritingPrompt(prompt)
   }
 
   onMount(() => {})
-  let prompts: Array<WritingPrompt> = []
-  $: if ($WritingPromptStore && $WritingPromptStore.length) {
-    initData()
-  }
+  let prompts = $state<Array<WritingPrompt>>([])
+
+  $effect(() => {
+    if ($WritingPromptStore && $WritingPromptStore.length) {
+      initData()
+    }
+  })
 
   const initData = () => {
     prompts = [...$WritingPromptStore]

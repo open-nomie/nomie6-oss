@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -12,38 +14,53 @@
 
   import Calendar3 from './calendar3.svelte'
 
-  export let trackable: Trackable
-  export let date: Date = new Date()
-
   const dispatch = createEventDispatcher()
+  let { trackable, date = $bindable() } = $props()
 
-  let loading = true
-  let tu: TrackableUsage
+  let loading = $state(true)
+  let tu = $state<TrackableUsage>(undefined)
 
-  let loadClearTimeout
   const loadData = async () => {
-    loading = true
-    clearTimeout(loadClearTimeout)
-    loadClearTimeout = setTimeout(async () => {
-      tu = await queryToTrackableUsage(
-        trackable,
-        {
-          start: dayjs(date).startOf('month'),
-          end: dayjs(date).endOf('month'),
-        },
-        $TrackableStore.trackables
-      )
+    try {
+      loading = true
+      const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(null)
+        }, 5000) // 5 second timeout
+      })
 
-      dispatch('usage', tu)
+      const result = await Promise.race([
+        queryToTrackableUsage(
+          trackable,
+          {
+            start: dayjs(date).startOf('month'),
+            end: dayjs(date).endOf('month'),
+          },
+          $TrackableStore.trackables
+        ),
+        timeoutPromise
+      ])
+
+      if (result) {
+        tu = result
+        dispatch('usage', tu)
+      }
+    } catch (e) {
+      console.error('loadData error:', e)
+    } finally {
       loading = false
-    }, 100)
+    }
   }
 
-  let lastHash = ''
-  $: if (date && trackable && $LedgerStore.hash && `${date?.toDateString()}${trackable.tag}` !== lastHash) {
-    lastHash = `${date.toDateString()}${trackable.tag}`
-    loadData()
-  }
+  // Disabled to prevent infinite loop with LedgerStore updates
+  // let lastHash = $state('')
+  // $effect(() => {
+  //   if (date && trackable && $LedgerStore.hash && `${date?.toDateString()}${trackable.tag}` !== lastHash) {
+  //     lastHash = `${date.toDateString()}${trackable.tag}`
+  //     loadData()
+  //   }
+  // })
+
   onMount(() => {
     loadData()
   })

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { UomType } from '../../../utils/nomie-uom/uoms'

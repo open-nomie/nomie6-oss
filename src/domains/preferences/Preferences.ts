@@ -6,6 +6,21 @@ import { showToast } from '../../components/toast/ToastStore'
 
 export type ThemeTypes = 'dark' | 'light' | 'auto'
 export type PrefsWeekStartTypes = 'sunday' | 'monday'
+export type AIServiceType = 'claude' | 'openrouter' | 'chatgpt'
+
+export type AIServiceConfig = {
+  apiKey?: string
+  encrypted?: boolean
+}
+
+export type AIConfig = {
+  enabled?: boolean
+  selectedService?: AIServiceType
+  services?: {
+    claude?: AIServiceConfig
+    chatgpt?: AIServiceConfig
+  }
+}
 
 export type PreferencesStateType = {
   use24hour?: boolean
@@ -23,13 +38,18 @@ export type PreferencesStateType = {
   weekStarts?: PrefsWeekStartTypes
   compactTrackers?: boolean
   hideBackupMessage?: boolean
+  backupNoticeDiscarded?: boolean
+  backupNoticeShownAt?: number
   backupDays: number
+  pluginCleanupDays?: number
+  lastPluginCleanup?: string
   hideMessages?: boolean
   allowFileEdit?: boolean
   lastBackup?: string
   alwaysLocate?: boolean
   onboarded?: boolean
   startPage?: 'track' | 'timeline' | 'history' | 'goals' | 'dashboard'
+  ai?: AIConfig
 }
 
 const sideStorage = new SideStore('preferences')
@@ -51,10 +71,22 @@ const InitialState: PreferencesStateType = sideStorage.get('state') || {
   compactTrackers: false,
   lastBackup: undefined,
   backupDays: 7,
+  pluginCleanupDays: -1,
+  lastPluginCleanup: undefined,
   hideBackupMessage: false,
+  backupNoticeDiscarded: false,
   hideMessages: false,
   allowFileEdit: false,
   alwaysLocate: true,
+  ai: {
+    enabled: false,
+    selectedService: 'claude',
+    services: {
+      claude: { apiKey: undefined },
+      openrouter: { apiKey: undefined },
+      chatgpt: { apiKey: undefined },
+    },
+  },
 }
 
 export const Prefs = writable(InitialState)
@@ -77,13 +109,22 @@ export const enabledBetaFeatures = async (): Promise<void> => {
   showToast({ message: 'Beta Features Enabled', type: 'success' })
 }
 
+// Media query listener for tracking OS theme changes
+let mediaQueryListenerCleanup: (() => void) | null = null
+
 /**
  * Sets the Theme of the Browser
  * Does this by applying .mode-dark .mode-light to the Body
- * It will also check for auto
+ * It will also check for auto and listen for OS theme changes
  * @param theme
  */
 export const setDocumentTheme = (theme: ThemeTypes) => {
+  // Clean up any existing listener
+  if (mediaQueryListenerCleanup) {
+    mediaQueryListenerCleanup()
+    mediaQueryListenerCleanup = null
+  }
+
   const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
   let themeToSet = theme
   if (theme === 'auto') {
@@ -92,6 +133,35 @@ export const setDocumentTheme = (theme: ThemeTypes) => {
   document.documentElement.className = ''
   document.documentElement.classList.add(`mode-${themeToSet}`)
   document.documentElement.classList.add(`${themeToSet}`)
+
+  // If theme is set to 'auto', listen for OS theme changes
+  if (theme === 'auto') {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+    // Modern browsers: use addEventListener
+    const handleThemeChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      const newDarkMode = e.matches
+      const newTheme = newDarkMode ? 'dark' : 'light'
+      document.documentElement.className = ''
+      document.documentElement.classList.add(`mode-${newTheme}`)
+      document.documentElement.classList.add(`${newTheme}`)
+    }
+
+    // Try to use addEventListener (modern approach)
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleThemeChange)
+      mediaQueryListenerCleanup = () => {
+        mediaQuery.removeEventListener('change', handleThemeChange)
+      }
+    }
+    // Fallback for older browsers
+    else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleThemeChange)
+      mediaQueryListenerCleanup = () => {
+        mediaQuery.removeListener(handleThemeChange)
+      }
+    }
+  }
 }
 
 export const getDateFormats = (): {

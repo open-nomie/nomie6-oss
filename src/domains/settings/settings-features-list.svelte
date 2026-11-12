@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import capitalize from 'lodash/capitalize'
   import ListItem from '../../components/list-item/list-item.svelte'
@@ -8,10 +10,9 @@
   import { Interact } from '../../store/interact'
 
   import tick from '../../utils/tick/tick'
-  import { onMount } from 'svelte'
 
   import List from '../../components/list/list.svelte'
-  import { Prefs, setDocumentTheme, ThemeTypes } from '../preferences/Preferences'
+  import { Prefs, setDocumentTheme, type ThemeTypes } from '../preferences/Preferences'
 
   import Avatar from '../../components/avatar/avatar.svelte'
   import ButtonGroup from '../../components/button-group/button-group.svelte'
@@ -27,16 +28,9 @@
   import SelectPop from '../../select-pop/select-pop.svelte'
 
   const themes: Array<ThemeTypes> = ['light', 'dark', 'auto']
-  let hasPin: boolean = false
+  let hasPin: boolean = $state(false)
 
-
-
-  $: if (($Prefs.usePin || '').length) {
-    hasPin = true
-  }
-  
-
-  onMount(() => {
+  $effect(() => {
     if ($Prefs.usePin) {
       hasPin = true
     }
@@ -206,19 +200,19 @@
 
 <List solo>
   <ListItem bottomLine={52} title={Lang.t('settings.show-all-board', 'Show All Board')}>
-    <IonIcon icon={AllBoardIcon} slot="left" />
+    <IonIcon icon={AllBoardIcon} slot="left" size={22} className="-ml-1 mr-2" />
     <div slot="right">
       <ToggleSwitch bind:value={$Prefs.allBoard} title="Toggle People Board" />
     </div>
   </ListItem>
   <ListItem bottomLine={52} title={Lang.t('settings.show-people-board', 'Show People Board')}>
-    <IonIcon icon={PeopleBoardIcon} slot="left" />
+    <IonIcon icon={PeopleBoardIcon} slot="left" size={22} className="-ml-1 mr-2" />
     <div slot="right">
       <ToggleSwitch bind:value={$Prefs.peopleBoard} title="Toggle People Board" />
     </div>
   </ListItem>
   <ListItem bottomLine={52} title={Lang.t('settings.show-context-board', 'Show Context Board')}>
-    <IonIcon icon={ContextBoardIcon} slot="left" />
+    <IonIcon icon={ContextBoardIcon} slot="left" size={22} className="-ml-1 mr-2" />
     <div slot="right">
       <ToggleSwitch bind:value={$Prefs.contextBoard} title="Toggle Context Board" />
     </div>

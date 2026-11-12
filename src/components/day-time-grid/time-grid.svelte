@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -6,25 +8,26 @@
   import type { TrackableUsage } from '../../domains/usage/trackable-usage.class'
   import { Device } from '../../store/device-store'
   import math from '../../utils/math/math'
-  import { logsToTimeGrid, TimeGridArray } from './time-grid-utils'
-  export let usage: TrackableUsage
-  export let trackable: Trackable
+  import { logsToTimeGrid, type TimeGridArray } from './time-grid-utils'
+
+  const { usage, trackable, className, style } = $props()
+
   // export let size: number = 4
-  export let className: string = ''
-  export let style: string = ''
 
-  $: if (usage) {
-    render()
-  }
-
-  let timeGrid: TimeGridArray = []
-  let max: number = 0
+  let timeGrid = $state<TimeGridArray>([])
+  let max = $state(0)
 
   const render = () => {
     const timeGridResponse = logsToTimeGrid(usage.logs, $Prefs.weekStarts, trackable)
     timeGrid = timeGridResponse.grid
     max = timeGridResponse.meta.max
   }
+
+  $effect(() => {
+    if (usage) {
+      render()
+    }
+  })
 
   const formatHour = (hour: number) => {
     if ($Prefs.use24hour) {

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script type="ts">
   import { createEventDispatcher, onMount } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -11,46 +13,35 @@
   import { ChevronForwardOutline, CloseOutline } from '../icon/nicons'
   import { openDateOptionPopMenu } from '../pop-menu/usePopmenu'
 
-  export let labels = []
-  export let height = 200
 
-  export let id: string
 
-  export let title = ''
-  export let color = '#4d84a1'
-  export let points: any
-  export let activeIndex = 2
-  export let xFormat: Function = (x) => x
-  export let yFormat: Function = (y) => y
-  export let hideYTicks: boolean = false
-  export let hideXTicks: boolean = false
-  export let type: string = 'bar'
+
   // export let beginAtZero: boolean = true;
-  export let showSelected: boolean = true
-  export let ignoreZero: boolean = false
 
   // Generate a random ID for this Component
   const chartId = `chart-${nid()}`
 
   // let showChart = false
-  let _canvas
-  let theChart
-  let lastPoints = []
+  let _canvas = $state()
+  let theChart = $state()
+  let lastPoints = $state([])
 
-  export let selected = undefined
+  $effect(() => {
+    if (points && theChart && points.map((p) => p.y).join() !== lastPoints) {
+      lastPoints = points.map((p) => p.y).join()
+      loadData()
+    }
+  })
 
-  $: if (points && theChart && points.map((p) => p.y).join() !== lastPoints) {
-    lastPoints = points.map((p) => p.y).join()
-    loadData()
-  }
-
-  $: if ($Interact.stats.focused && points) {
-    selected = points.find((p) => {
-      return p.date.format('YYYY-MM-DD') === $Interact.stats.focused.date.format('YYYY-MM-DD')
-    })
-  } else if (points && points.length) {
-    selected = undefined
-  }
+  $effect(() => {
+    if ($Interact.stats.focused && points) {
+      selected = points.find((p) => {
+        return p.date.format('YYYY-MM-DD') === $Interact.stats.focused.date.format('YYYY-MM-DD')
+      })
+    } else if (points && points.length) {
+      selected = undefined
+    }
+  })
 
   function loadData() {
     const lineStyle = {
@@ -174,6 +165,8 @@
       // showChart = true
     }
   })
+
+  const { labels, height, id, title, color, points, activeIndex, xFormat, yFormat, hideYTicks, hideXTicks, type, showSelected, ignoreZero, selected } = $props()
 </script>
 
 <div class="wrapper active-{activeIndex}" style="--chart-color:{color}">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // vendors
   import dayjs from 'dayjs'
@@ -9,31 +11,27 @@
   import { Prefs } from '../../domains/preferences/Preferences'
 
   // data
-  export let date: Date | undefined
-  export let time: any = undefined
-  export let className: string = ''
-  export let style: string = ''
-  export let size: 'sm' | 'lg' = 'sm'
 
   //consts
   const dispatch = createEventDispatcher()
+  let { date = $bindable(), time = $bindable(), className, style, size } = $props()
 
-  let inputEle: HTMLInputElement
-  let localDate: any
-  let lastTime: number
+  let inputEle = $state<HTMLInputElement>(undefined)
+  let localDate = $state<any>(dayjs(new Date()).format('YYYY-MM-DDTHH:mm'))
+  let lastTime = $state(time)
   const dtlFormat = 'YYYY-MM-DDTHH:mm'
-  let dateTimeFormat: string
+  let dateTimeFormat = $derived($Prefs.use24hour ? 'dd/mm/yyyy HH:mm' : 'mm/dd/yyyy hh:mm a')
 
-  $: dateTimeFormat = $Prefs.use24hour ? 'dd/mm/yyyy HH:mm' : 'mm/dd/yyyy hh:mm a'
-
-  $: if (time) {
-    if (time !== lastTime) {
-      lastTime = time
-      localDate = dayjs(new Date(time)).format(dtlFormat)
+  $effect(() => {
+    if (time) {
+      if (time !== lastTime) {
+        lastTime = time
+        localDate = dayjs(new Date(time)).format(dtlFormat)
+      }
+    } else {
+      localDate = dayjs(new Date()).format(dtlFormat)
     }
-  } else {
-    localDate = dayjs(new Date()).format(dtlFormat)
-  }
+  })
 
   function fireChange(evt: any) {
     date = new Date(evt.target.value)

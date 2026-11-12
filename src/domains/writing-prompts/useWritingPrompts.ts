@@ -7,7 +7,7 @@ import WritingPromptModal from "./writing-prompt-modal.svelte";
 
 import prompts2 from "./writing-prompts-v2.json";
 import nid from "../../modules/nid/nid";
-import { dateToDayPart, DayPartUnit } from "../../modules/time/time";
+import { dateToDayPart, type DayPartUnit } from "../../modules/time/time";
 import type { PopMenuButton } from "../../components/pop-menu/usePopmenu";
 import math from "../../utils/math/math";
 import { wait } from "../../utils/tick/tick";

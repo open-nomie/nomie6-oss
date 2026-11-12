@@ -1,10 +1,12 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
   import { createEventDispatcher } from 'svelte'
 
   import appConfig from '../../config/appConfig'
-  import { ConditionIfs, ICondition, IConditionIfUnit, IConditionIsUnit } from '../../modules/scoring/score-tracker'
+  import { ConditionIfs, type ICondition, type IConditionIfUnit, type IConditionIsUnit } from '../../modules/scoring/score-tracker'
   import { ConditionIs } from '../../modules/scoring/score-tracker'
   import Ordinal from '../../utils/ordinal/ordinal'
   import { parseNumber } from '../../utils/parseNumber/parseNumber'
@@ -12,20 +14,23 @@
   import type { Trackable } from '../trackable/Trackable.class'
   import { TrackableStore } from '../trackable/TrackableStore'
   import { getTrackableInputValue } from '../tracker/input/TrackerInputStore'
-  export let condition: ICondition
-  export let index: number
-  export let trackable: Trackable
 
-  let workingCondition: ICondition
+  const { condition, index, trackable } = $props()
+
+  let workingCondition = $state<ICondition>(undefined)
   const dispatch = createEventDispatcher()
 
-  $: if (!workingCondition && condition) {
-    workingCondition = { ...condition }
-  }
+  $effect(() => {
+    if (!workingCondition && condition) {
+      workingCondition = { ...condition }
+    }
+  })
 
-  $: if (workingCondition) {
-    dispatch('change', workingCondition)
-  }
+  $effect(() => {
+    if (workingCondition) {
+      dispatch('change', workingCondition)
+    }
+  })
 
   const getTrackableValue = async () => {
     const res = await getTrackableInputValue(trackable, $TrackableStore.trackables, 'Add Condition →', {
@@ -87,6 +92,7 @@
       <slot name="right" />
     </div>
   </header>
+  {#if workingCondition}
   <main class="condition-group px-8 w-full">
     <select aria-label="Compare to What?" bind:value={workingCondition.if} class="condition-select">
       {#each ConditionIfs as cif}
@@ -143,6 +149,7 @@
       {/each}
     </select>
   </main>
+  {/if}
 </div>
 
 <style lang="postcss" global>

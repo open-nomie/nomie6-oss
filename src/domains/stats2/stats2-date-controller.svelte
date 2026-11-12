@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { Dayjs } from 'dayjs'
   import { createEventDispatcher } from 'svelte'
@@ -8,9 +10,8 @@
 
   import { getDateFormats } from '../preferences/Preferences'
 
-  $: dateFormats = getDateFormats()
-  export let start: Dayjs | undefined = undefined
-  export let end: Dayjs | undefined = undefined
+  const { start = undefined, end = undefined } = $props()
+  const dateFormats = $derived(getDateFormats())
   const dispatch = createEventDispatcher()
 </script>
 

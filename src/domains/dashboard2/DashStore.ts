@@ -8,7 +8,6 @@
  */
 
 import {
-  AddCircleOutline,
   DuplicateOutline,
   PencilOutline,
   SwapOutline,
@@ -67,13 +66,10 @@ export const initializeDashStore = async (): Promise<InitialState> => {
     s = { ...storedState }
     s.activeIndex = getLastSelectedIndex()
 
-    try {
-      s.activeDashboard = s.dashboards[s.activeIndex]
-    } catch (e) {
+    if (!s.dashboards[s.activeIndex]) {
       s.activeIndex = 0
-      s.activeDashboard = s.dashboards[0]
-      console.error('Error finding dashboard, default to 0')
     }
+    s.activeDashboard = s.dashboards[s.activeIndex]
     finalState = s
     return s
   })
@@ -290,10 +286,11 @@ export const upsertWidget = async (widget: WidgetClass) => {
     return await saveDashboard(board)
   } else {
     const state = fuse()
-    if (state.activeDashboard) {
-      state.activeDashboard.widgets.push(widget)
+    if (!state.activeDashboard) {
+      throw new Error('No dashboard selected to add this widget to')
     }
-    saveDashboard(state.activeDashboard)
+    state.activeDashboard.widgets.push(widget)
+    await saveDashboard(state.activeDashboard)
   }
 }
 
@@ -397,16 +394,19 @@ export const showWidgetPopmenu = (widget: WidgetClass) => {
         duplicateWidget(widget)
       },
     },
-    {
-      title: 'Delete Widget',
-      icon: TrashOutline,
-      async click() {
-        await wait(300)
-        let confirmed = await Interact.confirm(Lang.t('general.delete', 'Delete?'), 'You can always recreate it later.')
-        if (confirmed) deleteWidget(widget)
-      },
-    },
   ]
+
+  buttons.push({
+    title: 'Delete Widget',
+    icon: TrashOutline,
+    divider: true,
+    async click() {
+      await wait(300)
+      let confirmed = await Interact.confirm(Lang.t('general.delete', 'Delete?'), 'You can always recreate it later.')
+      if (confirmed) deleteWidget(widget)
+    },
+  })
+
   Interact.popmenu({
     id: `widget-options`,
     title: Lang.t('widgets.widget-options', 'Widget Options'),

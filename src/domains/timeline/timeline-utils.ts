@@ -20,6 +20,7 @@ export type TimelineFilterProps = {
   maps?: boolean;
   trackables?: boolean;
   context?: boolean;
+  pointers?: boolean;
   search?: string;
 }
 

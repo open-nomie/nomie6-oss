@@ -1,7 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let className = "";
-  export let noFill: boolean = false;
-  export let gap = undefined;
+  const { className = "", noFill = false, gap = undefined } = $props()
 </script>
 
 <div class="{!noFill ? 'flex-grow flex-shrink w-full' : 'w-0'} {className}">

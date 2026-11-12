@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onDestroy, createEventDispatcher } from 'svelte'
 
@@ -9,44 +11,36 @@
 
   const dispatch = createEventDispatcher()
   // Props
-  export let padding: boolean = false
-  export let title = 'Modal'
-  export let allowClose: boolean | undefined = undefined
-  export let fullscreen: boolean = false
-  export let flexBody = undefined
-  export let show: boolean = true // Defaulted to true so it can be controlled by a parent component
-  export let className: string = ''
-  export let type: string = 'normal' // cover, fullscreen, bottom, bottom-slide-up
-  export let bodyClass: string = ''
-  export let closeOnBackgroundTap: boolean = false
-  export let ariaLabel: string = 'modal'
-  export let level: number = undefined
 
-  // declare var arguments: Array<any>;
 
-  const has_header = (arguments[1].$$slots || {}).hasOwnProperty('header')
-  const has_raw_header = (arguments[1].$$slots || {}).hasOwnProperty('raw-header')
-  const has_footer = (arguments[1].$$slots || {}).hasOwnProperty('footer')
 
-  let domVisible = false
-  let showModal = false
+  const { padding, title, allowClose, fullscreen, flexBody, show, className, type, bodyClass, closeOnBackgroundTap, ariaLabel, level } = $props()
+
+  const has_header = !!$$slots.header
+  const has_raw_header = !!$$slots['raw-header']
+  const has_footer = !!$$slots.footer
+
+  let domVisible = $state(false)
+  let showModal = $state(false)
 
   // Stagger showing and dom showing for CSS effects
-  $: if (show) {
-    // document.body.classList.add("no-scroll");
-    showModal = true
-    setTimeout(() => {
-      domVisible = true
-    }, 100)
-  }
-
-  $: if (show == false) {
-    // document.body.classList.remove("no-scroll");
-    domVisible = false
-    setTimeout(() => {
-      showModal = false
-    }, 400)
-  }
+  $effect(() => {
+    if (show) {
+      // document.body.classList.add("no-scroll");
+      showModal = true
+      const timer = setTimeout(() => {
+        domVisible = true
+      }, 100)
+      return () => clearTimeout(timer)
+    } else if (show === false) {
+      // document.body.classList.remove("no-scroll");
+      domVisible = false
+      const timer = setTimeout(() => {
+        showModal = false
+      }, 400)
+      return () => clearTimeout(timer)
+    }
+  })
 
   function backgroundTap() {
     if (closeOnBackgroundTap == true) {

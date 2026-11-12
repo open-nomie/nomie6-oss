@@ -173,6 +173,7 @@ export default {
     "notes": "Nomie",
     "locations": "Nomie",
     "context": "Nomie",
+    "pointers": "Nomie",
     "no-favorites-found": "Nomie",
     "edit-log": "Nomie",
     "positivity": "Nomie",
@@ -311,7 +312,8 @@ export default {
   "on-this-day": {
     "no-notes": "Nomie",
     "no-people": "Nomie",
-    "no-context": "Nomie"
+    "no-context": "Nomie",
+    "no-pointers": "Nomie"
   },
   "location": {
     "saved-locations": "Nomie",

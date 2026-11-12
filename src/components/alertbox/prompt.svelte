@@ -1,17 +1,18 @@
-<script type="ts">
+<svelte:options runes={true} />
+
+<script lang="ts">
   import type { AlertType } from '../../store/interact'
   import { closeModal } from '../backdrop/BackdropStore2'
   import DateTimeBar from '../date-time-bar/date-time-bar.svelte'
   import Alertbox from './alertbox.svelte'
-
-  export let id: string
-  export let payload: AlertType
 
   const ifOnEnter = (e, func) => {
     if (e.charCode === 13) {
       func()
     }
   }
+
+  const { id, payload } = $props()
 </script>
 
 <Alertbox {id} {payload}>

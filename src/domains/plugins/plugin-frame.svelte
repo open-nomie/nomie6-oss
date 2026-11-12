@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { broadcastPluginMessage } from './PluginStore'
 
@@ -6,28 +8,61 @@
   import { onMount } from 'svelte'
   import { wait } from '../../utils/tick/tick'
 
-  export let plugin: PluginClass
-  export let openAction: PluginUseTypes = 'onUIOpened'
-  export let widgetindexparam: string = "";
-  export let lid: string
-
-  let registered: boolean = false
-
-  let ready: boolean = false
-  let mounted: boolean = false
-
-  $: if (registered && !ready && mounted) {
-    ready = true
-    plugin.url 
-    broadcastPluginMessage(
-      {
-        action: openAction,
-        data: {},
-      },
-      plugin.id,
-      lid
-    )
+  interface Props {
+    plugin: PluginClass
+    openAction?: PluginUseTypes
+    widgetindexparam?: string
+    lid: string
   }
+
+  const { plugin, openAction = 'onUIOpened', widgetindexparam = '', lid } = $props<Props>()
+
+  let registered: boolean = $state(false)
+  let ready: boolean = $state(false)
+  let mounted: boolean = $state(false)
+
+  // Determine actual theme when in auto mode
+  function getActualTheme(): string {
+    if ($Prefs.theme === 'auto') {
+      // Check system preference
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+      return 'light' // fallback
+    }
+    return $Prefs.theme
+  }
+
+  let actualTheme = $state(getActualTheme())
+
+  // Update theme when system preference changes or Prefs change
+  $effect(() => {
+    actualTheme = getActualTheme()
+    // Also listen to system theme changes
+    if (typeof window !== 'undefined' && window.matchMedia && $Prefs.theme === 'auto') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handler = () => {
+        actualTheme = getActualTheme()
+      }
+      mediaQuery.addEventListener('change', handler)
+      return () => mediaQuery.removeEventListener('change', handler)
+    }
+  })
+
+  $effect(() => {
+    if (registered && !ready && mounted) {
+      ready = true
+      plugin.url
+      broadcastPluginMessage(
+        {
+          action: openAction,
+          data: {},
+        },
+        plugin.id,
+        lid
+      )
+    }
+  })
 
   const broadcastReadystate = async () => {
     if (!registered) {
@@ -44,7 +79,7 @@
                 useMetric: $Prefs.useMetric,
                 useLocation: $Prefs.alwaysLocate,
                 weekStarts: $Prefs.weekStarts,
-                theme: $Prefs.theme,
+                theme: actualTheme,
                 language: $Prefs.language
               },
             },
@@ -74,6 +109,6 @@
   }}
   class="h-full w-full "
   title={plugin.name}
-  src={plugin.urlWithParams}{widgetindexparam}
+  src="{plugin.urlWithParams}{widgetindexparam}"
   id="plugin-{lid}-{plugin.id}"
 />

@@ -1,4 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
+  import { untrack } from 'svelte'
   import ButtonGroup from '../../../../components/button-group/button-group.svelte'
   import Button from '../../../../components/button/button.svelte'
   import TinyColorPicker from '../../../../components/color-picker/tiny-color-picker.svelte'
@@ -22,10 +25,9 @@
   import { upsertWidget } from '../../DashStore'
   import { WidgetClass } from '../widget-class'
   import { timeFrames } from '../widget-timeframe'
-  import { getWidgetTypes, IWidgetType } from '../widget-types'
+  import { getWidgetTypes, type IWidgetType } from '../widget-types'
   import { canSaveWidget } from '../widget-utils'
   // import { activeTypes } from '../widget-types'
-
   import type { WidgetEditorProps } from './useWidgetEditorModal'
   import WidgetTypeSelector from './widget-type-selector.svelte'
   import { selectTrackable } from '../../../trackable/trackable-selector/TrackableSelectorStore'
@@ -35,53 +37,102 @@
   import CloseOutline from '../../../../n-icons/CloseOutline.svelte'
   import { PluginStore } from "../../../plugins/PluginStore";
   import Storage from '../../../../domains/storage/storage'
+  import type { ITrackerType } from '../../../../modules/tracker/TrackerClass'
 
-  let visible: boolean = false
-  let editingWidget: WidgetClass | undefined
+  let visible = $state(false)
+  let editingWidget = $state<WidgetClass | undefined>(undefined)
+  let processedWidgetId = $state<string | undefined>(undefined)
 
-  export let props: WidgetEditorProps
-  export let id: string
+  const { props, id } = $props()
 
-  let activeType: IWidgetType | undefined
-  let conditionalStyling: boolean = false
-  let canSave: boolean = false
+  let conditionalStyling = $state(false)
+  let canSave = $state(false)
 
-  $: if (props.widget && !visible) {
-    visible = true
-    editingWidget = new WidgetClass(props.widget)
-    if (isTruthy(editingWidget.compareValue)) {
-      conditionalStyling = true
+  $effect(() => {
+    if (props.widget && props.widget.id !== processedWidgetId) {
+      editingWidget = new WidgetClass(props.widget)
+      visible = true
+      processedWidgetId = props.widget.id
+      if (isTruthy(editingWidget.compareValue)) {
+        conditionalStyling = true
+      }
     }
+  })
+
+  let widgetTypes = $state(getWidgetTypes($PluginStore));
+
+  // Callback to handle widget type changes from child
+  const handleWidgetTypeChange = (selectedType: IWidgetType) => {
+    // Child already mutated widget, but we need to reassign to trigger Svelte 5 reactivity
+    if (editingWidget) {
+      // Preserve all existing properties and only update type and data
+      // Keep conditional coloring settings (compareValue, compareOverColor, compareUnderColor)
+      const newData = selectedType.data ? { ...selectedType.data } : (editingWidget.data || {})
+
+      // Create new object to trigger binding reactivity, preserving all other properties
+      editingWidget = { ...editingWidget, type: selectedType.id, data: newData }
+
+      // Initialize pointer data if this is a pointer widget
+      if (selectedType.id === "pointer" && !editingWidget.data?.pointersamples) {
+        editingWidget.data = { ...editingWidget.data, pointersamples: 5 }
+      }
+    }
+    // Force reactivity by incrementing a trigger
+    updateTrigger = updateTrigger + 1
   }
 
-  let widgetTypes = getWidgetTypes($PluginStore);
+  let updateTrigger = $state(0)
 
-  $: if (editingWidget.type) {
-    activeType = widgetTypes.find((wt) => wt.id === editingWidget.type)
-    if (editingWidget.type == "plugin"){
-      pluginGetWidgets(editingWidget.data.pluginId);
+  // Compute activeType as derived value (no side effects)
+  // Depends on updateTrigger to force re-evaluation when widget type changes
+  let activeType = $derived.by(() => {
+    const _ = updateTrigger // use trigger to create dependency
+    return editingWidget?.type ? widgetTypes.find((wt) => wt.id === editingWidget.type) : undefined
+  })
+
+  // Separate effect for plugin side effect
+  $effect(() => {
+    // Depend on updateTrigger to re-run when widget type changes
+    const _ = updateTrigger
+    if (editingWidget?.type === "plugin") {
+      pluginGetWidgets(editingWidget?.data?.pluginId);
     }
-  }
+  })
 
-  let lastWidgetHash: string | undefined = undefined
-  $: if (objectHash(editingWidget) !== lastWidgetHash) {
-    lastWidgetHash = objectHash(editingWidget)
-    try {
-      canSave = canSaveWidget(editingWidget, widgetTypes);
-    } catch (e) {
-      console.error(e)
-      canSave = false
+  // Separate effect for pointer data initialization (fallback)
+  $effect(() => {
+    if (editingWidget?.type === "pointer" && (!editingWidget?.data || !editingWidget?.data?.pointersamples)) {
+      editingWidget.data = {"pointersamples": 5}
     }
-  }
+  })
 
-  let pluginWidgets = [];
+  let lastWidgetHash = $state<string | undefined>(undefined)
+  $effect(() => {
+    // Explicitly depend on updateTrigger to re-run when widget type changes
+    const _ = updateTrigger
+
+    const currentHash = objectHash(editingWidget)
+    const prevHash = untrack(() => lastWidgetHash)
+
+    if (currentHash !== prevHash) {
+      lastWidgetHash = currentHash
+      try {
+        canSave = canSaveWidget(editingWidget, widgetTypes);
+      } catch (e) {
+        console.error(e)
+        canSave = false
+      }
+    }
+  })
+
+  let pluginWidgets = $state([]);
   async function pluginGetWidgets(pluginId:String) {
     let path = `plugins/${pluginId}/prefs.json`
     let data: any = undefined
     try {
       data = await Storage.get(path) || {widgets:[]};
-      pluginWidgets = data.widgets;
-      if (pluginWidgets == undefined || !validateWidgetParams(data.widgets)){pluginWidgets = [];}
+      pluginWidgets = data.widgets || [];
+      if (pluginWidgets == undefined || !validateWidgetParams(pluginWidgets)){pluginWidgets = [];}
     } catch (e) {
       console.error(e)
       pluginWidgets = [];
@@ -96,7 +147,7 @@
       valid = false;
       }
       i++;
-    }   
+    }
     return valid;
   }
 
@@ -105,38 +156,54 @@
   }
 
   const localSelectTrackables = async (multiple: boolean) => {
-    const selected = await selectTrackable()
+    let selected
+    if (editingWidget.type == 'habit') {
+    selected = await selectTrackable('tracker','habit')}
+    else {selected = await selectTrackable()}
     let token = trackableToToken(selected)
     editingWidget.token = token
+    // Force reactivity update
+    updateTrigger = updateTrigger + 1
+  }
+
+  const localSelectPointer = async (multiple: boolean) => {
+    let selected
+    selected = await selectTrackable('pointer')
+    let pointer = trackableToToken(selected)
+    editingWidget.pointer = pointer
+    // Force reactivity update
+    updateTrigger = updateTrigger + 1
   }
 
   const saveWidget = async () => {
     try {
-
       if([...activeType.requires, ...activeType.optional].indexOf('timeframe') === -1) {
         editingWidget.timeRange = undefined;
       }
 
+      const widget = new WidgetClass($state.snapshot(editingWidget))
+
       if(props.onSave) {
-        props.onSave(editingWidget);
-        await upsertWidget(editingWidget).catch((e) => {
+        props.onSave(widget);
+        await upsertWidget(widget).catch((e) => {
           throw e
         })
       } else {
-        await upsertWidget(editingWidget).catch((e) => {
+        await upsertWidget(widget).catch((e) => {
           throw e
         })
       }
       close()
     } catch (e) {
+      console.error('Save error:', e)
       Interact.error(e)
     }
   }
 </script>
 
 <BackdropModal mainClass="bg-gray-100 dark:bg-gray-800" className="bg-white dark:bg-black h-full">
-  <header slot="header" class="bg-white dark:bg-black">
-    <ToolbarGrid slot="header">
+  <div slot="header" class="bg-white dark:bg-black w-full">
+    <ToolbarGrid>
       <Button slot="left" clear primary on:click={close}>{Lang.t('general.cancel', 'Cancel')}</Button>
       <h1 class="ntitle">Widget Settings</h1>
       <div slot="right">
@@ -153,23 +220,24 @@
     </ToolbarGrid>
 
     <!-- Widget Type Selector -->
-    <WidgetTypeSelector bind:widget={editingWidget} />
-  </header>
+    <WidgetTypeSelector bind:widget={editingWidget} onWidgetTypeChange={handleWidgetTypeChange} {updateTrigger} />
+  </div>
 
   <div class="h-4" />
 
   <main class="px-2">
-    <!-- Select the Trackable if its required the by the active ttype  -->
-    <List solo>
+    {#key updateTrigger}
+      <!-- Select the Trackable if its required the by the active ttype  -->
+      <List solo>
       {#if (activeType?.requires?.indexOf('token') > -1) || activeType?.optional?.indexOf('token') > -1}
+        
         <ListItem
           on:click={() => {
             localSelectTrackables(activeType?.requires?.indexOf('tokens') > -1)
           }}
-          className="h-16"
-        >
+          className="h-16" >
           Trackable
-          {#if !editingWidget.token}
+          {#if !editingWidget?.token}
             <span class="opacity-50 text-black dark:text-white">
               {#if (activeType?.requires?.indexOf('token') > -1)}
                 (required)
@@ -179,9 +247,9 @@
             </span>
           {/if}
           <div slot="right" class="flex items-center space-x-2">
-            {#if !editingWidget.tokens.length}
+            {#if !editingWidget?.tokens?.length}
               <div class="text-primary-500">{Lang.t('general.select', 'Select')}</div>
-            {:else if editingWidget.token}
+            {:else if editingWidget?.token}
               <TrackablePill size={28} hideValue trackable={tokenToTrackable(editingWidget.token, $TrackableStore.trackables)} />
               {#if (activeType?.requires?.indexOf('token') === -1)}
                 <button class="flex items-center justify-center" on:click={()=>{editingWidget.token = undefined}}>
@@ -193,9 +261,43 @@
         </ListItem>
       {/if}
 
+      <!-- Select Pointer if required-->
+      {#if activeType && [...activeType.requires, ...activeType.optional].indexOf('pointer') > -1}
+      <Divider left={18} />
+      <ListItem
+          on:click={() => {
+            localSelectPointer(false)
+          }}
+          className="h-16" >
+          Pointer
+          {#if !editingWidget?.pointer}
+            <span class="opacity-50 text-black dark:text-white">
+              {#if (activeType?.requires?.indexOf('token') > -1)}
+                (required)
+              {:else}
+                (optional)
+              {/if}
+            </span>
+          {/if}
+          <div slot="right" class="flex items-center space-x-2">
+            {#if !editingWidget?.pointer}
+              <div class="text-primary-500">{Lang.t('general.select', 'Select')}</div>
+            {:else if editingWidget.pointer}
+              <TrackablePill size={28} hideValue trackable={tokenToTrackable(editingWidget.pointer, $TrackableStore.trackables)} />
+              {#if (activeType?.requires?.indexOf('token') === -1)}
+                <button class="flex items-center justify-center" on:click={()=>{editingWidget.pointer = undefined}}>
+                  <IonIcon icon={CloseOutline} />
+                </button>
+              {/if}
+            {/if}
+          </div>
+        </ListItem>
+      {/if}
+
       <!-- Select the timeframe if required -->
       {#if activeType && [...activeType.requires, ...activeType.optional].indexOf('timeframe') > -1}
         <Divider left={18} />
+        {#if editingWidget}
         <Input listItem bind:value={editingWidget.timeRange} type="select" label="Timeframe">
           <div
             slot="left"
@@ -220,6 +322,29 @@
             </div>
           </ListItem>
         {/if}
+      {#if editingWidget?.type == "pointer"}
+        <Divider left={18} />
+        <ListItem>
+          Samples: {editingWidget?.data?.pointersamples || 5}
+          <div slot="right" style="flex: 1; padding-right: 1rem; display: flex; align-items: center; min-height: 48px; width: 200px;">
+            {#if editingWidget?.data}
+              <input
+                type="range"
+                min="1"
+                max="8"
+                value={editingWidget.data.pointersamples}
+                on:input={(e) => {
+                  editingWidget.data.pointersamples = parseInt(e.target.value)
+                  updateTrigger = updateTrigger + 1
+                }}
+                step="1"
+                style="width: 100%; height: 24px; cursor: pointer; -webkit-appearance: none; appearance: none; background: transparent; border: none; outline: none;"
+              >
+            {:else}
+              <span style="color: #999; font-size: 12px;">initializing...</span>
+            {/if}
+          </div>
+        </ListItem>
       {/if}
       <Divider left={18} />
       <ListItem>
@@ -234,6 +359,8 @@
           slot="right"
         />
       </ListItem>
+        {/if}
+      {/if}
     </List>
 
     <!-- Just Note -->
@@ -244,29 +371,93 @@
       </List>
     {/if}
 
+    
     <!-- Plugins -->
     {#if activeType?.id == 'plugin'}
-    {#if pluginWidgets.length > 0}
     <List solo className="mt-4">
-    <Input listItem bind:value={editingWidget.data.widgetindex} type="select" label="Widget">
-      <div
-        slot="left"
-        class="{!editingWidget.data.widgetindex
-          ? 'pl-2 pt-3 w-full'
-          : ''} text-black dark:text-white pointer-events-none absolute"
-      >
-        {#if !editingWidget.data.widgetindex}
-          Select a Widget
-        {/if}
-      </div>
-      {#each pluginWidgets as pluginWidget}
-        <option value={pluginWidget.widgetid}>{pluginWidget.emoji} {pluginWidget.name}</option>
-      {/each}
-    </Input>
-      
+      {#if pluginWidgets.length > 0}
+        <Input listItem bind:value={editingWidget.data.widgetindex} type="select" label="Widget">
+          <div
+            slot="left"
+            class="{!editingWidget?.data?.widgetindex
+              ? 'pl-2 pt-3 w-full'
+              : ''} text-black dark:text-white pointer-events-none absolute"
+          >
+            {#if !editingWidget?.data?.widgetindex}
+              Select a Widget
+            {/if}
+          </div>
+          {#each pluginWidgets as pluginWidget}
+            <option value={pluginWidget.widgetid}>{pluginWidget.emoji} {pluginWidget.name}</option>
+          {/each}
+        </Input>
         <div class="text-gray-500 leading-tight px-4 text-sm pb-4">Select your Widget for this Plugin</div>
-      </List>
+      {:else}
+        <div class="text-gray-500 leading-tight px-4 text-sm pb-4">No widget options available for this plugin</div>
+      {/if}
+    </List>
     {/if}
+
+    <!-- AI Insight Widget Configuration -->
+    {#if activeType?.id == 'insight'}
+      <List solo className="mt-4">
+        <!-- Prompt Type Selection -->
+        <ListItem>
+          Prompt Type
+          <ButtonGroup
+            bind:value={editingWidget.data.promptType}
+            buttons={[
+              { value: 'predefined', label: 'Predefined' },
+              { value: 'custom', label: 'Custom' },
+            ]}
+            slot="right"
+          />
+        </ListItem>
+
+        <Divider left={18} />
+
+        <!-- Predefined Prompts Dropdown -->
+        {#if editingWidget.data.promptType === 'predefined'}
+          <Input listItem bind:value={editingWidget.data.promptValue} type="select" label="Select Prompt">
+            <div
+              slot="left"
+              class="{!editingWidget.data.promptValue
+                ? 'pl-2 pt-3 w-full'
+                : ''} text-black dark:text-white pointer-events-none absolute"
+            >
+              {#if !editingWidget.data.promptValue}
+                {Lang.t('dashboard.select-prompt', 'Select a prompt')}
+              {/if}
+            </div>
+            <option>Select</option>
+            <option value="patterns">Patterns</option>
+            <option value="progress">Progress</option>
+            <option value="insights">Insights</option>
+            <option value="recommendations">Recommendations</option>
+            <option value="trends">Trends</option>
+            <option value="wellbeing">Wellbeing</option>
+            <option value="productivity">Productivity</option>
+            <option value="health">Health</option>
+            <option value="mood">Mood & Emotions</option>
+            <option value="correlation">Correlations</option>
+          </Input>
+        {/if}
+
+        <!-- Custom Prompt Textarea -->
+        {#if editingWidget.data.promptType === 'custom'}
+          <Divider left={18} />
+          <Input
+            listItem
+            placeholder="Enter your custom prompt"
+            type="textarea"
+            rows={4}
+            bind:value={editingWidget.data.promptValue}
+          />
+          <div class="text-gray-500 leading-tight px-4 text-sm pb-4">
+            Describe what insight you'd like Claude to provide based on your tracking data
+          </div>
+        {/if}
+      </List>
     {/if}
 
     <!-- Start Conditional Styling -->
@@ -281,7 +472,16 @@
                 editingWidget.compareUnderColor = undefined
                 editingWidget.compareOverColor = undefined
                 editingWidget.compareValue = undefined
+              } else {
+                // Set default colors when turning ON conditional coloring
+                if (!editingWidget.compareOverColor) {
+                  editingWidget.compareOverColor = 'green'
+                }
+                if (!editingWidget.compareUnderColor) {
+                  editingWidget.compareUnderColor = 'red'
+                }
               }
+              editingWidget = editingWidget
             }}
           />
         </ListItem>
@@ -317,9 +517,11 @@
             <TinyColorPicker
               slot="right"
               size={16}
+              colors={['green', 'orange', 'red', 'blue']}
               value={editingWidget.compareOverColor}
               on:change={(evt) => {
                 editingWidget.compareOverColor = evt.detail
+                updateTrigger = updateTrigger + 1
               }}
             />
           </ListItem>
@@ -329,9 +531,11 @@
             <TinyColorPicker
               slot="right"
               size={16}
+              colors={['green', 'orange', 'red', 'blue']}
               value={editingWidget.compareUnderColor}
               on:change={(evt) => {
                 editingWidget.compareUnderColor = evt.detail
+                updateTrigger = updateTrigger + 1
               }}
             />
           </ListItem>
@@ -346,5 +550,61 @@
     <!-- Styling -->
 
     <List solo className="mt-4 dark:text-white" />
+    {/key}
   </main>
 </BackdropModal>
+
+<style lang="postcss">
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 24px;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: linear-gradient(to right, #9ca3af, #6b7280);
+    border-radius: 5px;
+    outline: none;
+    border: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #3b82f6;
+    margin-top: -8px;
+  }
+
+  input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: linear-gradient(to right, #9ca3af, #6b7280);
+    border-radius: 5px;
+    outline: none;
+    border: none;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #3b82f6;
+  }
+
+  input[type="range"]::-moz-range-progress {
+    background: linear-gradient(to right, #9ca3af, #6b7280);
+  }
+</style>

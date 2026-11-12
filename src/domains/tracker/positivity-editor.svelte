@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Svelte
   import { createEventDispatcher } from 'svelte'
@@ -28,8 +30,7 @@
   import { showToast } from '../../components/toast/ToastStore'
 
   // Prosp
-  export let tracker: TrackerClass | undefined = undefined
-  export let className = ''
+
 
   // consts
   const dispatch = createEventDispatcher()
@@ -53,10 +54,11 @@
 
   const methods = {
     async change() {
-      await wait(10)
+      await wait(50)
       dispatch('trackerChange', tracker)
 
       if (tracker.score == 'custom' && !tracker.score_calc) {
+        await wait(10)
         openScoreEditor({
           trackable: tracker.toTrackable(),
           show: true,
@@ -117,6 +119,8 @@
       methods.change()
     },
   }
+
+  const { tracker, className } = $props()
 </script>
 
 {#if tracker}
@@ -126,7 +130,7 @@
       type="select"
       bind:value={tracker.score}
       placeholder="Select a Positivity"
-      on:input={methods.change}
+      on:change={methods.change}
       label={Lang.t('tracker.positivity', 'Positivity')}
     >
       <div slot="left" class="pt-3 text-black dark:text-white">

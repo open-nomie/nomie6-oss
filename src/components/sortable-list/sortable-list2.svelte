@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
   import Muuri from 'muuri'
@@ -6,43 +8,48 @@
 
   const dispatch = createEventDispatcher()
 
-  export let items: Array<any> = []
-  export let sortable: boolean = true
-  export let direction: 'x' | 'y' | 'xy' = 'xy'
   // export let gap = 0
   // export let itemWidth = '120px'
-  export let className = ''
-  export let containerClass = ''
-  export let handleClass: undefined | string = undefined
-  export let key: string
-  export let id: string = `sl2-${nid()}`
-
-  export let enabled: boolean = true
 
   // const console = new Logger('↕️ NSortable');
-  let cleanItems: Array<any> = []
-  $: if (items && items.length) {
-    // cleanItems = dedupArray(items, key)
-    cleanItems = [...items]
-  }
-
-  let grid: Muuri
-
-  let gridEle: HTMLElement
+  let cleanItems = $state<Array<any>>([])
+  let grid = $state<Muuri>(undefined)
+  let gridEle = $state<HTMLElement>(undefined)
   // let sortableItems: HTMLElement
-  let ready: boolean = false
+  let ready = $state(false)
+  let lastItemCount = $state<number>(undefined)
 
-  let lastItemCount: number
-  $: if (ready && grid && cleanItems.length !== lastItemCount && sortable) {
-    try {
-      lastItemCount = cleanItems.length
-      // const children = sortableItems.children
-      // grid.add(children)
-      grid.refreshItems(grid.getItems(), true).layout()
-    } catch (e) {
-      console.error(`${e.message}`)
+  const {
+    items = $bindable(),
+    sortable,
+    direction = 'xy',
+    className = '',
+    containerClass = '',
+    handleClass = undefined,
+    key,
+    id = `sl2-${nid()}`,
+    enabled = true
+  } = $props()
+
+  $effect(() => {
+    if (items && items.length) {
+      // cleanItems = dedupArray(items, key)
+      cleanItems = [...items]
     }
-  }
+  })
+
+  $effect(() => {
+    if (ready && grid && cleanItems.length !== lastItemCount && sortable) {
+      try {
+        lastItemCount = cleanItems.length
+        // const children = sortableItems.children
+        // grid.add(children)
+        grid.refreshItems(grid.getItems(), true).layout()
+      } catch (e) {
+        console.error(`${e.message}`)
+      }
+    }
+  })
 
   const getMurriConfig = (): GridOptions => {
     return {
@@ -107,7 +114,7 @@
       // Drag & Drop
       dragEnabled: enabled,
       dragContainer: null,
-      dragHandle: handleClass,
+      dragHandle: handleClass ? `.${handleClass}` : null,
       dragStartPredicate: {
         distance: 0,
         delay: 0,
@@ -170,23 +177,30 @@
   }
 
   function main() {
-    // let isFirst = true
-    grid = new Muuri(`#${id} .sl2-grid`, getMurriConfig())
+    const selector = `#${id} .sl2-grid`
+    const element = document.querySelector(selector)
+
+    if (!element) {
+      console.warn(`sortable-list2: Element not found for selector: ${selector}`)
+      return
+    }
+
+    grid = new Muuri(selector, getMurriConfig())
 
     grid.on('layoutEnd', function (updatedItems) {
       let final = updatedItems.map((item: any) => {
         return JSON.parse(item._element.getAttribute('data-item'))
       })
       fireSorted(final)
-      // if (!isFirst)
-      // isFirst = false
     })
 
     ready = true
   }
 
   onMount(() => {
-    main()
+    requestAnimationFrame(() => {
+      main()
+    })
   })
 </script>
 

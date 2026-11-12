@@ -1,10 +1,11 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
 
   import IonIcon from '../icon/ion-icon.svelte'
   import { CloseOutline, SearchIcon } from '../icon/nicons'
 
-  export let searchText = ''
 
   let searchField
 
@@ -23,6 +24,8 @@
       event.stopPropagation()
     }
   }
+
+  let { searchText = $bindable() } = $props()
 </script>
 
 <div class="svelte-emoji-picker__search">

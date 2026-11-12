@@ -140,7 +140,6 @@ export class TrackableUsage {
       return note.score
     })
 
-    
     return new TrackableUsage({
       trackable: this.trackable,
       displayValue: this.displayValue,
@@ -315,6 +314,7 @@ export class TrackableUsage {
     const calendarDates = calendarMap(start.toDate(), end.toDate(), groupedBy)
     const dates: Array<Dayjs> = calendarDates.map((cd) => dayjs(cd.date))
     const values: Array<number> = calendarDates.map(() => NaN)
+    //const values= this.values
     const dateFormat: string = (CalendarGroupByOptions[groupedBy] || {}).keyFormat
 
     if (!dateFormat) {

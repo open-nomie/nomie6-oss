@@ -1,8 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let title: string = 'Tab'
-  export let className: string = ''
-  export let style: string = ''
-  export let isActive: boolean = false
+
+
+  const { title, className, style, isActive } = $props()
 </script>
 
 <div class="tab-panel filler {className}" data-title={title} {style}>

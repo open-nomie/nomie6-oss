@@ -1,23 +1,21 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Interact } from '../../store/interact'
 
   import math from '../../utils/math/math'
 
-  export let positive: number
-  export let negative: number
-  export let neutral: number
-  export let className: string = ''
-  export let style: string = ''
-  export let height: string = '8pt'
+  let score = $state(0)
+  let neuCount = $state({ type: 'neutral', count: 0, percent: 0 })
+  let counts = $state([])
 
-  let score = 0
-  let neuCount = { type: 'neutral', count: 0, percent: 0 }
+  const { positive, negative, neutral, className, style, height } = $props()
 
-  let counts = []
-
-  $: if (neutral | positive | negative) {
-    main()
-  }
+  $effect(() => {
+    if (neutral | positive | negative) {
+      main()
+    }
+  })
 
   function whatsThis() {
     let message = `Using your total negative (red), positive (green), and neutral (gray) events for the day, Nomie calculates your Positivity Score. 

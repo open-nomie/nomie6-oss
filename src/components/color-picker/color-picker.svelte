@@ -1,14 +1,13 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import NHScroller from '../h-scroller/h-scroller.svelte'
   import { base } from '../../modules/colors/colors'
   import { createEventDispatcher } from 'svelte'
 
-  export let value = '#20699d'
-  export let grid = false
-  export let colors = base.reverse()
-  export let className = ''
+  let { value = $bindable(), grid, colors, className } = $props()
 
-  $: selectedIndex = colors.indexOf(value) || 0
+  let selectedIndex = $derived(colors.indexOf(value) || 0)
   const dispatch = createEventDispatcher()
 </script>
 

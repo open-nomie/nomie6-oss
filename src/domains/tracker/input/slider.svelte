@@ -1,28 +1,41 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import LetterTicker from '../../../components/letter-ticker/letter-ticker.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
   import RangeSlider from 'svelte-range-slider-pips'
   import is from '../../../utils/is/is'
 
-  export let min = '0'
-  export let max = '10'
-  export let value = '5'
-  export let tracker: any = undefined
-  export let step = tracker ? tracker.step : '1'
+  const { min, max, value, tracker, step } = $props()
 
-  let tempValue
-  $: tempValue = value
+  // Numbers typed on a decimal keypad may use a comma (0,5); read both 0,5 and 0.5 the same way
+  const toNumber = (v: any): number => parseFloat(`${v ?? ''}`.replace(',', '.'))
+
+  // Decimal places in the step, so 0.5 keeps its half and a whole-number step stays whole
+  const decimalsOfStep = (): number => {
+    const parts = `${toNumber(tracker.step) || 1}`.split('.')
+    return parts[1] ? parts[1].length : 0
+  }
+  const toStepValue = (v: any): number => Number(toNumber(v).toFixed(decimalsOfStep()))
+
+  let values = $state([Number(value) || toNumber(tracker.min) || 0])
 
   const dispatch = createEventDispatcher()
 
-  async function main() {
-    // Trigger the change so the parent catches it.
-    if (tempValue) {
-      dispatch('change', parseInt(tempValue))
-    }
-  }
 
-  onMount(main)
+  $effect(() => {
+    const newValue = Number(value) || toNumber(tracker.min) || 0
+    if (values[0] !== newValue) {
+      values = [newValue]
+    }
+  })
+
+  onMount(() => {
+    // Trigger initial change event
+    if (values[0]) {
+      dispatch('change', toStepValue(values[0]))
+    }
+  })
 </script>
 
 <div class="tracker-input-slider relative">
@@ -40,9 +53,12 @@
     {/if}
 
     <RangeSlider
-      on:change={(evt) => {
-        // dispatch('change', evt.detail)
-        dispatch('change', parseInt(evt.detail.value))
+      bind:values={values}
+      on:input={() => {
+        dispatch('input', values[0])
+      }}
+      on:change={() => {
+        dispatch('change', toStepValue(values[0]))
       }}
       style="--range-slider:{tracker.color};"
       springValues={{
@@ -55,20 +71,19 @@
       first={tracker.minLabel}
       last={tracker.maxLabel}
       vertical={true}
-      value={tempValue}
-      min={parseFloat(tracker.min)}
-      max={parseFloat(tracker.max)}
-      steps={parseFloat(tracker.step || 1)}
+      min={toNumber(tracker.min)}
+      max={toNumber(tracker.max)}
+      step={toNumber(tracker.step) || 1}
       pips
     />
     <div class="value dark:bg-gray-700 bg-gray-300 px-2 pt-3 pb-1 w-20 -ml-3 -mt-6 rounded-b-xl text-center">
       {#if tracker && tracker.uom !== 'num'}
         <LetterTicker
-          text={`${tracker.displayValue(tempValue)}`}
+          text={`${tracker.displayValue(values[0])}`}
           className=" font-bold text-gray-800 dark:text-white"
         />
       {:else if tracker}
-        <LetterTicker text={`${tempValue}`} className="font-bold text-gray-800 dark:text-white" />
+        <LetterTicker text={`${values[0]}`} className="font-bold text-gray-800 dark:text-white" />
       {/if}
     </div>
   </div>

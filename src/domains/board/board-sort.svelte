@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import NItem from '../../components/list-item/list-item.svelte'
 
@@ -24,7 +26,7 @@
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../components/backdrop/BackdropStore2'
 
-  export let id: string
+  const { id } = $props<{ id: string }>()
 
   function boardsSorted(evt) {
     if (evt.detail instanceof Array) {

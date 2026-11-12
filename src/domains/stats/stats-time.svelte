@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import DayTimeGrid from '../../components/day-time-grid/day-time-grid.svelte'
 
@@ -6,10 +8,10 @@
   import type { IStats } from './statsV5'
   import Card from '../../components/card/card.svelte'
 
-  export let term: string
-  export let color: string
   // export let rows: Array<NLog>;
-  export let stats: IStats
+
+
+  const { term, color, stats } = $props()
 </script>
 
 <Card pad className="m-2">

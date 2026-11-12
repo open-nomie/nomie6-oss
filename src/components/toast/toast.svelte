@@ -1,7 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { fade, fly } from 'svelte/transition'
   // import { flip } from 'svelte/animate'
-  import { removeToast, ToastType } from './ToastStore'
+  import { removeToast, type ToastType } from './ToastStore'
   import { onDestroy, onMount } from 'svelte'
   import math from '../../utils/math/math'
   import ProgressBar from '../progress-bar/progress-bar.svelte'
@@ -10,14 +12,17 @@
   import CloseCircleOutline from '../../n-icons/CloseCircleOutline.svelte'
   import CheckmarkCircleOutline from '../../n-icons/CheckmarkCircleOutline.svelte'
 
-  export let toast: ToastType
+  let timer = $state(0)
+  let clearInterval = $state<any>(undefined)
+  let percentage = $state(0)
 
-  let timer: number = 0
-  let clearInterval: any
-  let percentage: number = 0
-  $: if (toast) {
-    percentage = math.percentage((toast.timeout || 3000) - 200, timer)
-  }
+  const { toast } = $props()
+
+  $effect(() => {
+    if (toast) {
+      percentage = math.percentage((toast.timeout || 3000) - 200, timer)
+    }
+  })
 
   onMount(() => {
     if (toast) {
@@ -41,7 +46,7 @@
 </script>
 
 {#if toast}
-  <div role="dialog" in:fade out:fly={{ y: 100 }} class="toast-wrapper transition-all duration-200">
+  <div role="dialog" in:fade|global out:fly|global={{ y: 100 }} class="toast-wrapper transition-all duration-200">
     {#if toast.type === 'success'}
       <div class="toast-type success">
         <IonIcon icon={CheckmarkCircleOutline} size={24} />

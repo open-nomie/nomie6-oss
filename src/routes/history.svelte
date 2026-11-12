@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Container from './../components/container/container.svelte'
 
@@ -59,42 +61,45 @@
   import { selectFuzzyDate } from '../domains/timeline/select-date-fuzzy'
   import { openUnisearch } from '../domains/search/UnisearchStore'
 
-  export const location = undefined
-  export let style = undefined
+  const location = undefined
+  let { style = undefined } = $props()
 
-  let appTitle = null
-  let showSearch = false
+  let appTitle = $state(null)
+  let showSearch = $state(false)
 
   const dateFormats = getDateFormats()
 
-  const state = {
+  const state = $state({
     date: dayjs(new Date()),
     // time_format: config.book_time_format,
-    logs: [],
     ledger: null,
     locations: [],
     showAllLocations: false,
-  } // Assign State to compiled history page
+  }) // Assign State to compiled history page
 
-  let refreshing = false
-  let logs = [] // holder of the logs
-  let loading = true
+  let refreshing = $state(false)
+  let logs = $state([]) // holder of the logs
+  let loading = $state(true)
   // let locations = []
 
   /// Watchers for when we're in edit mode
   // and when we have selected more than one.
 
-  let isToday = true
-  let view: OTDViewOption = 'all'
+  let isToday = $state(true)
+  let view = $state<OTDViewOption>('all')
 
-  // If the date changes - check to see if it's still today
   let activeDate
-  $: if (state.date && state.date !== activeDate) {
-    activeDate = state.date
-    isToday = new Date().toDateString() == state.date.toDate().toDateString()
-  }
 
-  $: appTitle = `History ${state.date.format('YYYY-MM-DD')}`
+  $effect(() => {
+    if (state.date && state.date !== activeDate) {
+      activeDate = state.date
+      isToday = new Date().toDateString() == state.date.toDate().toDateString()
+    }
+  })
+
+  $effect(() => {
+    appTitle = `History ${state.date.format('YYYY-MM-DD')}`
+  })
 
   function composeHere() {
     let logConfig = { end: undefined }
@@ -171,6 +176,9 @@
     contextTapped(context, log) {
       openStats2(new Trackable({ type: 'context', context }))
     },
+    pointerTapped(pointer, log) {
+      openStats2(new Trackable({ type: 'pointer', pointer }))
+    },
     showLogOptions(log) {
       Interact.logOptions(log)
     },
@@ -194,10 +202,10 @@
   let onLogsDeleted
 
   // WHen mounted.
-  onMount(() => {
+  onMount(async () => {
     Device.scrollToTop()
 
-    refresh()
+    await refresh()
 
     onLogUpdate = LedgerStore.hook('onLogUpdate', async (log) => {
       await tick(600)
@@ -293,7 +301,7 @@
           />
         </Container>
       {/if}
-      <OnThisDayViews {view} {logs} on:date={(evt)=>{
+      <OnThisDayViews {view} {logs} date={state.date} on:date={(evt)=>{
         methods.getDate(dayjs(evt.detail));
       }} />
     </div>

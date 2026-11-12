@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dropRight from 'lodash/dropRight'
   // Inspirated by https://codepen.io/ethanryan/details/MryqXv
@@ -12,15 +14,10 @@
 
   const dispatch = createEventDispatcher()
 
-  let globalAnswer: any = '0' //declaring global variable here... this is bad practice
-  let buffer = []
-  let fontSize = 40
-
-  export let value = 0
-  export let displayFormat = undefined
-  export let defaultEphemeral = true
-
-  let tapped = false
+  let globalAnswer = $state<any>('0')
+  let buffer = $state([])
+  let fontSize = $state(40)
+  let tapped = $state(false)
 
   onMount(() => {
     if (is.truthy(value)) {
@@ -167,6 +164,8 @@
       fontSize = 20
     }
   }
+
+  let { value = $bindable(), displayFormat, defaultEphemeral } = $props()
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

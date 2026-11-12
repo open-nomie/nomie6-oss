@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
@@ -23,24 +25,23 @@
   import LetterTicker from '../../components/letter-ticker/letter-ticker.svelte'
 
   const dispatch = createEventDispatcher()
+  let { endDate, trackable, loading = $bindable() } = $props()
 
   // TODO: See why it's not adding all the them .
 
-  let selectedIndex
-  let selectedLabel: string | undefined = undefined
-  let unsubLastUsedStore: Function
-  let lastUsedState: LastUsedStoreState
+  let selectedIndex = $state(undefined)
+  let selectedLabel = $state(undefined)
+  let unsubLastUsedStore = $state(null)
+  let lastUsedState = $state(null)
 
-  export let endDate: Date = new Date()
-  export let trackable: undefined | Trackable = undefined
-  export let loading: boolean = true
+  let trackableUsage = $state(null)
 
-  let trackableUsage: TrackableUsage
-
-  let trackableMaxUsed: number = 10
-  $: if (lastUsedState && (trackable || endDate)) {
-    getData()
-  }
+  let trackableMaxUsed = $state(10)
+  $effect(() => {
+    if (lastUsedState && (trackable || endDate)) {
+      getData()
+    }
+  })
 
   let getDataTimeout
   const getData = async () => {

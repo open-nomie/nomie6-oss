@@ -1,78 +1,54 @@
-<script lang="ts">
+<svelte:options runes={true} />
 
+<script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
 import is from '../../utils/is/is';
 
   const dispatch = createEventDispatcher()
 
-  export let label = null
-  export let placeholder = null
-  export let inputmode = undefined
-  export let value = null
-  export let type = 'text'
-  export let help = null
-  export let className = ''
-  export let id = ''
-  export let style = ''
-  export let inputStyle = ''
-  export let inputClass = ''
-  export let pattern = ''
-  export let width = ''
-  export let disabled = undefined
-  export let solo = undefined
-  export let listItem = undefined
-  export let compact = undefined
-  export let rows = 2
-  export let accept = 'png,jpeg,jpg,csv'
-  export let name = undefined
+  let { label = null, placeholder = null, inputmode = undefined, value = $bindable(), type = 'text', help = null, className = '', id = '', style = '', inputStyle = '', inputClass = '', pattern = '', width = '', disabled = undefined, solo = undefined, listItem = undefined, compact = undefined, rows = 2, accept = 'png,jpeg,jpg,csv', name = undefined, autocomplete = undefined, autocorrect = undefined, autocapitalize = undefined, autofocus = undefined } = $props<{ label?: any; placeholder?: any; inputmode?: any; value?: any; type?: string; help?: any; className?: string; id?: string; style?: string; inputStyle?: string; inputClass?: string; pattern?: string; width?: string; disabled?: any; solo?: any; listItem?: any; compact?: any; rows?: number; accept?: string; name?: any; autocomplete?: any; autocorrect?: any; autocapitalize?: any; autofocus?: any }>()
 
-  export let autocomplete = undefined
-  export let autocorrect = undefined
-  export let autocapitalize = undefined
-  export let autofocus = undefined
+  let focused = $state(false)
+  let _elInput = $state<any>(undefined)
 
-  const SLOTS = $$props.$$slots
-
-  let focused = false
-  let hasInput = false
-
-  let _elInput
-
-  export function doFocus() {
-    _elInput.focus()
+  function doFocus() {
+    _elInput?.focus()
   }
 
-  export function getValue() {
-    return _elInput.value
+  function getValue() {
+    return _elInput?.value
   }
 
   let blur = () => {
     focused = false
   }
-  let focus = (event) => {
+  let focus = (event: any) => {
     focused = true
     dispatch('focus', event)
   }
 
-  let onInput = (evt) => {
-    if (evt.key == 'Enter') {
+  let onInput = (evt: any) => {
+    if (evt?.key == 'Enter') {
       dispatch('enter', value)
     }
-    dispatch('input', evt.target.value)
+    // Use the bound value instead of evt.target.value (evt.target can be null in Safari)
+    dispatch('input', value)
   }
 
-  $: if (value !== "" && (value === 0 || is.truthy(value))) {
-    hasInput = true
-  } else {
-    hasInput = false
-  }
+  let hasInput = $derived.by(() => {
+    if (value !== "" && (value === 0 || is.truthy(value))) {
+      return true
+    } else {
+      return false
+    }
+  })
 
   onMount(() => {
     if (type == 'select') {
-      hasInput = true
+      // hasInput = true (can't set derived)
     }
     if (value && `${value}`.length) {
-      hasInput = true
+      // hasInput = true (can't set derived)
     }
   })
 </script>
@@ -265,7 +241,7 @@ import is from '../../utils/is/is';
           bind:this={_elInput}
           {disabled}
           {id}
-          type="text"
+          {type}
           {inputmode}
           style={inputStyle}
           class={inputClass}
@@ -290,7 +266,7 @@ import is from '../../utils/is/is';
     <slot name="right" />
   </div>
   <slot name="bottom" />
-  {#if help || SLOTS?.help}
+  {#if help || $$slots.help}
     <div class="helper">{help || ''} <slot name="help" /></div>
   {/if}
 </div>

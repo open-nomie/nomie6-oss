@@ -1,44 +1,40 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true,
-    jest: true,
+    es2021: true,
+    node: true,
   },
-  extends: 'eslint:recommended',
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
-  },
-  plugins: [
-    'svelte3',
-    '@typescript-eslint', // add the TypeScript plugin
-  ],
+  extends: ['eslint:recommended'],
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 2021,
     sourceType: 'module',
   },
+  rules: {
+    'indent': ['warn', 2],
+    'linebreak-style': ['warn', 'unix'],
+    'quotes': ['warn', 'double'],
+    'semi': ['warn', 'always'],
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+  },
   overrides: [
-    // this stays the same
     {
       files: ['*.svelte'],
       processor: 'svelte3/svelte3',
+      rules: {
+        'indent': 'off',
+      },
+    },
+    {
+      files: ['*.spec.js', '*.test.js'],
+      rules: {
+        'quotes': 'off',
+        'semi': 'off',
+      },
     },
   ],
-  rules: {
-    indent: ['error', 'space'],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'double'],
-    semi: ['error', 'always'],
-    'max-line-length': [
-      true,
-      {
-        limit: 120,
-        'ignore-pattern': '^import |^export {(.*?)}',
-      },
-    ],
-  },
+  plugins: ['svelte3'],
   settings: {
-    'svelte3/typescript': true, // load TypeScript as peer dependency
-    // ...
+    'svelte3/typescript': true,
   },
-}
+};

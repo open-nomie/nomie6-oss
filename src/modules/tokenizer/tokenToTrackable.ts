@@ -5,6 +5,7 @@ import Person from '../../domains/people/Person.class'
 import TrackerClass from '../tracker/TrackerClass'
 import type { Token } from './lite'
 import { ContextClass } from '../../domains/context/context-class'
+import { PointerClass } from '../../domains/pointers/pointer-class'
 import type { Trackable } from '../../domains/trackable/Trackable.class'
 
 export const tokenToTag = (token: Token, includeValue: boolean = false): string => {
@@ -16,7 +17,7 @@ export const tokenToTag = (token: Token, includeValue: boolean = false): string 
 }
 
 export const tokenToTrackable = (token: Token, knownTrackables: ITrackables = {}): Trackable | undefined => {
-  if (['tracker', 'person', 'context'].indexOf(token.type) > -1) {
+  if (['tracker', 'person', 'context', 'pointer'].indexOf(token.type) > -1) {
     // Get Trackables as Array
     const key = `${token.prefix}${token.id}`
     let found: Trackable | undefined = knownTrackables[key]
@@ -55,6 +56,13 @@ export const tokenToTrackable = (token: Token, knownTrackables: ITrackables = {}
       } else if (token.type === 'context') {
         // Create a new context trackable
         found = new ContextClass({ tag: token.id, label: token.id }).toTrackable()
+        // Pass a value - this is for a new feature
+        found.value = token.value ? parseNumber(`${token.value}`) : NaN
+
+        // Return trackable
+      } else if (token.type === 'pointer') {
+        // Create a new pointer trackable
+        found = new PointerClass({ tag: token.id, label: token.id }).toTrackable()
         // Pass a value - this is for a new feature
         found.value = token.value ? parseNumber(`${token.value}`) : NaN
 

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { useStorageSelectMenu } from './settings-functions'
 
@@ -8,7 +10,7 @@
 
   import List from '../../components/list/list.svelte'
 
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../vendor/svelte-navigator'
 
   import { Prefs, saveStorageType } from '../preferences/Preferences'
   import { wait } from '../../utils/tick/tick'
@@ -20,12 +22,17 @@
 
   import { updateAllLastUsed } from '../usage/UsageStore'
   import PouchdbSettings from '../storage/engines/pouchdb/pouchdb.svelte'
-  import { getStorageEngineDetails, StorageEngineType } from '../storage/storage'
+  import { getStorageEngineDetails, type StorageEngineType } from '../storage/storage'
 
   import { showImportModal } from '../import-export/ImporterStore'
   import { showToast } from '../../components/toast/ToastStore'
 
   import BackupListItems from '../../components/backup-message/backup-list-items.svelte'
+  import NomieServer from '../storage/engines/nomie-server/nomie-server.svelte'
+  import { openModal } from '../../components/backdrop/BackdropStore2'
+  import PluginDedupModal from '../plugins/plugin-dedup-modal.svelte'
+  import SelectPop from '../../select-pop/select-pop.svelte'
+  import { autoCleanupPlugins } from '../plugins/PluginCleanupStore'
 
   // let fileInputF
   // let showImporter = false
@@ -46,6 +53,70 @@
     }
   }
 
+  const openPluginDedupModal = () => {
+    openModal({
+      id: 'plugin-dedup-modal',
+      component: PluginDedupModal,
+      componentProps: {}
+    })
+  }
+
+  let pluginCleanupDays = $state($Prefs.pluginCleanupDays || -1)
+  let previousCleanupDays = $state(-1)
+
+  $effect(() => {
+    if ($Prefs.pluginCleanupDays !== undefined) {
+      pluginCleanupDays = $Prefs.pluginCleanupDays
+    }
+  })
+
+  const handleCleanupScheduleChange = async (newDays: number) => {
+    const wasDisabled = previousCleanupDays === -1
+    const isNowEnabled = newDays !== -1
+
+    if (wasDisabled && isNowEnabled) {
+      console.log('[Settings] Cleanup enabled - running initial scan')
+      await autoCleanupPlugins()
+    }
+
+    previousCleanupDays = newDays
+  }
+
+  let cleanupOptions = $derived([
+    {
+      key: -1,
+      value: 'Never',
+      selected: `${pluginCleanupDays}` == '-1',
+    },
+    {
+      key: 1,
+      value: 'Daily',
+      selected: `${pluginCleanupDays}` == '1',
+    },
+    {
+      key: 3,
+      value: 'Every Few Days',
+      selected: `${pluginCleanupDays}` == '3',
+    },
+    {
+      key: 7,
+      value: 'Weekly',
+      selected: `${pluginCleanupDays}` == '7',
+    },
+    {
+      key: 14,
+      value: 'Every Other Week',
+      selected: `${pluginCleanupDays}` == '14',
+    },
+    {
+      key: 30,
+      value: 'Monthly',
+      selected: `${pluginCleanupDays}` == '30',
+    },
+  ])
+
+  let selectedCleanupLabel = $derived((cleanupOptions.find((s) => s.selected) || {}).value)
+
   const showStorageOptions = () => {
     useStorageSelectMenu({
       current: $Prefs.storageType,
@@ -64,10 +135,7 @@
     })
   }
 
-  let storageDetails: StorageEngineType
-  $: {
-    storageDetails = getStorageEngineDetails($Prefs.storageType)
-  }
+  let storageDetails = $derived(getStorageEngineDetails($Prefs.storageType))
 </script>
 
 <List solo className="mb-4" title={Lang.t('settings.my-data', 'My Data')} outside>
@@ -81,6 +149,8 @@
         🗄
       {:else if $Prefs.storageType === 'firebase'}
         ☁️
+      {:else if $Prefs.storageType === 'nomie-server'}
+        ☁️
       {:else if $Prefs.storageType == 'pouchdb'}
         🛋
       {/if}
@@ -91,6 +161,10 @@
   {#if $Prefs.storageType === 'pouchdb'}
     <Divider left={32} />
     <PouchdbSettings />
+  {/if}
+  {#if $Prefs.storageType === "nomie-server"}
+    <Divider left={32} />
+    <NomieServer />
   {/if}
 </List>
 
@@ -134,6 +208,29 @@
     title={Lang.t('settings.update-last-used-date', 'Update Last-Used Dates')}
     on:click={updateLastUsedDates}
   />
+
+  <ListItem
+    bottomLine={16}
+    detail
+    clickable
+    title="Clean Plugin Database"
+    description="Find and remove duplicate plugin settings"
+    on:click={openPluginDedupModal}
+  />
+
+  <ListItem title="Auto-PluginDB-Cleanup Schedule">
+    <div slot="right">
+      <SelectPop
+        id="plugin-cleanup-schedule"
+        value={selectedCleanupLabel}
+        on:change={(evt) => {
+          $Prefs.pluginCleanupDays = evt.detail.key
+          handleCleanupScheduleChange(evt.detail.key)
+        }}
+        options={cleanupOptions}
+      />
+    </div>
+  </ListItem>
 </List>
 <!-- <p class="list-note -mt-2 mb-2">
   {Lang.t(

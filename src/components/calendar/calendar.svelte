@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Port and modification from vue-n-calendar
   // https://github.com/maryayi/vue-sweet-calendar/blob/master/src/components/Calendar.vue
@@ -22,38 +24,25 @@
 
   import NextPrevCal from '../../components/next-prev-cal/next-prev-cal.svelte'
   import appConfig from '../../config/appConfig'
-  import { Prefs, PrefsWeekStartTypes } from '../../domains/preferences/Preferences'
+  import { Prefs, type PrefsWeekStartTypes } from '../../domains/preferences/Preferences'
 
   const console = new Logger('📅 calendar/calendar')
   const dispatch = createEventDispatcher()
 
   // Props
-  export let initialDate = dayjs()
-  export let size = 'md'
-  export let className = ''
-  export let style = ''
-  export let height: any = undefined
-  export let width: any = undefined
+  let firstDayOfWeek = $state<'sunday' | 'monday'>('sunday')
 
-  let firstDayOfWeek: 'sunday' | 'monday' = 'sunday'
+  // Extract props first - initialDate is needed below
+  const { initialDate, size, className, style, height, width, events, offDays, showHeader, showControls, showCalControl, showDetails, tracker, compact, color = appConfig.primary_color } = $props()
 
   // Updating to be react...
-  $: firstDayOfWeek = $Prefs.weekStarts
-
-  // export let eventCategories = [];
-  export let events = []
-  export let offDays = [[1, 7]]
-  export let showHeader = true
-  export let showControls = true
-  export let showCalControl = true
-  export let showDetails = true
-  export let tracker = null
-  export const color: string = appConfig.primary_color
-  export let compact: boolean = false
+  $effect(() => {
+    firstDayOfWeek = $Prefs.weekStarts
+  })
 
   // Data
-  export let state = {
-    date: initialDate.format ? initialDate : dayjs(initialDate),
+  let state = $state({
+    date: initialDate && initialDate.format ? initialDate : dayjs(initialDate),
     selectedDate: undefined, //initialDate.format ? initialDate : dayjs(initialDate)
     today: new Date(),
     weekdays: null,
@@ -63,9 +52,9 @@
       negative: 0,
       neutral: 0,
     },
-  }
+  })
 
-  let mounted = false
+  let mounted = $state(false)
 
   onMount(() => {
     mounted = true
@@ -75,28 +64,32 @@
     mounted = false
   })
 
-  let days: Array<any>
+  let days = $state<Array<any>>([])
 
-  let displayMonthFormat = 'MMMM'
+  let displayMonthFormat = $state('MMMM')
 
-  $: if (compact) {
-    displayMonthFormat = 'MMM'
-  } else {
-    displayMonthFormat = 'MMMM'
-  }
+  $effect(() => {
+    if (compact) {
+      displayMonthFormat = 'MMM'
+    } else {
+      displayMonthFormat = 'MMMM'
+    }
+  })
 
-  let startWeekDayOfMonth = state.date.startOf('month').toDate().getDay() + 1
-  let numberOfDays = state.date.daysInMonth()
+  let startWeekDayOfMonth = $state(state.date.startOf('month').toDate().getDay() + 1)
+  let numberOfDays = $state(state.date.daysInMonth())
 
-  let selectedMonthName = state.date.format(displayMonthFormat)
-  let selectedYear = state.date.format('YYYY')
-  let monthStartDate = dayjs(state.date).startOf('month')
+  let selectedMonthName = $state(state.date.format(displayMonthFormat))
+  let selectedYear = $state(state.date.format('YYYY'))
+  let monthStartDate = $state(dayjs(state.date).startOf('month'))
 
   // If the initial date is set, convert to dayjs date
-  $: if (initialDate) {
-    state.date = dayjs(initialDate)
-    state.weekdays = methods.generateWeekdayNames(firstDayOfWeek)
-  }
+  $effect(() => {
+    if (initialDate) {
+      state.date = dayjs(initialDate)
+      state.weekdays = methods.generateWeekdayNames(firstDayOfWeek)
+    }
+  })
 
   function init() {
     lastDate = state.date
@@ -127,10 +120,12 @@
 
   // If date change - do the magic.
 
-  let lastDate = null
-  $: if (state.date && state.date != lastDate) {
-    init()
-  }
+  let lastDate = $state(null)
+  $effect(() => {
+    if (state.date && state.date != lastDate) {
+      init()
+    }
+  })
 
   // Methods
   const methods = {
@@ -169,6 +164,9 @@
       let total = 0
       let score = undefined
       // Filter values, get only this days
+      if (!events || events.length === 0) {
+        return {}
+      }
       let values = events
         .filter((row) => {
           return day.toDate().toDateString() === new Date(row.end).toDateString()

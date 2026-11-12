@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -6,18 +8,20 @@
   import IonIcon from '../icon/ion-icon.svelte'
   import { ChevronBackOutline, ChevronForwardOutline } from '../icon/nicons'
 
-  export let date: number
-
   const dispatch = createEventDispatcher()
-  let theDate = new Date()
 
   const dayMonth = $Prefs.use24hour ? 'DD/MM' : 'MM/DD'
+  const { date } = $props()
 
-  $: if (date && date !== theDate.getTime()) {
-    theDate = new Date(date)
-  } else if (!date && theDate.getTime()) {
-    theDate = new Date()
-  }
+  let theDate = $state(new Date())
+
+  $effect(() => {
+    if (date && date !== theDate.getTime()) {
+      theDate = new Date(date)
+    } else if (!date && theDate.getTime()) {
+      theDate = new Date()
+    }
+  })
 
   const addDate = () => {
     theDate = dayjs(theDate).add(1, 'day').toDate()

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -9,19 +11,18 @@
 
   import ProgressBar from '../progress-bar/progress-bar.svelte'
   import TimeRangeText from '../time-range/time-range-text.svelte'
-  export let log: NLog
-  export let trackable: Trackable
-  export let max: number = undefined
-  export let className: string = ''
-  export let hideTime: boolean = false;
 
-  let value: number = 0
+  const { log, trackable, max, className, hideTime } = $props()
+
+  let value = $state(0)
   const dateFormats = getDateFormats()
   const dispatch = createEventDispatcher()
 
-  $: if (log || trackable) {
-    value = trackable.tracker ? log.getTrackerValue(trackable.tracker?.tag) : 1
-  }
+  $effect(() => {
+    if (log || trackable) {
+      value = trackable.tracker ? log.getTrackerValue(trackable.tracker?.tag) : 1
+    }
+  })
 </script>
 
 <button

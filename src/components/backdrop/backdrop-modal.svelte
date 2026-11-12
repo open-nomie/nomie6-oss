@@ -1,8 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let className: string = ''
-  export let mainClass: string = ''
-  export let headerClass: string = ''
-  export let style: string = ''
+
+
+  const { className, mainClass, headerClass, style } = $props()
 </script>
 
 <div class="bd-modal {className}" {style}>
@@ -39,7 +40,6 @@
     @apply relative;
     max-height: calc(100vh - 50px);
     @apply flex-grow flex-shrink;
-
 
   }
 

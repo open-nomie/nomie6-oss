@@ -1,6 +1,8 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { Router, Route } from 'svelte-navigator'
-  import FileBrowser from './file-browser.svelte'
+  import { Router, Route } from '../vendor/svelte-navigator'
+  import FileBrowser from '../components/file-browser/file-browser.svelte'
   // import DynamicPage from '../DynamicPage.svelte'
   // import Messages from './Messages.svelte'
   import Csv from './export/csv.svelte'
@@ -14,6 +16,7 @@
   import Timeline from './Timeline.svelte'
   import Goals from './Goals.svelte'
   import Analytics from './Analytics.svelte'
+  import AfterNomie from './AfterNomie.svelte'
   import Tests from './tests/tests.svelte'
   import Uoms from './Uoms.svelte'
   import Awards from './Awards.svelte'
@@ -23,6 +26,8 @@
   import Settings from './settings.svelte'
   import Export from './export.svelte'
   import Setup from './setup.svelte'
+  import TestAi from './test-ai.svelte'
+  import NomieBlockly from './nomie-blockly.svelte'
 </script>
 
 <Router>
@@ -51,7 +56,12 @@
   <Route path="/analytics">
     <Analytics />
   </Route>
-
+  <Route path="/afternomie">
+    <AfterNomie />
+  </Route>
+  <Route path="/nomie-blockly">
+    <NomieBlockly />
+  </Route>
   <Route path="/timeline">
     <Timeline />
   </Route>
@@ -94,10 +104,17 @@
   <Route path="/settings/export/csv">
     <Csv />
   </Route>
+  <Route path="/files">
+    <FileBrowser />
+  </Route>
+
   <Route path="/files/*path" let:params>
     <FileBrowser path={params.path} />
   </Route>
   <Route path="/setup">
     <Setup />
+  </Route>
+  <Route path="/test-ai">
+    <TestAi />
   </Route>
 </Router>

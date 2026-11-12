@@ -1,16 +1,22 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { onMount } from 'svelte'
   import AppTabs from './tabs.svelte'
   import { Device } from '../../store/device-store'
-  export let title = 'Welcome'
-  export let refresh = undefined
-  export let showTabs = true
 
-  $: if (title) {
-    document.title = `Nomie ${title}`
-  }
+  const { title = 'Welcome', refresh = undefined, showTabs = true } = $props<{
+    title?: string
+    refresh?: any
+    showTabs?: boolean
+  }>()
 
-  onMount(async () => {
+  $effect(() => {
+    if (title) {
+      document.title = `Nomie ${title}`
+    }
+  })
+
+  $effect(() => {
     Device.scrollToTop()
   })
 </script>

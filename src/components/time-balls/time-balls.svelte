@@ -1,6 +1,8 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let hours = []
-  export let color = undefined
+
+  const { hours, color } = $props()
 </script>
 
 <div class="time-balls">

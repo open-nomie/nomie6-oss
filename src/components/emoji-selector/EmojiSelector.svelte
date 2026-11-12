@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -10,15 +12,12 @@
   import ButtonGroup from '../button-group/button-group.svelte'
   import Panel from '../panel/panel.svelte'
 
-  export let maxRecents = 50
-  export let autoClose = true
 
-  let variantsVisible = false
-
-  let variants
-  let currentEmoji
-  let searchText
-  let recentEmojis = JSON.parse(localStorage.getItem('recent-emojis')) || []
+  let variantsVisible = $state(false)
+  let variants = $state(undefined)
+  let currentEmoji = $state(undefined)
+  let searchText = $state(undefined)
+  let recentEmojis = $state(JSON.parse(localStorage.getItem('recent-emojis')) || [])
 
   const dispatch = createEventDispatcher()
 
@@ -92,8 +91,10 @@
     })
   }
 
-  let selectedIndex = 1
-  let selectedCategory = 'People'
+  let selectedIndex = $state(1)
+  let selectedCategory = $state('People')
+
+  const { maxRecents, autoClose } = $props()
 </script>
 
 <svelte:body on:keydown={onKeyDown} />

@@ -1,5 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import dayjs from 'dayjs'
   import type { Dayjs } from 'dayjs'
 
@@ -22,22 +24,16 @@
     getTrackableDetailPopButton,
   } from '../../modules/pop-buttons/pop-buttons'
 
+  let { date = $bindable(new Date()), height = 320, className = '', size = 'sm' } = $props<{
+    date?: Date
+    height?: number
+    className?: string
+    size?: 'sm' | 'md' | 'lg' | 'auto'
+  }>()
+
   const dispatch = createEventDispatcher()
 
-  export let date: Date = new Date()
-  export let height: number = 320
-  export let className: string = ''
-
-  export let size: 'sm' | 'md' | 'lg' | 'auto' = 'sm'
-
-  // type ContextDetails = {
-  //   date: Date
-  //   trackable?: Trackable
-  //   value?: number
-  // }
-
-  let boundingBox: HTMLElement
-  // let focused: ContextDetails
+  let boundingBox = $state<HTMLElement | undefined>(undefined)
 
   interface ContextMapWrapper {
     usage: TrackableUsage
@@ -53,41 +49,23 @@
     marks: Array<ContextMapWrapper>
   }
 
-  let contextItems: Array<TrackableUsage> = []
+  let contextItems = $state<Array<TrackableUsage>>([])
+  let width = $state(320)
+  let start = $state<Date | undefined>(undefined)
+  let end = $state<Date | undefined>(undefined)
+  let rowHeight = $state(0)
+  let contextMap = $state<Array<ContextTrackableUsage>>([])
+  let lastDate = $state<Date | undefined>(undefined)
 
-  // function focus(_context: any) {
-  //   focused = _context
-  // }
+  $effect(() => {
+    if (date && date !== lastDate) {
+      lastDate = date
+      start = dayjs(date).subtract(30, 'day').toDate()
+      end = dayjs(date).add(30, 'day').toDate()
+      generateContextMap()
+    }
+  })
 
-  // function clearFocus() {
-  //   focused = undefined;
-  // }
-
-  let width: number = 320
-
-  let start: Date
-  let end: Date
-
-  let rowHeight: number = 0
-
-  let contextMap: Array<ContextTrackableUsage> = []
-
-  /**
-   * Grid of 60
-   * [ ]  [ ]  [ ]  [ ]  [ ]  [ ]
-   */
-  let lastDate: Date
-  $: if (date && date !== lastDate) {
-    // days = []
-    lastDate = date
-    start = dayjs(date).subtract(30, 'day').toDate()
-    end = dayjs(date).add(30, 'day').toDate()
-    generateContextMap()
-  }
-
-  /**
-   * Generate the Needed Context Chart - should this be in a store?
-   */
   async function generateContextMap() {
     const trackables = $TrackableStore.trackables
     const frameStart = dayjs(start)
@@ -102,7 +80,6 @@
       : []
 
     const final: Array<ContextTrackableUsage> = []
-    // Loop over context items  (1 per trackable)
     contextItems.forEach((contextUsage: TrackableUsage) => {
       const node: ContextTrackableUsage = {
         trackable: contextUsage.trackable,
@@ -110,7 +87,6 @@
       }
       const trackable = contextUsage.trackable
       ;(contextUsage.dates || []).forEach((loopDate, index) => {
-        // Get Reverb Days
         let parsedValue =
           trackable.ctx.duration > trackable.value ? trackable.ctx.duration : trackable.value || trackable.ctx.duration
 
@@ -141,7 +117,7 @@
     }
   }
 
-  onMount(() => {
+  $effect(() => {
     if (boundingBox) {
       width = boundingBox.offsetWidth
       height = boundingBox.offsetHeight

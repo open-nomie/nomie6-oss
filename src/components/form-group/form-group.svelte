@@ -1,9 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let className: string = ''
-  export let style: string = ''
-  export let solid: boolean = true
-  export let tint: boolean = false
-  export let pad: boolean = false
+
+
+  const { className, style, solid, tint, pad } = $props()
 </script>
 
 <style lang="postcss" global>

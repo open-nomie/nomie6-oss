@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { slide } from 'svelte/transition'
   import dayjs from 'dayjs'
@@ -15,22 +17,20 @@
 
   const dispatch = createEventDispatcher()
 
-  export let date: any = new Date().getTime() // prop
-  export let opened: boolean = false
-  export let style: string = ''
-  export let calendarClass: string = ''
-  export let calendarPosition: 'top' | 'bottom' = 'bottom'
+  let lastDate = $state(undefined)
+  let _date = $state<Dayjs>(undefined)
+  let _opened = $state(false)
+  let hide = $state(false)
 
-  let lastDate
-  let _date: Dayjs // local
-  let _opened: boolean = opened
-  let hide = false
+  let { date = $bindable(), opened, style, calendarClass, calendarPosition } = $props()
 
-  $: if (date && date !== lastDate) {
-    init()
-  } else if (!date && lastDate) {
-    init()
-  }
+  $effect(() => {
+    if (date && date !== lastDate) {
+      init()
+    } else if (!date && lastDate) {
+      init()
+    }
+  })
 
   async function toggleOpen(): Promise<void> {
     _opened = !_opened
@@ -92,7 +92,7 @@
       />
     </div>
     {#if _opened}
-      <div class="view date" transition:slide={{ delay: 0, duration: 300, easing: quintOut }}>
+      <div class="view date" transition:slide|global={{ delay: 0, duration: 300, easing: quintOut }}>
         <!-- <Calendar4 date={_date.toDate()} on:dateChange={(evt)=>{
           let calDate = dayjs(evt.detail).hour(_date.hour()).minute(_date.minute())
             setDate(calDate)

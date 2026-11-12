@@ -1,19 +1,20 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import CheckmarkCircle from '../../n-icons/CheckmarkCircle.svelte'
 import CheckmarkCircleOutline from '../../n-icons/CheckmarkCircleOutline.svelte';
   import IonIcon from '../icon/ion-icon.svelte'
 
-  export let value
-  export let colors: Array<string> = ['green', 'orange', 'red', 'blue']
-  export let size = 24
-  export let className = ''
   const dispatch = createEventDispatcher()
+  const { value, colors, size, className } = $props()
 
-  let selected
-  $: if (value && value !== selected) {
-    selected = value
-  }
+  let selected = $state(undefined)
+  $effect(() => {
+    if (value && value !== selected) {
+      selected = value
+    }
+  })
 </script>
 
 <div class="tiny-color-picker flex {className}">

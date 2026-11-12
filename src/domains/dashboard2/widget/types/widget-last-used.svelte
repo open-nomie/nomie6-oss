@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -10,22 +12,22 @@
   import { getDateFormats } from '../../../preferences/Preferences'
   import { UsageStore } from '../../../usage/UsageStore'
 
-  export let widget: WidgetClass
-  export let trackable: Trackable
-  export let usage: TrackableUsage
+  const { widget = $bindable(), trackable = $bindable(), usage = $bindable() } = $props()
 
-  let dateFormat = getDateFormats()
-  let lastUsedDate: Date
-  let lastUsedValue: number
-  let last: undefined | { d: string; v: number }
+  let dateFormat = $state(getDateFormats())
+  let lastUsedDate = $state<Date | undefined>(undefined)
+  let lastUsedValue = $state<number | undefined>(undefined)
+  let last = $state<undefined | { d: string; v: number }>(undefined)
 
-  $: if ($UsageStore[trackable.tag]) {
-    last = $UsageStore[trackable.tag].last
-    if (last) {
-      lastUsedDate = new Date(last.d)
-      lastUsedValue = last.v
+  $effect(() => {
+    if (trackable && $UsageStore[trackable.tag]) {
+      last = $UsageStore[trackable.tag].last
+      if (last) {
+        lastUsedDate = new Date(last.d)
+        lastUsedValue = last.v
+      }
     }
-  }
+  })
 </script>
 
 {#if widget}

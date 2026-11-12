@@ -23,13 +23,13 @@ export class ContextClass {
     if (starter && typeof starter === 'string') {
       this.tag = starter
       this.label = starter.replace('+', '')
-    } else if (starter && typeof starter === 'object' && starter.tag) {
+    } else if (starter && typeof starter === 'object') {
       this.tag = starter.tag
       this.label = starter.label || starter.tag
       this.duration = starter.duration || 1
       this.avatar = starter.avatar
       this.emoji = starter.emoji
-      this.color = starter.color || strToColor(this.tag)
+      this.color = starter.color
     }
   }
 

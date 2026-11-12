@@ -1,17 +1,18 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Lang } from '../../store/lang'
 
   import dayjs from 'dayjs'
   import Button from '../../components/button/button.svelte'
   import { Prefs } from '../preferences/Preferences'
-  import { onMount } from 'svelte'
   import Container from '../../components/container/container.svelte'
 import Badge from '../../components/badge/badge.svelte'
 import { Interact } from '../../store/interact';
 
-  let initialized: boolean = false
+  let initialized = $state(false)
 
-  onMount(() => {
+  $effect(() => {
     if (!initialized) {
       if (new Date(new Date().setHours(20)).toLocaleTimeString().search('PM') === -1) {
         $Prefs.use24hour = true

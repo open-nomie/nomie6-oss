@@ -1,12 +1,14 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type NLog from '../nomie-log/nomie-log'
-  import { logsToTimeline, TimelineFilterProps, TimelineItemType } from './timeline-utils'
+  import { logsToTimeline, type TimelineFilterProps, type TimelineItemType } from './timeline-utils'
 
   import { TrackableStore } from '../trackable/TrackableStore'
   import TrackablePill from '../trackable/trackable-pill.svelte'
 
   import { getDateFormats } from '../preferences/Preferences'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, untrack } from 'svelte'
 
   import { showTrackablePopmenu } from '../board/boardActions'
 
@@ -27,40 +29,41 @@
   import { textToId } from '../../utils/text/text'
 
   import ListItem from '../../components/list-item/list-item.svelte'
-  
 
-  export let logs: Array<NLog> = []
-  export let filters: TimelineFilterProps = {}
+
+  const { logs = [], filters = $bindable({}) } = $props<{ logs?: Array<NLog>, filters?: TimelineFilterProps }>()
   const dispatch = createEventDispatcher()
 
-  let timeline: Array<TimelineItemType> = []
-  let dateFormats = getDateFormats()
+  let timeline: Array<TimelineItemType> = $state([])
+  let dateFormats = $state(getDateFormats())
 
-  let listStartIndex: number
-  let listEndIndex: number
+  $effect(() => {
+    if ($TrackableStore?.trackables && logs && logs.length > 0) {
+      const newTimeline = logsToTimeline(logs, $TrackableStore.trackables)
+      // Use untrack to prevent the assignment from triggering dependent effects
+      untrack(() => {
+        timeline = newTimeline
+      })
+    }
+  })
 
-  $: if ($TrackableStore) {
-    timeline = logsToTimeline(logs, $TrackableStore.trackables)
-  }
-
-  let topItem: TimelineItemType | undefined = undefined
-
-  // let lastEndIndex = 0
-
-  $: if (listEndIndex === timeline.length && timeline.length > 0) {
-    dispatch('endOfItems')
-  }
+  let topItem: TimelineItemType | undefined = $state(undefined)
 </script>
 
 <NvirtualList
   on:topItem={(evt) => {
-    topItem = evt.detail
+    untrack(() => {
+      topItem = evt.detail
+    })
     dispatch('scrollItem', evt.detail)
   }}
   items={timeline}
   let:item
-  bind:start={listStartIndex}
-  bind:end={listEndIndex}
+  on:end={() => {
+    // The list has shown its last item: ask the loader for older entries.
+    // (NvirtualList sends 'end', not 'update', so the view has to listen for it.)
+    dispatch('endOfItems')
+  }}
 >
   <Container size="md">
     <header class="text-center px-6 items-center mt-6 mb-2 font-bold text-gray-900 dark:text-gray-100">
@@ -105,7 +108,7 @@
                   value={usageMapItem.usage.trackable.formatValue(
                     usageMapItem.usage.trackable.tallyValues(usageMapItem.usage.values)
                   )}
-                  hideValue={usageMapItem.usage.trackable.type === 'person'}
+                  hideValue={usageMapItem.usage.trackable.type === 'person' || usageMapItem.usage.trackable.type === 'pointer'}
                   trackable={usageMapItem.usage.trackable}
                   size={$Device.width < 350 ? 34 : 42}
                   className="stiff z-10 hover:scale-105 focus:scale-95 transition-all transform duration-200 mb-1 mr-1  lg:mr-2 shadow-md lg:col-span-3 md:col-span-6 col-span-6 timeline-pill w-full"

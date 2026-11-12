@@ -70,14 +70,19 @@ function checkCondition(condition: ICondition, value: number, endTime: Date): IC
 
 export default function ScoreTracker(value: number, tracker: TrackerClass, time?: Date) {
   let score = 0
-  if (tracker.score && !tracker.score_calc) {
+
+  // Use static score if not custom and no conditions
+  if (tracker.score && tracker.score !== 'custom' && !tracker.score_calc) {
     score = parseInt(`${tracker.score}`)
-  } else if (tracker.score_calc) {
+  } else if (tracker.score_calc && tracker.score_calc.length > 0) {
+    // Use custom conditions if they exist
     let conditionsMet = tracker.score_calc.map((condition) => {
       return checkCondition(condition, value, time)
     })
+
     let met = conditionsMet.filter((condition) => condition.true)
     score = met.length ? parseFloat(`${met[0].score}`) : score
   }
+
   return score
 }

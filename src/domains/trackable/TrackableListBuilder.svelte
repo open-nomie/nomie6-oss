@@ -1,10 +1,12 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { AllTrackables, TrackableStore } from './TrackableStore'
   import { getTrackerInputAsString } from '../tracker/input/TrackerInputStore'
   import { MenuOutline, SearchIcon } from '../../components/icon/nicons'
   import { selectTrackables } from './trackable-selector/TrackableSelectorStore'
   import { showToast } from '../../components/toast/ToastStore'
-  import { strToToken, Token, tokenizeLite } from '../../modules/tokenizer/lite'
+  import { strToToken, type Token, tokenizeLite } from '../../modules/tokenizer/lite'
   import { tokenToTrackable } from '../../modules/tokenizer/tokenToTrackable'
   import { Trackable } from './Trackable.class'
   import { wait } from '../../utils/tick/tick'
@@ -19,20 +21,21 @@
   import SortableList2 from '../../components/sortable-list/sortable-list2.svelte'
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
 
-  export let value: string = ''
-  export let className: string = ''
+  let { value = $bindable(), className = '', onValueChange } = $props<{ value?: string, className?: string, onValueChange?: (newValue: string) => void }>()
 
-  let trackables: Array<Trackable> = []
-  let manualAdd: string = ''
-  let ready: boolean = true
+  let trackables: Array<Trackable> = $state([])
+  let manualAdd: string = $state('')
+  let ready: boolean = $state(true)
 
-  let lastValueHash: any
-  $: if (value && value !== lastValueHash) {
-    lastValueHash = value
-    trackables = tokenizeLite(`${value || ''}`).map((token) => {
-      return tokenToTrackable(token, $AllTrackables)
-    })
-  }
+  let lastValueHash: any = $state(undefined)
+  $effect(() => {
+    if (value && value !== lastValueHash) {
+      lastValueHash = value
+      trackables = tokenizeLite(`${value || ''}`).map((token) => {
+        return tokenToTrackable(token, $AllTrackables)
+      })
+    }
+  })
 
   // Adding a token to the trackables array.
   async function addToken(token: Token) {
@@ -73,15 +76,17 @@
   }
 
   // Updating the value of the trackable list builder.
-  async function update() {
-    value = trackablesToNote()
-    ready = false
-    await wait(10)
-    ready = true
+  function update() {
+    const newValue = trackablesToNote()
+    value = newValue
+    // Also notify parent through callback to ensure update is received
+    if (onValueChange) {
+      onValueChange(newValue)
+    }
   }
 
   // Removing a trackable from the trackables array.
-  async function remove(trackable: Trackable) {
+  function remove(trackable: Trackable) {
     trackables = trackables.filter((d: Trackable) => {
       return d.tag !== trackable.tag
     })
@@ -113,8 +118,12 @@
       if (value) {
         const updatedTokens = trackables.map((t, index) => {
           if (t.tag == trackable.tag) {
-            t.value = value.value
-            t.tracker.default = value.value
+            // Create new Trackable instance to trigger Svelte 5 reactivity
+            const newTrackable = new Trackable({
+              ...t,
+              value: value.value,
+            })
+            return newTrackable
           }
           return t
         })
@@ -160,6 +169,7 @@
       key="id"
       direction="y"
       sortable={true}
+      handleClass="trackable-drag-handle"
       {className}
       items={trackables}
       on:update={(evt) => {
@@ -182,12 +192,20 @@
         {item.label}
         <div slot="right" class="flex items-center space-x-2">
           {#if item.type == 'tracker' && item.tracker}
-            <Badge on:click={() => updateDefault(item)} pad value={item.formatValue(item.tracker.default)} />
+            <Badge on:click={() => updateDefault(item)} pad value={item.formatValue(item.value)} />
           {/if}
-          <IonIcon icon={MenuOutline} className="text-gray-500" />
+          <div class="trackable-drag-handle cursor-move">
+            <IonIcon icon={MenuOutline} className="text-gray-500" />
+          </div>
         </div>
       </ListItem>
       <Divider inset />
     </SortableList2>
   {/if}
 </div>
+
+<style lang="postcss">
+  :global(.trackable-list-builder-bound .sl2-grid .item) {
+    @apply h-auto;
+  }
+</style>

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { OfflineQueue } from '../../store/offline-queue-store'
   import Text from '../text/text.svelte'
@@ -12,7 +14,7 @@
   import IonIcon from '../icon/ion-icon.svelte'
 
   // declare var window: any;
-  let showLogs: boolean = false
+  let showLogs = $state(false)
 </script>
 
 {#if $OfflineQueue.logs && $OfflineQueue.logs.length}

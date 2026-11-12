@@ -22,6 +22,15 @@ const types: TrackerTypesConfig = {
       `Tally each time it's used. Good for: pooped, gluten, made bed, showered.`
     ),
   },
+  habit: {
+    id: 'habit',
+    emoji: '🔄',
+    label: Lang.t('tracker.type.habit', 'Habit'),
+    description: Lang.t(
+      'tracker.type.habit_description',
+      `Track your habits daily; either you did something...or not. Good for: meditation, tooth brush, praying.`
+    ),
+  },
   value: {
     id: 'value',
     emoji: '🔢',
@@ -43,7 +52,7 @@ const types: TrackerTypesConfig = {
     label: Lang.t('tracker.type.picker', 'Pick List'),
     description: Lang.t(
       'tracker.type.picker_description',
-      'Create a pick list of anything. Including #trackers, @people and +context'
+      'Create a pick list of anything. Including #trackers, @people, ^pointers and +context'
     ),
   },
   timer: {

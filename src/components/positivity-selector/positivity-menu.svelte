@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { getEmojiFromScore } from '../../utils/positivity/positivity'
 
@@ -5,17 +7,12 @@
   import PositivitySelector from './positivity-selector.svelte'
   import IonIcon from '../icon/ion-icon.svelte'
   import { CloseOutline } from '../icon/nicons'
-  export let score = 0
-  export let closeBackgroundTap: boolean = false
-  export let className = ''
-  export let size = 'lg'
-  export let y = '60%'
-  export let direction: 'horizontal' | 'vertical' = 'horizontal'
 
-  let selected: any
-  let showMenu: boolean = false
-  $: selected = getEmojiFromScore(score)
+
+  let showMenu: boolean = $state(false)
   let triggerButton
+
+  const selected = $derived(getEmojiFromScore(score))
 
   let id: string = `ps-${Math.random()}`
 
@@ -30,6 +27,8 @@
     }
     showMenu = !showMenu
   }
+
+  const { score, closeBackgroundTap, className, size, y, direction } = $props()
 </script>
 
 <div

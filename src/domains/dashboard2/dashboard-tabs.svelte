@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import HScroller from '../../components/h-scroller/h-scroller.svelte'
   import { DashStore, selectDashboardByIndex } from './DashStore'

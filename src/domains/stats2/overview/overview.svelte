@@ -1,7 +1,8 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
-  import { onMount } from 'svelte'
   import Badge from '../../../components/badge/badge.svelte'
 
   import ListItem from '../../../components/list-item/list-item.svelte'
@@ -34,14 +35,13 @@
   // import OverviewTimer from './overview-timer.svelte'
   // import OverviewValue from './overview-value.svelte'
 
-  export let trackable: Trackable
-  export let usage: TrackableUsage
-  export let className: string = ''
+  const { trackable, usage, className = '' } = $props()
+
 
   const dateFormats = getDateFormats()
 
-  let usageByDay: TrackableUsage
-  let lastUsageData: TrackableLastUsedType
+  let usageByDay = $state<TrackableUsage | undefined>(undefined)
+  let lastUsageData = $state<TrackableLastUsedType | undefined>(undefined)
 
   const openLatest = async (usage: TrackableLastUsedType) => {
     const date = usage.last.d
@@ -59,9 +59,8 @@
     let chartUsage = new TrackableUsage({ ...usage, ...{ trackable } })
     usageByDay = chartUsage.byDay
     if ($Stats2Store.time === '1y') {
-      chartUsage = chartUsage.groupBy('month', 'YYYY-MM-W')
-    // } else if ($Stats2Store.time === '6m') {
-      // chartUsage = chartUsage.groupBy('day', 'YYYY-MM-W')
+      chartUsage = chartUsage.groupBy('month', 'MMM YYYY')
+
     } else {
       chartUsage = chartUsage.byDay
     }
@@ -74,17 +73,19 @@
     // localUsage = chartUsage.groupBy(timeDetails.unit, timeDetails.groupByFormat)
   }
 
-  let lastUsageHash = ''
-  let mounted: boolean = false
-  let localUsage: TrackableUsage
-  $: if (objectHash(usage) !== lastUsageHash && mounted) {
-    lastUsageHash = objectHash(usage)
-    // totalScore =
-    renderChart()
-  }
+  let lastUsageHash = $state('')
+  let mounted = $state(false)
+  let localUsage = $state<TrackableUsage | undefined>(undefined)
 
-  // let unsub
-  onMount(() => {
+  $effect(() => {
+    if (objectHash(usage) !== lastUsageHash && mounted) {
+      lastUsageHash = objectHash(usage)
+      // totalScore =
+      renderChart()
+    }
+  })
+
+  $effect(() => {
     mounted = true
   })
   // onDestroy(() => unsub())

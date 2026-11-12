@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Prefs } from './../preferences/Preferences'
   import Title from './../../components/title/title.svelte'
@@ -8,7 +10,8 @@
   import type { Template } from './templates-utils'
   import { useTemplate } from './templates-svelte-helpers'
 
-  export let template: Template
+
+  const { template = $bindable() } = $props()
 </script>
 
 <div class="template-view">
@@ -81,6 +84,20 @@
         {#each template.goals as goal}
           <div class="pill">
             <div class="ntitle">{goal.tag} {goal.comparison} {goal.target}</div>
+            <div class="text-xs text-gray-500 whitespace-nowrap" />
+          </div>
+        {/each}
+      </div>
+    </section>
+  {/if}
+  {#if template.pivots.length}
+    <section>
+      <Title className="mb-2">Pivots</Title>
+
+      <div class="flex flex-wrap">
+        {#each template.pivots as pivot}
+          <div class="pill">
+            <div class="ntitle">{pivot.emoji}{pivot.tag}</div>
             <div class="text-xs text-gray-500 whitespace-nowrap" />
           </div>
         {/each}

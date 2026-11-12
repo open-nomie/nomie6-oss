@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   
   import type { NLog } from './../../nomie-log/nomie-log'
@@ -10,9 +12,9 @@
   import FileUploader from './../../../components/file-uploader/file-uploader.svelte'
 
   import ImportLoader from '../../../modules/import/import-loader'
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../../vendor/svelte-navigator'
   import { truncateText } from '../../../utils/text/text'
-  import CSVRImport, { CsvTemplateStore, IImportConfig } from './csv-import-helper'
+  import CSVRImport, { CsvTemplateStore, type IImportConfig } from './csv-import-helper'
   import { onMount } from 'svelte'
 
   import Button from '../../../components/button/button.svelte'
@@ -34,25 +36,18 @@
   import ToolbarGrid from '../../../components/toolbar/toolbar-grid.svelte'
 import Divider from '../../../components/divider/divider.svelte'
 
-  let stepId: string = 'home'
-  let templates: Array<IImportConfig> = []
-  let activeImporter: CSVRImport
-  let activeMapIndex
-  let previewIndex = 0
-  let previewRow: Array<any>
-  let refreshing = false
-  let previewLog: NLog
-  let listMode = 'list'
-  let expandFields = false
+  let { id, fileUpload = $bindable() } = $props()
 
-  export let id: string = 'csv-import'
-
-  export let fileUpload:
-    | undefined
-    | {
-        data: string
-        file: File
-      }
+  let stepId: string = $state('home')
+  let templates: Array<IImportConfig> = $state([])
+  let activeImporter: CSVRImport = $state(undefined)
+  let activeMapIndex = $state(undefined)
+  let previewIndex = $state(0)
+  let previewRow: Array<any> = $state(undefined)
+  let refreshing = $state(false)
+  let previewLog: NLog = $state(undefined)
+  let listMode = $state('list')
+  let expandFields = $state(false)
 
   if (fileUpload) {
     activeImporter = activeImporter || new CSVRImport({})
@@ -61,13 +56,15 @@ import Divider from '../../../components/divider/divider.svelte'
     stepId = 'note'
   }
 
-  $: if (activeImporter && activeImporter.parsed && activeImporter.parsed.data) {
-    if (activeImporter.length() > 1 && previewIndex == 0) {
-      previewIndex = 1
+  $effect(() => {
+    if (activeImporter && activeImporter.parsed && activeImporter.parsed.data) {
+      if (activeImporter.length() > 1 && previewIndex == 0) {
+        previewIndex = 1
+      }
+      previewRow = activeImporter.parsed.data[previewIndex]
+      previewLog = activeImporter.toLog(previewRow)
     }
-    previewRow = activeImporter.parsed.data[previewIndex]
-    previewLog = activeImporter.toLog(previewRow)
-  }
+  })
 
   async function nextPreview() {
     let current = previewIndex + 0
@@ -88,7 +85,7 @@ import Divider from '../../../components/divider/divider.svelte'
     }
   }
 
-  let views = [
+  let views = $state([
     {
       title: 'Import CSV',
       id: 'home',
@@ -101,9 +98,9 @@ import Divider from '../../../components/divider/divider.svelte'
       title: 'Template',
       id: 'template',
     },
-  ]
+  ])
 
-  $: view = views.find((v) => v.id == stepId)
+  let view = $derived(views.find((v) => v.id == stepId))
 
   function setFieldMap(name: string, index) {
     activeImporter.config.fieldMap[name] = activeMapIndex
@@ -333,7 +330,6 @@ import Divider from '../../../components/divider/divider.svelte'
       {/if}
     </div>
   </ToolbarGrid>
-
 
   <main class="page page-csv-import flex-column">
     {#if activeImporter && activeImporter.name}

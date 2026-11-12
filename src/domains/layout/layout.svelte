@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import AppTabs from '../../domains/layout/tabs.svelte'
 
@@ -12,39 +14,43 @@
   import { hideMenuBlocker, MenuBlockerStore } from '../../components/menu/useDropmenu'
 import appConfig from '../../config/appConfig';
 
-  export let style: string = ''
-  export let className: string = ''
-  export let pageTitle = undefined
-  export let showTabs: boolean = true
-  export let headerClassNames = ''
-  export let showCapture: boolean = true
+  const { style = '', className = '', pageTitle, showTabs = true, headerClassNames = '', showCapture = true } = $props<{
+    style?: string
+    className?: string
+    pageTitle?: string
+    showTabs?: boolean
+    headerClassNames?: string
+    showCapture?: boolean
+  }>()
 
-  let mainEle: HTMLElement
-  let mainEleHeight: string = '100%'
+  let mainEle: HTMLElement | undefined = $state(undefined)
+  let mainEleHeight: string = $state('100%')
 
   let id = `layout-${nid()}`
 
   // Controll Scrolling
 
-  let footerBuffer: HTMLElement
-  let footerEle: HTMLElement
+  let footerBuffer: HTMLElement | undefined = $state(undefined)
+  let footerEle: HTMLElement | undefined = $state(undefined)
 
-  $: hasHeader = (arguments[1].$$slots || {}).hasOwnProperty('header')
-  $: hasFooter = (arguments[1].$$slots || {}).hasOwnProperty('footer')
-  $: hasContent = (arguments[1].$$slots || {}).hasOwnProperty('content')
-  $: hasBottom = (arguments[1].$$slots || {}).hasOwnProperty('bottom')
+  let hasHeader = $derived(!!$$slots.header)
+  let hasFooter = $derived(!!$$slots.footer)
+  let hasContent = $derived(!!$$slots.content)
+  let hasBottom = $derived(!!$$slots.bottom)
 
-  $: {
+  $effect(() => {
     const footerPos = getElementPosition(footerEle)
     if (footerPos && footerBuffer) {
       footerBuffer.style.height = `${footerPos.eleHeight + 70}px`
     }
-  }
+  })
 
-  $: if ($Device.height && mainEle) {
-    const pos = getElementPosition(mainEle)
-    mainEleHeight = `${pos.eleHeight}px`
-  }
+  $effect(() => {
+    if ($Device.height && mainEle) {
+      const pos = getElementPosition(mainEle)
+      mainEleHeight = `${pos.eleHeight}px`
+    }
+  })
 </script>
 
 <svelte:head>
@@ -68,7 +74,7 @@ import appConfig from '../../config/appConfig';
     {/if}
     <section class="xl:ml-56 layout-section-wrap">
       {#if hasHeader}
-        <header class=" z-50 sticky top-0  glass {headerClassNames}">
+        <header class=" non-printable z-50 sticky top-0  glass {headerClassNames}">
           <BackupMessage />
           <slot name="header" />
         </header>
@@ -82,18 +88,20 @@ import appConfig from '../../config/appConfig';
       </main>
     </section>
     {#if $Device.width > 899}
+    <div class="non-printable">
       <DesktopSidebar loggedIn={showTabs} />
+    </div>
     {/if}
   </div>
   {#if hasBottom}
-    <main id="nomie-main-bottom" class="glass xl:ml-56">
+    <main id="nomie-main-bottom" class="glass xl:ml-56 non-printable">
       <slot name="bottom" />
     </main>
   {/if}
   <!-- <div id="footer-buffer" class="sticky bottom-0" bind:this={footerBuffer} /> -->
   <footer
     bind:this={footerEle}
-    class="xl:ml-56  sticky self-justify-start left-0 right-0 bottom-0 z-50 border-t border-gray-300 layout-footer glass dark:border-gray-400 dark:border-opacity-20"
+    class="non-printable xl:ml-56  sticky self-justify-start left-0 right-0 bottom-0 z-50 border-t border-gray-300 layout-footer glass dark:border-gray-400 dark:border-opacity-20"
   >
     <slot name="footer" />
 
@@ -109,3 +117,9 @@ import appConfig from '../../config/appConfig';
     {/if}
   </footer>
 </div>
+
+<style>
+  @media print {
+      .non-printable { display: none; }
+  }
+</style>

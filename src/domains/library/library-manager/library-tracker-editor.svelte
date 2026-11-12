@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Modal2 from '../../../components/modal/modal2.svelte'
   import Panel from '../../../components/panel/panel.svelte'
@@ -27,24 +29,27 @@
   import { openTrackableEditor } from '../../trackable/trackable-editor/TrackableEditorStore'
   import { Trackable } from '../../trackable/Trackable.class'
 
-  let workingLibTracker: LibraryTrackerType
-  let showDom: boolean = false
-  let trackers: Array<TrackerClass> = []
+  const { id } = $props()
 
-  export let id: string
+  let workingLibTracker = $state<LibraryTrackerType>()
+  let showDom = $state(false)
+  let trackers = $state<Array<TrackerClass>>([])
+  let lastHash = $state('')
 
-  let lastHash = ''
-  $: if (objectHash($LibraryManagerStore.libraryTracker) !== lastHash) {
-    lastHash = objectHash($LibraryManagerStore.libraryTracker)
-    workingLibTracker = Object.assign({}, $LibraryManagerStore.libraryTracker)
-    trackers = [...trackers, ...workingLibTracker.trackers.map((t) => new TrackerClass(t))]
+  $effect(() => {
+    if (objectHash($LibraryManagerStore.libraryTracker) !== lastHash) {
+      lastHash = objectHash($LibraryManagerStore.libraryTracker)
+      workingLibTracker = Object.assign({}, $LibraryManagerStore.libraryTracker)
+      trackers = [...trackers, ...workingLibTracker.trackers.map((t) => new TrackerClass(t))]
 
-    setTimeout(() => {
-      showDom = true
-    }, 100)
-  }
+      const timer = setTimeout(() => {
+        showDom = true
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  })
 
-  $: canSave = workingLibTracker && trackers?.length > 0 && workingLibTracker.title && workingLibTracker.tags
+  const canSave = $derived(workingLibTracker && trackers?.length > 0 && workingLibTracker.title && workingLibTracker.tags)
 
   const selectTrackers = async () => {
     const trks = await selectTrackables('tracker')

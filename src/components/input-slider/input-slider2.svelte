@@ -1,20 +1,24 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   //@ts-ignore
   import RangePure from 'rangeslider-pure'
   import { createEventDispatcher, onMount } from 'svelte'
   import type { Trackable } from '../../domains/trackable/Trackable.class'
 
-  export let min = 0
-  export let max = 10
-  export let value = 5
-  export let className: string = ''
-  export let trackable: Trackable
-  export let mini: boolean = false
-  export let step = 1
+  const { min, max, value, className, trackable, mini, step } = $props()
 
-  let smallInput: HTMLInputElement
-  let tempValue: any
-  $: tempValue = value
+  let smallInput = $state<HTMLInputElement>(undefined)
+  let tempValue = $state(Number(value) || 0)
+  let lastPropValue = Number(value) || 0
+
+  $effect(() => {
+    const newValue = Number(value) || 0
+    if (newValue !== lastPropValue) {
+      tempValue = newValue
+      lastPropValue = newValue
+    }
+  })
 
   const dispatch = createEventDispatcher()
   async function main() {

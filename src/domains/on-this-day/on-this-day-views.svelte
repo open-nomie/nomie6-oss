@@ -1,4 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
+  import dayjs from 'dayjs'
   import Button from '../../components/button/button.svelte'
   import Container from '../../components/container/container.svelte'
 
@@ -14,7 +17,7 @@
   import { Lang } from '../../store/lang'
 
   import { showTrackablePopmenu } from '../board/boardActions'
-  import { getFocusScoresFromLogs, IFocusResults } from '../focus/focus-utils'
+  import { getFocusScoresFromLogs, type IFocusResults } from '../focus/focus-utils'
   import { getTrackersAndValuesFromLogs } from '../ledger/ledger-tools'
   import Map from '../map/map.svelte'
   import type NLog from '../nomie-log/nomie-log'
@@ -24,58 +27,65 @@
   import { Trackable } from '../trackable/Trackable.class'
   import { TrackableStore } from '../trackable/TrackableStore'
   import type { OTDViewOption, TrackerProcessedConfig } from './on-this-day-helpers'
-  import { getContext, getNotes, getPeople, processTrackers } from './on-this-day-helpers'
+  import { getContext, getPointers, getNotes, getPeople, processTrackers } from './on-this-day-helpers'
   import ContextChart from '../context/context-chart.svelte'
   import ListItem from '../../components/list-item/list-item.svelte'
   import TrackableAvatar from '../../components/avatar/trackable-avatar.svelte'
   
   import PositivityGrid from '../../components/positivity-bar/positivity-grid.svelte'
   import Memories from '../ledger/Memories.svelte'
+  import OnThisDayTrackers from './on-this-day-trackers.svelte'
   import { createEventDispatcher } from 'svelte'
 
-  export let view: OTDViewOption = 'notes'
-  export let logs: Array<NLog> = []
-
-  let trackers: Array<TrackerProcessedConfig> = []
-  let notes: Array<NLog> = []
-  let people: Array<Person> = []
-  let context: Array<string> = []
+  let trackers = $state<Array<TrackerProcessedConfig>>([])
+  let notes = $state<Array<NLog>>([])
+  let people = $state<Array<Person>>([])
+  let context = $state<Array<string>>([])
+  let pointers = $state<Array<string>>([])
 
   const dispatch = createEventDispatcher()
 
-  let lastLogs: string
-  let startDate: Date = new Date()
+  let lastLogs = $state('')
+  let startDate = $state(new Date())
+  let columns = $state(3)
+  let focusScores = $state<Array<IFocusResults>>()
+  let hasFocusScores = $state(false)
 
-  let columns: number = 3
+  const { view, logs, date = new Date() } = $props()
 
-  $: if ($Device.width < 400) {
-    columns = 2
-  } else if ($Device.width < 700) {
-    columns = 3
-  } else if ($Device.width > 900) {
-    columns = 3
-  }
+  // The day being viewed, not the day of the last entry: an empty day has no entries to set it
+  const isToday = $derived(dayjs(date).isSame(dayjs(), 'day'))
 
-  let focusScores: Array<IFocusResults>
-  let hasFocusScores: boolean
+  $effect(() => {
+    if ($Device.width < 400) {
+      columns = 2
+    } else if ($Device.width < 700) {
+      columns = 3
+    } else if ($Device.width > 900) {
+      columns = 3
+    }
+  })
 
-  $: if (logs && logs.length && lastLogs !== logs.map((l) => l._id).join(',')) {
-    startDate = logs[0].end
-    lastLogs = logs.map((l) => l._id).join(',')
-    let trackersUsed = getTrackersAndValuesFromLogs(logs)
+  $effect(() => {
+    if (logs && logs.length && lastLogs !== logs.map((l) => l._id).join(',')) {
+      startDate = logs[0].end
+      lastLogs = logs.map((l) => l._id).join(',')
+      let trackersUsed = getTrackersAndValuesFromLogs(logs)
 
-    notes = getNotes(logs)
-    people = getPeople(logs, $PeopleStore)
-    context = getContext(logs)
-    trackers = processTrackers(trackersUsed, $TrackerStore)
-    focusScores = getFocusScoresFromLogs(logs, $TrackableStore.trackables)
+      notes = getNotes(logs)
+      people = getPeople(logs, $PeopleStore)
+      context = getContext(logs)
+      pointers = getPointers(logs)
+      trackers = processTrackers(trackersUsed, $TrackerStore)
+      focusScores = getFocusScoresFromLogs(logs, $TrackableStore.trackables)
 
-    hasFocusScores =
-      focusScores && (focusScores[0].score !== 0 || focusScores[1].score !== 0 || focusScores[2].score !== 0)
-  }
+      hasFocusScores =
+        focusScores && (focusScores[0].score !== 0 || focusScores[1].score !== 0 || focusScores[2].score !== 0)
+    }
+  })
 </script>
 
-{#if view !== 'context'}
+{#if view !== 'context' || 'pointers' }
   <Container className="px-2 z-10">
     <div class="px-2 flex space-y-2 lg:space-y-0 lg:space-x-2 lg:flex-row flex-col items-center">
       <PositivityGrid {logs} />
@@ -110,7 +120,9 @@
     </Grid>
   </Container>
 {:else if view === 'context'}
-  <ContextChart size="auto" date={startDate} />
+  <Container className="p-2 py-4">
+    <ContextChart size="auto" date={startDate} />
+  </Container>
 {:else if view === 'all'}
   {#if !logs.length}
     <slot name="empty" />
@@ -143,7 +155,7 @@
   {#if !people.length}
     <Empty title={Lang.t('on-this-day.no-people', 'No People on this Day')} icon={People} />
   {:else}
-    <Container>
+    <Container className="p-2 py-4 space-y-4">
       {#each people as person}
         <ListItem
           bottomLine={68}
@@ -163,9 +175,9 @@
   {#if !context.length}
     <Empty title={Lang.t('on-this-day.no-context', 'No Context on this Day')} emoji="🤷‍♂️" />
   {:else}
-    <Container>
+    <Container className="p-2 py-4">
       <div class="mt-3 n-grid">
-        {#each context as context}
+        {#each context as contex}
           <Button
             shape="round"
             size="lg"
@@ -174,29 +186,61 @@
             on:click={() => {
               showTrackablePopmenu(
                 new Trackable({
-                  id: context,
+                  id: contex,
                   type: 'context',
-                  context: context,
+                  context: contex,
                 })
               )
             }}
           >
-            {context}
+            {contex}
+          </Button>
+        {/each}
+      </div>
+    </Container>
+  {/if}
+{:else if view === 'pointers'}
+  {#if !pointers.length}
+    <Empty title={Lang.t('on-this-day.no-pointers', 'No Pointers on this Day')} emoji="🤷‍♂️" />
+  {:else}
+    <Container className="p-2 py-4">
+      <div class="mt-3 n-grid">
+        {#each pointers as pointer}
+          <Button
+            shape="round"
+            size="lg"
+            color="light"
+            className="m-2"
+            on:click={() => {
+              showTrackablePopmenu(
+                new Trackable({
+                  id: pointer,
+                  type: 'pointer',
+                  pointer: pointer,
+                })
+              )
+            }}
+          >
+            {pointer}
           </Button>
         {/each}
       </div>
     </Container>
   {/if}
 {:else if view === 'locations'}
-  {#key logs}
-    <Map records={logs} className="h-full h-75vh" />
-  {/key}
+  <Container className="p-2 py-4">
+    {#key logs}
+      <Map records={logs} className="h-full h-75vh" />
+    {/key}
+  </Container>
 {/if}
 
-{#if startDate.toDateString() === new Date().toDateString()}
+{#if isToday}
   <Memories
     on:date={(evt) => {
       dispatch('date', evt.detail)
     }}
   />
 {/if}
+
+<OnThisDayTrackers {date} />

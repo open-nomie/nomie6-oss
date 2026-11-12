@@ -1,9 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
 
   import SvelteMarkdown from 'svelte-markdown'
-
-  export let content: string
 
   let wrapperEle: HTMLElement
 
@@ -13,9 +13,11 @@
       item.setAttribute('target', '_blank')
     })
   })
+
+  const { content, ...rest } = $props()
 </script>
 
-<div bind:this={wrapperEle} {...$$restProps} class="markdown {$$restProps['class']}">
+<div bind:this={wrapperEle} {...rest} class="markdown {rest['class']}">
   <SvelteMarkdown source={content} />
 </div>
 

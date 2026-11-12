@@ -13,6 +13,7 @@ import { switchToLocal } from '../settings/settings-functions'
 // import DumbStorage from './engines/storage.dumb'
 
 import { LocalForageEngine } from './engines/localforage/engine.localforage'
+import { NomieServierStorage } from './engines/nomie-server/engine.nomie-server'
 import { PouchDBEngine } from './engines/pouchdb/engine.pouchdb'
 import { SideStore } from './side-storage'
 // import { S3Engine } from "./engines/engine.s3";
@@ -55,6 +56,16 @@ export const StorageEngines: Array<StorageEngineType> = [
     multipleDevices: false,
     engine: PouchDBEngine,
     advanced: true
+  },
+  {
+    id: 'nomie-server',
+    name: 'Nomie Server',
+    shortName: 'Nomie Server',
+    description: 'Sync to your own Nomie Server',
+    price: 'FREE',
+    multipleDevices: true,
+    engine: NomieServierStorage,
+    advanced: true
   }
 ]
 
@@ -81,6 +92,7 @@ export interface IStorage {
   _storageType?(): string
   getEngine?(): IStorage
   get(path: string): Promise<any>
+  getStrict?(path: string): Promise<any>
   put(path: string, content: any): Promise<any>
   delete(path: string): Promise<any>
   convertPath?(path: string): string
@@ -153,6 +165,12 @@ const Storage: IStorage = {
   // Get a file
   async get(path, onChange = null) {
     return await this.getEngine().get(path, onChange)
+  },
+  // Like get, but a failed read throws instead of returning null. Backup and restore use this,
+  // so a read error is never taken for a missing file.
+  async getStrict(path: string) {
+    const engine: any = this.getEngine()
+    return engine.getStrict ? await engine.getStrict(path) : await engine.get(path)
   },
   // Put a file
   async put(path, content) {

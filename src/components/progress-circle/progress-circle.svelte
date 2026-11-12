@@ -1,16 +1,11 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // https://github.com/stephane-vanraes/svelte-progresscircle/edit/master/src/index.svelte
 
-  export let value: number = 0
-  export let max: number = 100
-  export let size: number = 100
-  export let color: string | undefined = undefined
-  export let backgroundColor: string | undefined = undefined
-  export let showValue: boolean = true
-  export let className: string = ''
-  export let style: string = ''
+  const { value, max, size, color, backgroundColor, showValue, className, style } = $props()
 
-  $: progressPath = () => {
+  const progressPath = $derived.by(() => {
     if (value <= 0) {
       return ''
     } else if (value >= max) {
@@ -30,7 +25,7 @@
 
       return path
     }
-  }
+  })
 </script>
 
 <div

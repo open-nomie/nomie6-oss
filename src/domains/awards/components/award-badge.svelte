@@ -1,9 +1,10 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
-
-  export let sm: boolean = false
   import type Award from '../helpers/award.class'
-  export let award: Award
+
+  const { sm = false, award } = $props<{ sm?: boolean; award: Award }>()
 </script>
 
 <div class="award-badge" class:sm>

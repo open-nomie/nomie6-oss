@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { Template } from './templates-utils'
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
@@ -7,11 +9,11 @@
 
   import TemplateView from './template-view.svelte'
 
-  export let id: string
-  export let template: Template
   const close = () => {
     closeModal(id)
   }
+
+  let { id, template = $bindable() } = $props()
 </script>
 
 <BackdropModal className="h-full" mainClass="bg-gray-100 dark:bg-gray-800">

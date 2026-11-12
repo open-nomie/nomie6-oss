@@ -117,7 +117,7 @@ export const usageAwards: Array<AwardConfig> = [
   },
   {
     id: 'usage-6-year',
-    name: 's of Nomie',
+    name: '6 Years of Nomie',
     value: 0.6,
 
     config: {

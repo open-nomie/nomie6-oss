@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../../components/list-item/list-item.svelte'
 
@@ -5,9 +7,9 @@
 
   import { AwardStore } from '../AwardsStore'
 
-  $: awardsToShow = $AwardStore.awards
+  let awardsToShow = $derived($AwardStore.awards
     .sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
-    .filter((a, index) => index < 4)
+    .filter((a, index) => index < 4))
 </script>
 
 

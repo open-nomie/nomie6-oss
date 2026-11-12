@@ -1,21 +1,30 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import Tribute from 'tributejs/dist/tribute.esm'
   import autosize from 'svelte-autosize'
 
-  export let value: any
-  
-  export let tributeConfig: any = undefined;
   const emit = createEventDispatcher()
-
-	export const setSelectionRange = (a,b)=>{
-		textarea.setSelectionRange(a,b);
-		textarea.focus();
-	}
-
+  let { value = $bindable(), tributeConfig, ...rest } = $props()
 
   let tribute
   let textarea: HTMLTextAreaElement
+
+  $effect(() => {
+    value
+    if (textarea) autosize.update(textarea)
+  })
+
+  export const setSelectionRange = (a,b)=>{
+    textarea.setSelectionRange(a,b);
+    textarea.focus();
+  }
+
+  export const setValue = (text: string) => {
+    textarea.value = text;
+    value = text;
+  }
 
 	const tributeTriggered = (e)=>{
 		let payload:any = e.detail;
@@ -37,10 +46,11 @@
 	onDestroy(()=>{
 		textarea.removeEventListener('tribute-replaced', tributeTriggered)
 	})
+
 </script>
 
 <textarea
-  {...$$restProps}
+  {...rest}
   bind:this={textarea}
   use:autosize
   bind:value
@@ -56,5 +66,5 @@
   on:blur={(evt) => {
     emit('blur', evt)
   }}
-  class={`${$$restProps.class}`}
+  class={`${rest.class}`}
 />

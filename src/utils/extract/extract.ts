@@ -52,6 +52,8 @@ function generateRaw(str = '', type = 'generic') {
       return `@${str}`
     case 'context':
       return `+${str}`
+    case 'pointer':
+      return `^${str}`  
     default:
       return str
   }
@@ -74,6 +76,11 @@ export default {
   context(str) {
     return parse(str).filter((token) => {
       return token.type == 'context'
+    })
+  },
+  pointers(str) {
+    return parse(str).filter((token) => {
+      return token.type == 'pointer'
     })
   },
 }

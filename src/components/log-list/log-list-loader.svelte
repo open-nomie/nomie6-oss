@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import config from '../../config/appConfig'
@@ -17,30 +19,26 @@
   import { Lang } from '../../store/lang'
   import { getDateFormats } from '../../domains/preferences/Preferences'
 
-  export let term = null
-  export let limit = 20
-  export let className = ''
-  export let compact = false
-  export let fullDate = true
-  export let results = []
-  export let showTimeDiff = false
+  let { term, limit, className, compact, fullDate, results = $bindable(), showTimeDiff } = $props()
 
-  let loading = false
-  let logs = []
+  let loading = $state(false)
+  let logs = $state([])
 
-  let lastFrom
-  let lastTo
+  let lastFrom = $state(undefined)
+  let lastTo = $state(undefined)
 
   const dtFormat = getDateFormats()
 
   // React to Term Change
-  let lastTerm
+  let lastTerm = $state(undefined)
 
-  $: if (term && lastTerm !== term) {
-    lastTerm = term
-    reset()
-    search()
-  }
+  $effect(() => {
+    if (term && lastTerm !== term) {
+      lastTerm = term
+      reset()
+      search()
+    }
+  })
 
   function reset() {
     logs = []

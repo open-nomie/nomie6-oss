@@ -48,6 +48,10 @@ export default class AwardChain {
     return await this.storage.put(this.path, this.chain)
   }
 
+  async reset(): Promise<AwardChain> {
+    return await this.storage.put(this.path, [])
+  }
+
   getById(id: string): Award | undefined {
     return this.chain.find((a: Award) => a.id === id)
   }

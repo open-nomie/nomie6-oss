@@ -4,11 +4,13 @@ import TrackableSelectorModal from './trackable-selector-modal.svelte'
 import { openModal } from '../../../components/backdrop/BackdropStore2'
 import { wait } from '../../../utils/tick/tick'
 import { writable } from 'svelte/store'
+import type { ITrackerType } from '../../../modules/tracker/TrackerClass'
 
 export type TrackableSelectorProps = {
   multiple?: boolean
   onSelect?: Function
   type?: TrackableTypes
+  subtype?: ITrackerType
 }
 
 export const TrackableSelectorStore = writable<TrackableSelectorProps | undefined>()
@@ -45,12 +47,14 @@ export const closeTrackableSelector = () => {
  */
 export const selectTrackables = async (
   type?: TrackableTypes | undefined,
+  subtype? : ITrackerType | undefined,
   multiple: boolean = true
 ): Promise<Array<Trackable>> => {
   return new Promise((resolve) => {
     openTrackableSelector({
       multiple: multiple,
       type,
+      subtype,
       onSelect: async (trackables: Array<Trackable>) => {
         resolve(trackables)
         await wait(200)
@@ -64,8 +68,8 @@ export const selectTrackables = async (
  * @param {TrackableTypes | undefined} [type] - The type of trackable you want to select.
  * @returns An array of trackables
  */
-export const selectTrackable = async (type?: TrackableTypes | undefined) => {
-  const trackables = await selectTrackables(type, false)
+export const selectTrackable = async (type?: TrackableTypes | undefined, subtype?: ITrackerType | undefined) => {
+  const trackables = await selectTrackables(type, subtype, false)
   if (trackables.length) {
     return trackables[0]
   }

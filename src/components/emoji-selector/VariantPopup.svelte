@@ -1,11 +1,11 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
   import IonIcon from '../icon/ion-icon.svelte'
   import { CloseOutline } from '../icon/nicons'
   import Emoji from './Emoji.svelte'
-
-  export let variants: any
 
   const dispatch = createEventDispatcher()
 
@@ -16,6 +16,8 @@
   function onClickContainer(event?: any) {
     dispatch('close', event)
   }
+
+  const { variants } = $props()
 </script>
 
 <div class="svelte-emoji-picker__variants-container frosted" on:click={onClickContainer}>

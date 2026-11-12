@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import Avatar from '../../../components/avatar/avatar.svelte'
@@ -26,12 +28,10 @@
     LibraryTrackerType,
   } from './LibraryManagerStore'
 
-  let categories: Array<any> = []
-  let activeCategory: LibraryCategoryType
-
-  let activeTrackers: Array<LibraryTrackerType> = []
-
-  let expanded = {}
+  let categories = $state<Array<any>>([])
+  let activeCategory = $state<LibraryCategoryType>()
+  let activeTrackers = $state<Array<LibraryTrackerType>>([])
+  let expanded = $state({})
 
   // const toggleExpand = (index: number) => {
   //   const key = `index-${index}`
@@ -76,19 +76,23 @@
     setActiveTrackers(trackers)
   }
 
-  $: if (!$LibraryManagerStore.libraryTracker && activeCategory) {
-    getTrackers()
-  } else if (!activeCategory) {
-    getAllTrackers()
-  }
+  $effect(() => {
+    if (!$LibraryManagerStore.libraryTracker && activeCategory) {
+      getTrackers()
+    } else if (!activeCategory) {
+      getAllTrackers()
+    }
+  })
 
-  $: if ($LibraryManagerStore.libraryTracker) {
-    openModal({
-      id: 'library-tracker-editor',
-      component: LibraryTrackerEditor,
-      componentProps: {},
-    })
-  }
+  $effect(() => {
+    if ($LibraryManagerStore.libraryTracker) {
+      openModal({
+        id: 'library-tracker-editor',
+        component: LibraryTrackerEditor,
+        componentProps: {},
+      })
+    }
+  })
 
   onMount(async () => {
     categories = await getLibraryCategories()

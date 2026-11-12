@@ -2,6 +2,7 @@ import { closeModal, openModal } from '../../components/backdrop/BackdropStore2'
 import NPaths from '../../paths'
 import { createArrayStore } from '../../store/ArrayStore'
 import { Template } from './templates-utils'
+import { Trackable } from '../trackable/Trackable.class'
 import TemplateEditorModal from './template-editor-modal.svelte'
 import TemplateManagerModal from './template-manager-modal.svelte'
 import { Interact } from '../../store/interact'
@@ -13,7 +14,12 @@ import { getRawPrefs } from '../preferences/Preferences'
 import { InitTrackableStore, TrackableStore } from '../trackable/TrackableStore'
 import { initializeDashStore } from '../dashboard2/DashStore'
 import { initUniboardStore } from '../board/UniboardStore'
+import { LocationStore } from '../locations/LocationStore'
+import { GoalStore } from '../goals/GoalStore'
+import { PivotStore } from '../analytics/PivotStore'
+import { PluginStore } from '../plugins/PluginStore'
 import is from '../../utils/is/is'
+import { navigate } from '../../vendor/svelte-navigator'
 
 /* Creating a store for the templates. */
 export const TemplateStore = createArrayStore(NPaths.storage.templates(), {
@@ -35,6 +41,14 @@ export const openTemplateManager = () => {
     id: 'template-manager',
     component: TemplateManagerModal,
   })
+}
+
+export const openAnalytics = () => {
+  navigate('/analytics')
+}
+
+export const openAfterNomie = () => {
+  navigate('/afternomie')
 }
 
 /**
@@ -74,6 +88,12 @@ export const openTemplateRef = async (url: string) => {
     const call = await fetch(url)
     const payload = await call.json()
     if (payload && payload.type == 'template') {
+      // Convert trackables to Trackable instances for proper reactivity
+      if (payload.trackables && Array.isArray(payload.trackables)) {
+        payload.trackables = payload.trackables.map((t: any) =>
+          t instanceof Trackable ? t : new Trackable(t)
+        )
+      }
       const template = new Template(payload)
       return openTemplatePreview(template)
     } else {
@@ -122,16 +142,27 @@ export const closeTemplateEditor = () => {
  * It takes a template object, asks the user if they want to install it, and if they do, it converts
  * the template to an importable archive, imports it, and closes the modal
  * @param {Template} template - Template - this is the template object that is passed to the function.
+ * @param {string} closeModalId - Optional modal ID to close after import (defaults to 'template-preview')
  */
-export const useTemplate = async (template: Template) => {
+export const useTemplate = async (template: Template, closeModalId: string = 'template-preview') => {
   const confirmed = await Interact.confirm(`Install the ${template.name} template?`)
   if (confirmed) {
     const backup: any = TemplateToImport(template, getRawPrefs().useMetric)
-    await importStorageArchive(backup, { silent: true })
+    const installed = await importStorageArchive(backup, { silent: true, addMissingOnly: true })
+    if (!installed) {
+      await Interact.alert(`${template.name} could not be fully installed`, 'Some items could not be saved. Check the console for details.')
+      return
+    }
     showToast({ message: `${template.name} installed` })
-    closeModal('template-preview')
+    closeModal(closeModalId)
+
+    // Reinitialize all stores to load newly imported data
     let trackables = await InitTrackableStore();
     initializeDashStore();
     initUniboardStore(trackables);
+    LocationStore.init();
+    GoalStore.init();
+    PivotStore.init();
+    PluginStore.init();
   }
 }

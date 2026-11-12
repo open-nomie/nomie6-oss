@@ -1,5 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let size: number = 24
+
+
+  const { size } = $props()
 </script>
 
 <svg height="{size}px" width="{size}px" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 196 196">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { Dayjs } from 'dayjs'
   import dayjs from 'dayjs'
@@ -9,13 +11,11 @@
 
   import { getDateFormats } from '../../domains/preferences/Preferences'
 
-  $: dateFormats = getDateFormats()
-  export let start: Dayjs | undefined = undefined
-  export let end: Dayjs | undefined = undefined
-  export let date: Dayjs | undefined = dayjs()
-  export let className: string = ''
-  export let dateClass: string = 'text-center text-gray-600 dark:text-gray-400 text-xs md:text-sm my-1'
   const dispatch = createEventDispatcher()
+
+  const { start, end, date, className, dateClass } = $props()
+
+  let dateFormats = $derived(getDateFormats())
 </script>
 
 <div class="flex items-center py-2 justify-center {className}">
@@ -32,7 +32,7 @@
   <div class="filler">
     <slot />
     <div class="title text-center"><slot name="title" /></div>
-    <p class=" {dateClass}">
+    <p class="text-center {dateClass}">
       {#if start && end}
         {start.format(dateFormats.mmm_d_yyyy)} -
         {end.format(dateFormats.mmm_d_yyyy)}

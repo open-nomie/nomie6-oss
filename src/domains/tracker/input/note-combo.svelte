@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
 
@@ -7,12 +9,12 @@
   import ToggleSwitch from '../../../components/toggle-switch/toggle-switch.svelte'
   import ManualTime from '../../../components/counter/manual-time.svelte'
   import { TrackableStore } from '../../trackable/TrackableStore'
-  import type { Trackable } from '../../trackable/Trackable.class'
+  import { Trackable } from '../../trackable/Trackable.class'
   import TrackableAvatar from '../../../components/avatar/trackable-avatar.svelte'
   import type TrackerClass from '../../../modules/tracker/TrackerClass'
   // import InputSlider from '../../../components/input-slider/input-slider.svelte'
   import InputSlider2 from '../../../components/input-slider/input-slider2.svelte'
-  import { Token, tokenizeLite } from '../../../modules/tokenizer/lite'
+  import { type Token, tokenizeLite } from '../../../modules/tokenizer/lite'
   import { tokenToTrackable } from '../../../modules/tokenizer/tokenToTrackable'
   import IonIcon from '../../../components/icon/ion-icon.svelte'
   import Button from '../../../components/button/button.svelte'
@@ -23,15 +25,31 @@
   import List from '../../../components/list/list.svelte'
   import Title from '../../../components/title/title.svelte'
 
-  export let value = '5'
-  export let tracker: TrackerClass = undefined
+  const { value, tracker } = $props()
 
-  let tempValue
-  $: tempValue = value
+  let tempValue = $state(value)
+  $effect(() => {
+    tempValue = value
+  })
 
   const dispatch = createEventDispatcher()
 
-  let trackables: Array<Trackable> = []
+  let trackables = $state<Array<Trackable>>([])
+  // Trackers the user changed in this input. Only these are tracked.
+  let touched = $state(new Set<string>())
+  const markTouched = (trackable: Trackable) => {
+    if (trackable.tag) touched = new Set([...touched, trackable.tag])
+  }
+  // Selected means the user changed it and it has a value. Anything else is greyed out.
+  // Range and value items: touched, or (unless the combo is touch only) logged at their default
+  const isSelected = (t: Trackable): boolean => {
+    if (t.value === true) return true
+    const n = Number(t.value)
+    if (isNaN(n) || n === 0) return false
+    if (touched.has(t.tag)) return true
+    const isValueItem = t.tracker?.type === 'range' || t.tracker?.type === 'value'
+    return tracker.combo_touch_only !== true && isValueItem
+  }
 
   async function main() {
     const noteElements: Array<Token> = tokenizeLite(tracker.note)
@@ -44,6 +62,12 @@
       if (trackable.tracker?.type == 'tick' && trackable.value == 1) {
         trackable.value = 0
       }
+      // A #name without a value starts at the tracker's configured default. The editor writes #name(1)
+      // into the template, and a (1) is treated as no value, like the context rule.
+      const givenValue = (token.raw || '').replace('(1)', '').includes('(')
+      if (trackable.tracker && !givenValue && !isNaN(Number(trackable.tracker.default))) {
+        trackable.value = trackable.tracker.default
+      }
 
       return trackable
     })
@@ -52,6 +76,8 @@
     if (tempValue) {
       dispatch('change', parseInt(tempValue))
     }
+    // Send the starting note, so an untouched combo with automatic defaults still logs them
+    fireChange()
   }
 
   const getNote = () => {
@@ -60,18 +86,18 @@
         // if (f.type == 'tracker' && f.tracker.type == 'tick') {
         //   console.log({ f })
         // }
-        //@ts-ignore
-        if (f.value === true) {
-          return true
-        } else if (f.value > 0 || f.value < 0) {
-          return true
-        }
-        return false
+        // Only what the user selected is tracked. A range slider starts at its minimum, so an untouched
+        // tracker is left out.
+        return isSelected(f)
       })
       .map((trackable) => {
         //@ts-ignore
         if (trackable.value === true) {
           trackable.value = 1
+        }
+        // A checked context is logged as +name with no value, so the period set on the context is used
+        if (trackable.type === 'context' && Number(trackable.value) === 1) {
+          return trackable.tag
         }
         return trackable.getNoteValue()
       })
@@ -80,7 +106,6 @@
 
   const fireChange = () => {
     const note = getNote()
-
     dispatch('note', note)
     dispatch('change', 1)
   }
@@ -92,7 +117,10 @@
   <List solo>
     {#each trackables as trackable, index}
       <article class="flex flex-col justify-center items-center" />
-      <ListItem bottomLine={64} className="bg-white dark:bg-gray-900">
+      <ListItem
+        bottomLine={64}
+        className="bg-white dark:bg-gray-900 {(trackable.tracker?.type === 'range' || trackable.tracker?.type === 'value') && !isSelected(trackable) ? 'opacity-40' : ''}"
+      >
         <TrackableAvatar slot="left" {trackable} size={46} />
         <main class="filler">
           <header class="flex items-center justify-between">
@@ -105,15 +133,18 @@
             <div class="dark:text-white filler  py-1 text-sm ">Nested Combos are currently not supported</div>
           {/if}
           {#if trackable.tracker?.type === 'range'}
-            <div class="">
+            <div class="" on:pointerdown={() => markTouched(trackable)} on:keydown={() => markTouched(trackable)} role="presentation">
               <InputSlider2
                 {trackable}
                 step={trackable.tracker.step || 1}
-                value={isTruthy(trackable.tracker.default) ? trackable.tracker.default : trackable.value}
-                min={parseFloat(`${trackable.tracker.min}`)}
+                value={trackable.value}
+                min={parseFloat(`${trackable.tracker.min}`) || 0}
                 max={parseFloat(`${trackable.tracker.max}`) || 100}
                 on:input={(evt) => {
-                  trackable.value = evt.detail
+                  const index = trackables.indexOf(trackable)
+                  const updated = new Trackable({ ...trackable, value: evt.detail })
+                  trackables[index] = updated
+                  trackables = trackables
                   fireChange()
                 }}
                 className="w-full"
@@ -126,9 +157,10 @@
             <div class="flex items-center">
               <input
                 aria-label={trackable.label}
+                on:input={() => markTouched(trackable)}
                 on:change={(evt) => {
                   // trackable.value = evt.target?.value;
-
+                  markTouched(trackable)
                   fireChange()
                 }}
                 on:focus={(evt) => {
@@ -152,22 +184,25 @@
                 title="Add value"><IonIcon icon={AddCircleOutline} /></Button
               >
             </div>
-          {:else if trackable.tracker?.type === 'tick' || trackable.type === 'context'}
+          {:else if trackable.tracker?.type === 'tick' || trackable.type === 'context' || trackable.type === 'pointer'}
             <ToggleSwitch
               title={`input`}
               on:change={(evt) => {
                 trackable.value = evt.detail ? 1 : 0
+                markTouched(trackable)
                 fireChange()
               }}
             />
+            
           {:else if trackable.tracker?.type === 'timer'}
             <ManualTime size="sm" bind:value={trackable.value} />
             <!-- {:else if trackable.tracker?.type === 'note'} -->
-          {:else if trackable.person || trackable.context}
+          {:else if trackable.person || trackable.context || trackable.pointer}
             <ToggleSwitch
               title="value"
               on:change={(evt) => {
                 trackable.value = evt.detail ? 1 : 0
+                markTouched(trackable)
                 fireChange()
               }}
             />

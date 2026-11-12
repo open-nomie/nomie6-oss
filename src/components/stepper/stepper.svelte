@@ -1,22 +1,20 @@
-<script lang="ts">
-  export let steps = 0
-  export let current = 0
-  export let dark = false
-  export let stepClass = ''
-  export let single = false
-  export let style = ''
+<svelte:options runes={true} />
 
-  let _steps = []
-  $: if (steps || current) {
-    _steps = []
+<script lang="ts">
+
+  const { steps, current, dark, stepClass, single, style } = $props()
+
+  let _steps = $derived.by(() => {
+    const result = []
     for (let i = 0; i < steps; i++) {
       if (!single) {
-        _steps.push(current >= i)
+        result.push(current >= i)
       } else {
-        _steps.push(current == i)
+        result.push(current == i)
       }
     }
-  }
+    return result
+  })
 </script>
 
 <div class="n-stepper {dark ? 'dark' : 'light'}" {style}>

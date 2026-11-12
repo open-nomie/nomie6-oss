@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { LedgerStore } from '../ledger/LedgerStore'
   import dayjs from 'dayjs'
@@ -5,7 +7,7 @@
   import ButtonGroup from '../../components/button-group/button-group.svelte'
   import Toolbar from '../../components/toolbar/toolbar.svelte'
 
-  import { getContext, getNotes, getPeople, OTDViews, processTrackers } from './on-this-day-helpers'
+  import { getContext, getPointers, getNotes, getPeople, OTDViews, processTrackers } from './on-this-day-helpers'
 
   import type { OTDViewOption } from './on-this-day-helpers'
   import OnThisDayViews from './on-this-day-views.svelte'
@@ -25,9 +27,7 @@
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../components/backdrop/BackdropStore2'
 
-  export let id: string
-
-  const state = {
+  const state = $state({
     notes: [],
     trackers: [],
     trackers1: [],
@@ -35,25 +35,32 @@
     records: [],
     people: [],
     context: [],
+    pointers: [],
     locations: [],
-  }
+  })
 
-  let loading = true
+  let loading = $state(true)
 
-  let views: typeof OTDViews = OTDViews
+  let views = $state<typeof OTDViews>(OTDViews)
 
-  let view: OTDViewOption = 'all'
+  let view = $state<OTDViewOption>('all')
 
   function setView(v: OTDViewOption) {
     view = v
   }
 
   async function loadDay() {
+    if (!$OnThisDayModalStore) {
+      loading = false
+      return
+    }
+
     loading = true
     let day = await LedgerStore.getDay($OnThisDayModalStore)
     let trackersUsed = LedgerStore.extractTrackerTagAndValues(day)
     state.people = getPeople(day, $PeopleStore)
     state.context = getContext(day)
+    state.pointers = getPointers(day)
     state.notes = getNotes(day)
     state.trackers = processTrackers(trackersUsed)
 
@@ -89,13 +96,11 @@
     gotoDate(date.toDate());
   }
 
-  const mounted = async () => {
-    loadDay()
-  }
-
-  onMount(() => {
-    mounted()
+  onMount(async () => {
+    await loadDay()
   })
+
+  const { id } = $props()
 </script>
 
 <BackdropModal>
@@ -152,7 +157,7 @@
 
   <main class="h-full relative min-h-full h-50vh pt-3">
     {#if !loading}
-      <OnThisDayViews {view} on:date={(evt)=>{
+      <OnThisDayViews {view} date={$OnThisDayModalStore} on:date={(evt)=>{
         gotoDate(evt.detail);
       }} logs={state.records} />
     {:else if loading}

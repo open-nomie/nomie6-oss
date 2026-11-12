@@ -4,6 +4,7 @@ export type autoCompleteDataTypes = {
   trackers: ITrackers
   context: any
   people: IPeople
+  pointers: any
 }
 
 export const autoCompleteSearch = (searchTag, type = 'tracker', elements: autoCompleteDataTypes): Array<any> => {
@@ -50,6 +51,18 @@ export const autoCompleteSearch = (searchTag, type = 'tracker', elements: autoCo
       return context.length
         ? context.map((c) => {
             return { tag: c, emoji: '💡', type: 'context' }
+          })
+        : []
+        // Search for Pointers
+    } else if (type === 'pointer') {
+      let pointers = elements.pointers.filter((term) => {
+        let text = searchTag.replace('^', '').toLowerCase()
+        term = term.toLowerCase()
+        return term.search(text.toLowerCase()) > -1
+      })
+      return pointers.length
+        ? pointers.map((c) => {
+            return { tag: c, emoji: '🏷', type: 'pointer' }
           })
         : []
     }

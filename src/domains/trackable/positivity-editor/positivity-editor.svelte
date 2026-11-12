@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Svelte
   import { createEventDispatcher } from 'svelte'
@@ -28,19 +30,21 @@
   import { wait } from '../../../utils/tick/tick'
   import { showToast } from '../../../components/toast/ToastStore'
 
-  // Prosp
-  export let tracker: TrackerClass | undefined = undefined
-  export let className = ''
+  const { tracker = undefined, className = '' } = $props<{ tracker?: TrackerClass, className?: string }>()
 
-  // consts
   const dispatch = createEventDispatcher()
 
-  // State
-  let state = {
+  let showNeutral = $state(true)
+
+  $effect(() => {
+    showNeutral = !tracker?.score
+  })
+
+  let state = $state({
     showConditionForm: false,
     genesisCalc: new PositivityCondition({}),
     selectedIndex: -1,
-  }
+  })
 
   // const getTrackerInput = async () => {
   //   const response = await Interact.trackerInput(tracker, {
@@ -54,10 +58,11 @@
 
   const methods = {
     async change() {
-      await wait(10)
+      await wait(50)
       dispatch('trackerChange', tracker)
 
       if (tracker.score == 'custom' && !tracker.score_calc) {
+        await wait(10)
         openScoreEditor({
           trackable: tracker.toTrackable(),
           show: true,
@@ -121,24 +126,26 @@
 
 {#if tracker}
   <div class={className}>
-    <NInput
-      listItem
-      type="select"
-      bind:value={tracker.score}
-      placeholder="Select a Positivity"
-      on:input={methods.change}
-      label={Lang.t('tracker.positivity', 'Positivity')}
-    >
-      <div slot="left" class="pt-3 text-black dark:text-white">
-        {#if !tracker.score}
-          <div class="pl-2">😐 {Lang.t('tracker.neutral', 'Neutral')}</div>
-        {/if}
-      </div>
-      {#each appConfig.positivity as positivity}
-        <option value={`${positivity.score}`}>{positivity.emoji} {positivity.label}</option>
-      {/each}
-      <option value="custom">🛠 {Lang.t('general.customize', ' Custom')}</option>
-    </NInput>
+    {#key showNeutral}
+      <NInput
+        listItem
+        type="select"
+        bind:value={tracker.score}
+        placeholder="Select a Positivity"
+        on:change={methods.change}
+        label={Lang.t('tracker.positivity', 'Positivity')}
+      >
+        <div slot="left" class="pt-3 text-black dark:text-white">
+          {#if showNeutral}
+            <div class="pl-2">😐 {Lang.t('tracker.neutral', 'Neutral')}</div>
+          {/if}
+        </div>
+        {#each appConfig.positivity as positivity}
+          <option value={`${positivity.score}`}>{positivity.emoji} {positivity.label}</option>
+        {/each}
+        <option value="custom">🛠 {Lang.t('general.customize', ' Custom')}</option>
+      </NInput>
+    {/key}
     {#if tracker.score === 'custom'}
       <section class="points-editor">
         {#if !state.showConditionForm}

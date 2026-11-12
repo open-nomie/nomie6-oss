@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Originally from https://github.com/metonym/svelte-keydown/blob/master/component/Keydown.svelte
   /**
@@ -5,16 +7,20 @@
    * @event {string} key
    */
   /** Set to `true` to pause the capture of keydown events */
-  export let paused = false
   /** Set to `true` to pause keydown events when typing in an input field */
-  export let pauseOnInput = false
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
-  let combo = []
-  let down = []
-  $: combination = combo.join('-')
-  $: comboByKey = combo.reduce((keys, key) => ({ ...keys, [key]: true }), {})
-  $: if (combo.length > 0) dispatch('combo', combination)
+  let combo = $state([])
+  let down = $state([])
+
+  const { paused, pauseOnInput } = $props()
+
+  let combination = $derived(combo.join('-'))
+  let comboByKey = $derived(combo.reduce((keys, key) => ({ ...keys, [key]: true }), {}))
+
+  $effect(() => {
+    if (combo.length > 0) dispatch('combo', combination)
+  })
 </script>
 
 <svelte:body

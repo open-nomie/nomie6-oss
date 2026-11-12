@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../components/list-item/list-item.svelte'
   import List from '../../components/list/list.svelte'

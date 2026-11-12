@@ -1,5 +1,8 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { wait } from '../../../../utils/tick/tick'
+  import { untrack } from 'svelte'
 
   /**
    * Welcome to the Editor - this is a mess... but I'm trying to simplify the whole process
@@ -33,10 +36,8 @@
   import Text from '../../../../components/text/text.svelte'
 
   import Button from '../../../../components/button/button.svelte'
-
   import trackerTypes from '../../../../modules/tracker-types/tracker-types'
 
-  import { TrackableStore } from '../../../trackable/TrackableStore'
   import List from '../../../../components/list/list.svelte'
   import Divider from '../../../../components/divider/divider.svelte'
 
@@ -45,115 +46,151 @@
   import { focusTypes } from '../../../focus/focus-utils'
 
   import IonIcon from '../../../../components/icon/ion-icon.svelte'
-  import { AddCircleOutline, ChevronDownOutline, ChevronUpOutline } from '../../../../components/icon/nicons'
+  import { AddOutline, ChevronDownOutline, ChevronUpOutline, RemoveOutline } from '../../../../components/icon/nicons'
 
   import type { Trackable } from '../../Trackable.class'
-  import { getTrackerInputAsString, useTrackerInputModal } from '../../../tracker/input/TrackerInputStore'
   import type TrackerClass from '../../../../modules/tracker/TrackerClass'
   import PositivityEditor from '../../positivity-editor/positivity-editor.svelte'
   import TrackableListBuilder from '../../TrackableListBuilder.svelte'
 
-  export let trackable: Trackable
-  let tracker: TrackerClass
-  $: if (trackable) {
-    tracker = trackable.tracker
-  }
+  let { trackable = $bindable() } = $props<{ trackable: Trackable }>()
+  let updateTrigger: number = $state(0)
+  let tracker: TrackerClass = $state(trackable.tracker)
+  let lastTrackerRef = $state<TrackerClass | undefined>(undefined)
+  let focusList: Array<string> = $state([])
+  // The default value as typed, so a comma can be entered and kept while typing
+  let defaultText: string = $state('')
+
+  // Sync when tracker reference changes or when updateTrigger changes
+  $effect(() => {
+    updateTrigger // depend on trigger to detect external changes
+    if (trackable?.tracker !== lastTrackerRef) {
+      tracker = trackable.tracker
+      lastTrackerRef = trackable.tracker
+      focusList = [...(tracker?.focus || [])]
+      defaultText = formatDefault(tracker.default)
+    }
+  })
+
+  // Initialize focus list from tracker
+  $effect(() => {
+    if (tracker) {
+      focusList = [...(tracker.focus || [])]
+    }
+  })
+
+  // Initialize note field if undefined
+  $effect(() => {
+    if (tracker && tracker.type === 'note' && tracker.note === undefined) {
+      tracker.note = ''
+    }
+  })
 
   const groupedUOM = getGroupedUoms()
 
-  let advanced = false
-  let forceAdvancedView = false
-  let advancedCanToggle = true
-  let tagHardcoded = false
-  let alsoInclude: boolean = false
+  let advanced: boolean = $state(false)
+  let forceAdvancedView: boolean = $state(false)
+  let advancedCanToggle: boolean = $state(true)
+  let tagHardcoded: boolean = $state(false)
+  let alsoInclude: boolean = $state(false)
 
-  // Watch for Tracker Changed while NOT Forced Advanced
-  $: if (tracker && !forceAdvancedView) {
-    if (tracker.include) {
-      alsoInclude = true
-    }
-    if (
-      tracker.include ||
-      tracker.default ||
-      tracker.math !== 'sum' ||
-      tracker.uom !== 'num' ||
-      tracker.step ||
-      tracker.one_tap
-    ) {
+  $effect(() => {
+    if (tracker && !forceAdvancedView) {
+      if (tracker.include) {
+        alsoInclude = true
+      }
+      // For habit type, always allow toggling - don't force advanced based on properties
+      if (tracker.type === 'habit') {
+        advancedCanToggle = true
+        advanced = false
+      } else {
+        // For other types, check if they have advanced properties set
+        const mathCheck = tracker.math !== 'sum'
+        const hasAdvancedProps =
+          tracker.include ||
+          tracker.default ||
+          mathCheck ||
+          tracker.uom !== 'num' ||
+          tracker.step ||
+          tracker.one_tap
+
+        if (hasAdvancedProps) {
+          advanced = true
+          advancedCanToggle = false
+        } else {
+          advancedCanToggle = true
+          advanced = false
+        }
+      }
+    } else if (forceAdvancedView) {
       advanced = true
-      advancedCanToggle = false
-    } else {
-      advancedCanToggle = true
-      advanced = false
     }
-  } else if (forceAdvancedView) {
-    advanced = true
+  })
+
+  $effect(() => {
+    if (tracker.type === 'timer') {
+      tracker.uom = 'timer'
+      tracker.min = null
+      tracker.max = null
+    } else if (tracker.uom == 'timer') {
+      tracker.uom = 'num'
+    } else if (tracker.type === 'range' && isNaN(tracker.min)) {
+      tracker.min = 1
+      tracker.max = 10
+    }
+  })
+
+  $effect(() => {
+    if (tracker.label && tracker._dirty && !tagHardcoded) {
+      tracker.tag = toTag(tracker.label)
+    }
+  })
+
+  const toNumber = (v) => parseFloat(`${v ?? ''}`.replace(',', '.'))
+
+  /**
+   * Step the min, max or default value up or down by the range step.
+   * Min never goes above max and max never goes below min.
+   * The default stays within the range.
+   */
+  function nudge(field: 'min' | 'max' | 'default', direction: 1 | -1) {
+    const step = toNumber(tracker.step) || 1
+    const min = toNumber(tracker.min)
+    const max = toNumber(tracker.max)
+    const current = toNumber(tracker[field])
+    let next = isNaN(current) ? (isNaN(min) ? 0 : min) : current + direction * step
+    if (field !== 'max' && !isNaN(max)) next = Math.min(max, next)
+    if (field !== 'min' && !isNaN(min)) next = Math.max(min, next)
+    tracker[field] = Math.round(next * 1e6) / 1e6
+    if (field === 'default') defaultText = formatDefault(tracker.default)
+    updateTrigger++
   }
 
-  //Catch if the UPM is timer and not a timer tracker
-  $: if (tracker.type === 'timer') {
-    tracker.uom = 'timer'
-    tracker.min = null
-    tracker.max = null
-  } else if (tracker.uom == 'timer') {
-    tracker.uom = 'num'
-  } else if (tracker.type === 'range' && isNaN(tracker.min)) {
-    tracker.min = 1
-    tracker.max = 10
-  }
-
-  $: if (tracker.label && tracker._dirty && !tagHardcoded) {
-    tracker.tag = toTag(tracker.label)
+  const formatDefault = (value: any): string => {
+    const n = toNumber(value)
+    return value === undefined || value === null || isNaN(n) ? '' : `${n}`
   }
 
   /**
-   * Get the Input for a tracker
-   * used in getting defaults
-   * but instead of using the defaults we will
-   * make ranges use value input instead of the slider.
+   * The default field is a text input, so a comma works as the decimal point.
+   * The typed text is kept as it is; the default is stored as a number.
    */
-  const getTrackerInput = async (target) => {
-    let str = await getTrackerInputAsString({
-      trackables: $TrackableStore.trackables,
-      tracker: tracker,
-      allowSave: false,
-      nextLabel: Lang.t('general.set', 'Set'),
-    })
-    if (str) {
-      tracker[target] = str.value
+  function onDefaultInput(text: string) {
+    defaultText = text
+    if (text.trim() === '') {
+      tracker.default = undefined
+      return
     }
-    // const [open, close] = useTrackerInputModal()
-    // open({
-    //   tracker: tracker,
-    //   trackables: $TrackableStore.trackables,
-    //   allowSave: false,
-    //   onComplete: async (value: any) => {
-    //     tracker[target] = value.value
-    //     await wait(200)
-    //     close({})
-    //   },
-    // })
-
-    // const response: any = await Interact.trackerInput(
-    //   {
-    //     label: tracker.label || 'Value',
-    //     tracker: 'value',
-    //     type: tracker.type == 'range' ? 'numeric' : tracker.type,
-    //     emoj: tracker.emoji || '',
-    //   },
-    //   {
-    //     value: tracker.default,
-    //     allowSave: false,
-    //   }
-    // )
-    // if (response && response.value) {
-    //   tracker[target] = response.value
-    // }
+    const n = toNumber(text)
+    if (!isNaN(n)) tracker.default = n
   }
 
   async function setType(type: ITrackerType) {
     await wait(200)
     tracker.type = type
+    if (tracker.type == 'habit') {tracker.math = 'mean'}
+    // Force reactivity update
+    updateTrigger++
   }
 
   const methods = {
@@ -188,11 +225,12 @@
   }
 </script>
 
-<!-- Tracker Label input -->
-<main class="flex flex-col space-y-4">
-  <!-- Tracker Type Selector -->
+{#key updateTrigger}
+  <!-- Tracker Label input -->
+  <main class="flex flex-col space-y-4">
+    <!-- Tracker Type Selector -->
 
-  <List solo>
+    <List solo>
     <ListItem
       id="tracker-type-selector"
       clickable
@@ -224,13 +262,35 @@
     </List>
   {/if}
 
+  {#if tracker.type == 'habit'}
+  <List solo>
+    <NInput
+      placeholder="Label for Achieved Habit"
+      type="text"
+      className="tracker-math mb-3"
+      bind:value={tracker.habitChoice[0]}
+    >
+    </NInput>
+    <Divider center />
+    <NInput
+      type="text"
+      className="tracker-math mb-3"
+      name="False"
+      placeholder="Label for Missed Habit"
+      bind:value={tracker.habitChoice[1]}
+    >
+     
+    </NInput>
+  </List>
+  
+    {/if}
+
   {#if tracker.type == 'range'}
     <List solo>
       <div class="flex px-1">
         <NInput
           listItem
-          pattern="[0-9]*"
-          inputmode="numeric"
+          inputmode="decimal"
           className="mr-2 tracker-min bg-transparent"
           style="width:45%;"
           name="min"
@@ -241,21 +301,18 @@
           }}
           bind:value={tracker.min}
         >
-          <div slot="right" class="pr-1">
-            <Button
-              icon
-              on:click={() => {
-                getTrackerInput('min')
-              }}
-            >
-              <IonIcon icon={AddCircleOutline} className="text-gray-500" />
+          <div slot="right" class="flex items-center">
+            <Button icon on:click={() => nudge('min', -1)}>
+              <IonIcon icon={RemoveOutline} className="text-gray-500" />
+            </Button>
+            <Button className="pr-1" icon on:click={() => nudge('min', 1)}>
+              <IonIcon icon={AddOutline} className="text-gray-500" />
             </Button>
           </div>
         </NInput>
         <NInput
           listItem
-          pattern="[0-9]*"
-          inputmode="numeric"
+          inputmode="decimal"
           className="tracker-max"
           style="width:45%;"
           name="max"
@@ -264,14 +321,12 @@
           on:focus={(e) => e.detail.target.select()}
           bind:value={tracker.max}
         >
-          <div slot="right" class="pr-1">
-            <Button
-              icon
-              on:click={() => {
-                getTrackerInput('max')
-              }}
-            >
-              <IonIcon icon={AddCircleOutline} className="text-gray-500" />
+          <div slot="right" class="flex items-center">
+            <Button icon on:click={() => nudge('max', -1)}>
+              <IonIcon icon={RemoveOutline} className="text-gray-500" />
+            </Button>
+            <Button className="pr-1" icon on:click={() => nudge('max', 1)}>
+              <IonIcon icon={AddOutline} className="text-gray-500" />
             </Button>
           </div>
         </NInput>
@@ -306,7 +361,34 @@
 
   {#if tracker.type == 'note'}
     <List solo>
-      <TrackableListBuilder bind:value={tracker.note} />
+      <TrackableListBuilder
+        value={tracker.note}
+        onValueChange={(newValue) => {
+          if (trackable?.tracker) {
+            trackable.tracker.note = newValue
+            // Increment trigger to force parent effect to re-run and detect the change
+            updateTrigger++
+          }
+        }}
+      />
+      <ListItem
+        title={Lang.t('tracker.combo-touch-only', 'Only log range and value items when touched')}
+        description={Lang.t(
+          'tracker.combo-touch-only-description',
+          'Off: range and value items log their default when you do not touch them. On: they are only logged once you touch them.'
+        )}
+      >
+        <div slot="right">
+          <NToggle
+            value={tracker.combo_touch_only === true}
+            on:change={(evt) => {
+              tracker.combo_touch_only = evt.detail
+              // Re-render from the tracker, so the switch shows the value that was set
+              updateTrigger++
+            }}
+          />
+        </div>
+      </ListItem>
       <!-- <ListItem
             transparent
             description={Lang.t(
@@ -317,7 +399,7 @@
     </List>
   {/if}
 
-  {#if tracker.type !== 'timer' && tracker.type !== 'note' && tracker.type !== 'picker'}
+  {#if tracker.type !== 'timer' && tracker.type !== 'note' && tracker.type !== 'picker' && tracker.type !== 'habit'}
     <List solo>
       <NInput
         listItem
@@ -396,23 +478,11 @@
         <NInput
           listItem
           className="tracker-step mb-3"
-          pattern="[0-9]*"
-          inputmode="numeric"
+          inputmode="decimal"
           label={Lang.t('tracker.step', 'Range Step')}
           placeholder={Lang.t('tracker.step', 'Range Step')}
           bind:value={tracker.step}
-        >
-          <div slot="right" class="pr-1">
-            <Button
-              icon
-              on:click={() => {
-                getTrackerInput('step')
-              }}
-            >
-              <IonIcon icon={AddCircleOutline} className="text-gray-500" />
-            </Button>
-          </div>
-        </NInput>
+        />
       </List>
     {/if}
 
@@ -429,34 +499,44 @@
           </ListItem>
         {/if} -->
 
-    {#if advanced && ['note', 'picker'].indexOf(tracker.type) === -1}
+    {#if advanced && ['note', 'picker'].indexOf(tracker.type) === -1 && tracker.type != 'habit'}
       <NInput
         listItem
         className="tracker-default mb-3 error"
-        pattern="[0-9]*"
-        inputmode="numeric"
-        type="number"
+        inputmode="decimal"
         label={Lang.t('tracker.value', 'Default Value')}
         placeholder={Lang.t('tracker.default-value', 'Default Value')}
-        bind:value={tracker.default}
+        value={defaultText}
+        on:input={(evt) => onDefaultInput(evt.detail)}
       >
-        <div slot="right">
+        <div slot="right" class="flex items-center">
           {#if tracker.default}
-            <Text size="xs" className="text-right text-primary-500">
+            <Text size="xs" className="text-right text-primary-500 mr-1">
               {tracker.displayValue(tracker.default)}
             </Text>
           {/if}
-          <Button
-            className="pr-1"
-            icon
-            on:click={() => {
-              getTrackerInput('default')
-            }}
-          >
-            <IonIcon icon={AddCircleOutline} className="text-gray-500" />
+          <Button icon on:click={() => nudge('default', -1)}>
+            <IonIcon icon={RemoveOutline} className="text-gray-500" />
+          </Button>
+          <Button className="pr-1" icon on:click={() => nudge('default', 1)}>
+            <IonIcon icon={AddOutline} className="text-gray-500" />
           </Button>
         </div>
       </NInput>
+    {/if}
+    {#if advanced && tracker.type === 'habit'}
+    <NInput
+    listItem
+    type="select"
+    className="tracker-math mb-3"
+    name="default habit"
+    placeholder="Choose Default Habit Result"
+    bind:value={tracker.default}
+  >
+    {#each [{ value: 1, label: tracker.habitChoice[0]}, { value: -1, label: tracker.habitChoice[1]}] as habit_key}
+      <option value={habit_key.value}>{habit_key.label}</option>
+    {/each}
+  </NInput>
     {/if}
   </List>
 
@@ -485,7 +565,7 @@
             label={Lang.t('tracker.include', 'Also Include')}
             placeholder={Lang.t(
               'tracker.include-placeholder',
-              'Insert additional #trackers, @people, and +context when using this tracker'
+              'Insert additional #trackers, @people, ^pointers and +context when using this tracker'
             )}
             bind:value={tracker.include}
           />
@@ -515,16 +595,18 @@
         <div class="grid p-2 grid-cols-3 gap-2">
           {#each focusTypes as focus}
             <button
+              type="button"
               on:click={() => {
-                let foundIndex = tracker.focus.indexOf(focus.id)
+                let foundIndex = focusList.indexOf(focus.id)
                 if (foundIndex > -1) {
-                  tracker.focus = tracker.focus.filter((f) => f !== focus.id)
+                  focusList = focusList.filter((f) => f !== focus.id)
                 } else {
-                  tracker.focus.push(focus.id)
+                  focusList = [...focusList, focus.id]
                 }
-                tracker.focus = tracker.focus
+                tracker.focus = focusList
+                updateTrigger++
               }}
-              class=" flex text-center justify-center py-1 px-2 rounded-md items-center {tracker.focus.indexOf(
+              class=" flex text-center justify-center py-1 px-2 rounded-md items-center {focusList.indexOf(
                 focus.id
               ) > -1
                 ? 'ring-2 ring-primary-500 dark:text-white font-bold'
@@ -555,4 +637,5 @@
       </List>
     </section>
   {/if} -->
-</main>
+  </main>
+{/key}

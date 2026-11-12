@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -9,19 +11,14 @@
 
   const dispatch = createEventDispatcher()
 
-  export let score = 0
-  export let className = ''
-  export let style = ''
-  export let size = 'md'
-  export let transparent = false
-  export let id = undefined
-  export let showClose: boolean = false
 
   async function onChange(sc) {
     score = sc
     await tick(200)
     dispatch('change', score)
   }
+
+  const { score, className, style, size, transparent, id, showClose } = $props()
 </script>
 
 <div

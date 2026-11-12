@@ -10,7 +10,7 @@ export default {
   always_locate_key: 'always-locate',
   dark_mode_key: 'dark-mode',
   theme_key: 'theme',
-  support_email: 'support@happydata.org',
+  support_email: 'dailynomie@gmail.com',
   support_contact: 'Email Support',
   messages_url: 'https://s3.amazonaws.com/cdn.nomie.app/messages/messages.json',
   s3providersLink: "https://spectacular-collard-13a.notion.site/S3-Storage-Providers-fa4888f87e964ffaabbe113c1ede8f83",

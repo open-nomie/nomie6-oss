@@ -1,7 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import SettingsPage from '../domains/settings/settings-page.svelte'
-  export const location = undefined
-  export const style = undefined
+  const location = undefined
+  const style = undefined
 </script>
 
 <SettingsPage />

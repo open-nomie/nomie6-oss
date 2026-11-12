@@ -1,7 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let emojis: Array<string> = []
-  export let size: number = 42
-  export let className: string = ''
+
+
+  const { emojis, size, className } = $props()
 </script>
 
 <div class="many-emoji {className}" style="--size:{size}px">

@@ -1,12 +1,11 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // Svelte
   import { createEventDispatcher } from 'svelte'
   // Utils
   import time from '../../utils/time/time'
   // export let started = undefined;
-  export let className = ''
-  export let value = 0
-  export let size: 'sm' | 'default' = 'default'
 
   // Consts
   const dispatch = createEventDispatcher()
@@ -83,26 +82,28 @@
     },
   }
 
+  let { className, value = $bindable(), size } = $props()
+
   // Data
-  let data = {
+  let data = $state({
     ...methods.timeStringToNode(value),
     computed: {
       totalSeconds: 0,
     },
     localValue: value,
-  }
+  })
 
   // Watch for Value Change
-  $: if (value > -1) {
-    // Get the Chunks from Seconds
-    let dateChunks = methods.timeStringToNode(value)
-    // Set local data chunks to new value
-    data.hours = time.padTime(dateChunks.hours)
-    data.minutes = time.padTime(dateChunks.minutes)
-    data.seconds = time.padTime(dateChunks.seconds)
-  }
-
-  // On Mount
+  $effect(() => {
+    if (value > -1) {
+      // Get the Chunks from Seconds
+      let dateChunks = methods.timeStringToNode(value)
+      // Set local data chunks to new value
+      data.hours = time.padTime(dateChunks.hours)
+      data.minutes = time.padTime(dateChunks.minutes)
+      data.seconds = time.padTime(dateChunks.seconds)
+    }
+  })
 </script>
 
 <div class="n-counter-manual size-{size} {className}">

@@ -3,7 +3,6 @@ import { wait } from '../../utils/tick/tick'
 import dayjs, { Dayjs } from 'dayjs'
 import { Trackable } from '../trackable/Trackable.class'
 import { strToTrackable } from '../trackable/trackable-utils'
-import { trackEvent } from '../usage/stat-ping'
 
 type StatsStoreState = {
   trackable: undefined | Trackable
@@ -46,7 +45,6 @@ export const openStats = async (trackable: Trackable | string, date?: Dayjs) => 
     }
     return s
   })
-  trackEvent('open_stats')
   // Give time for ui to do Animation
   await wait(300)
   StatsStore.update((s) => {

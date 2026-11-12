@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import IonIcon from './../icon/ion-icon.svelte'
   import { createEventDispatcher } from 'svelte'
@@ -8,28 +10,13 @@
 
   import { MoreVertical } from '../icon/nicons'
 
-  export let title: string | undefined = undefined
-  export let subtitle: string | undefined = undefined
-  export let value: any = undefined
-  export let color: string | number | undefined = undefined
-  export let emoji: string | undefined = undefined
-  export let avatar: string | undefined = undefined
-  export let style: string = ''
-  export let id: string | undefined = undefined
+  const { title, subtitle, value, color, emoji, avatar, style, id, hideMore, hideValue, className, compact, moreIcon = MoreVertical, oneTap, hoursUsed } = $props()
 
-  export let hideMore: boolean = false
-  export let hideValue: boolean = false
-  export let className: string = ''
-  export let compact: boolean = false
-  export let moreIcon: any = MoreVertical
-  export let oneTap: boolean = false
-  export let hoursUsed = []
-
-  let clickSkip
+  let clickSkip = $state(undefined)
 
   const dispatch = createEventDispatcher()
 
-  $: emojiSize = compact ? 30 : 40
+  let emojiSize = $derived(compact ? 30 : 40)
 
   async function more() {
     dispatch('more')
@@ -91,7 +78,18 @@
       {/if}
       <div class="value-sub">
         {#if value && !hideValue}
+          {#if id.includes('habit')}
+            {#if value < -0.5}
+            <span class="value">👎</span>
+            {:else if value <0.3}
+            <span class="value">🤙</span>
+            {:else}
+            <span class="value">👍</span>
+            {/if}
+          
+          {:else}
           <span class="value">{value}</span>
+          {/if}
         {/if}
         {#if subtitle}
           <span class="subtitle">{subtitle}</span>

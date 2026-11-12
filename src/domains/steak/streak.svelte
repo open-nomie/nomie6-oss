@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
   import type { Dayjs } from 'dayjs'
@@ -16,26 +18,12 @@
   import { strToTrackable } from '../trackable/trackable-utils'
   import { TrackableStore } from '../trackable/TrackableStore'
 
-  export let term: string
-  export let selectedDate: Dayjs = dayjs()
-  export let view: StreakViewTypes = 'month'
-  export let trackable: Trackable
-  export let className: string = ''
-  export let showDetail: boolean = true
+  const { term, selectedDate, view, trackable, className, showDetail } = $props()
 
-  let calendarLogs: Array<CalendarLog>
-  let mockTracker: TrackerClass
-  let lastTerm: string
-  let lastElement: Trackable
-
-  $: if (term && lastTerm !== term && !trackable) {
-    lastTerm = term
-    trackable = strToTrackable(term, $TrackableStore.trackables)
-    main()
-  } else if (trackable && lastElement !== trackable) {
-    lastElement = trackable
-    main()
-  }
+  let calendarLogs = $state<Array<CalendarLog>>([])
+  let mockTracker = $state<TrackerClass>()
+  let lastTerm = $state<string>()
+  let lastElement = $state<Trackable>()
 
   async function main() {
     if (trackable) {
@@ -45,6 +33,17 @@
       calendarLogs = StreakHelper.logsToCalendar(logs)
     }
   }
+
+  $effect(() => {
+    if (term && lastTerm !== term && !trackable) {
+      lastTerm = term
+      trackable = strToTrackable(term, $TrackableStore.trackables)
+      main()
+    } else if (trackable && lastElement !== trackable) {
+      lastElement = trackable
+      main()
+    }
+  })
 </script>
 
 <div class="n-streak n-streak-{view} {className}">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 
   import { dedupArray } from '../../utils/array/array_utils'
@@ -8,19 +10,22 @@
   import { TrackableStore } from '../trackable/TrackableStore'
   import { TrackableUsage } from '../usage/trackable-usage.class'
   import { wait } from '../../utils/tick/tick'
-  
+
   import dayjs from 'dayjs'
   import logsToTrackableUsage, { logFilter } from '../usage/usage-utils'
   import type { DashboardClass } from './dashboard-class'
   import type { Trackable } from '../trackable/Trackable.class'
   import type { WidgetClass } from './widget/widget-class'
+  import { WidgetClass } from './widget/widget-class'
   import type NLog from '../nomie-log/nomie-log'
   import WidgetDisplay from './widget/widget-display.svelte'
 
-  export let dashboard: DashboardClass
-  export let showDate: boolean = false
+  const { dashboard, showDate = false } = $props<{
+    dashboard: DashboardClass
+    showDate?: boolean
+  }>()
 
-  let loaded = false
+  let loaded = $state(false)
 
   type WidgetWrapper = {
     id: string
@@ -31,9 +36,9 @@
     logs: Array<NLog>
   }
 
-  let logs: Array<NLog> = []
-  let widgets: Array<WidgetWrapper> = []
-  let dateFormats = getDateFormats()
+  let logs: Array<NLog> = $state([])
+  let widgets: Array<WidgetWrapper> = $state([])
+  let dateFormats = $state(getDateFormats())
 
   /**
    * Load Dashboard Usage
@@ -76,17 +81,21 @@
 
     // Loop over dashboard widgets
     let newWidgets = dashboardWidgets.map((widget, index) => {
+      // Ensure widget is a WidgetClass instance
+      const widgetInstance = widget instanceof WidgetClass ? widget : new WidgetClass(widget)
+
       // If its a widget that needs a trackable
       let hash = md5(JSON.stringify(widget))
-      if (widget.token) {
+      if (widgetInstance.token) {
         // Get the Trackable for this widget
-        let trackable = tokenToTrackable(widget.token, trackables)
+        //console.log(widget.token)
+        let trackable = tokenToTrackable(widgetInstance.token, trackables)
 
         // Filter out based on the time and trackable
         const filteredLogs = logFilter(logs, {
           trackables: [trackable],
-          start: widget.getStartDate($Prefs.weekStarts),
-          end: widget.getEndDate($Prefs.weekStarts),
+          start: widgetInstance.getStartDate($Prefs.weekStarts),
+          end: widgetInstance.getEndDate($Prefs.weekStarts),
         })
 
         // Generate Usage Map
@@ -105,13 +114,13 @@
         }
       } else {
         const filteredLogs = logFilter(logs, {
-          start: widget.getStartDate($Prefs.weekStarts),
-          end: widget.getEndDate($Prefs.weekStarts),
+          start: widgetInstance.getStartDate($Prefs.weekStarts),
+          end: widgetInstance.getEndDate($Prefs.weekStarts),
         })
 
         return {
-          widget,
-          id: widget.id,
+          widget: widgetInstance,
+          id: widgetInstance.id,
           trackable: undefined,
           usage: undefined,
           logs: filteredLogs,
@@ -123,9 +132,11 @@
     loaded = true
   }
 
-  $: if (dashboard) {
-    loadDashboardUsage()
-  }
+  $effect(() => {
+    if (dashboard) {
+      loadDashboardUsage()
+    }
+  })
 </script>
 
 <div id="widgets-frame" class={showDate ? 'bg-gray-100 pt-4 dark:bg-gray-800' : ''}>

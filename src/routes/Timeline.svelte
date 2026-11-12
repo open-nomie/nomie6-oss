@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   /**
    * Timeline Page
@@ -7,13 +9,13 @@
 
   import dayjs from 'dayjs'
   import type { Dayjs } from 'dayjs'
+  import { untrack } from 'svelte'
 
   import Layout from '../domains/layout/layout.svelte'
 
   import { getDateFormats } from '../domains/preferences/Preferences'
   import LetterTicker from '../components/letter-ticker/letter-ticker.svelte'
   import { TrackableStore } from '../domains/trackable/TrackableStore'
-  import { onMount } from 'svelte/internal'
 
   import Button from '../components/button/button.svelte'
   import IonIcon from '../components/icon/ion-icon.svelte'
@@ -44,19 +46,21 @@
 
   import TimelineLoader from '../domains/timeline/timeline-loader.svelte'
 
-  let startingDate: Date = new Date()
-  let date: Dayjs = dayjs(startingDate)
-  let displayDate = dayjs()
-  let topItem: TimelineItemType
-  let inPast: boolean = false
+  let startingDate = $state<Date>(new Date())
+  let date = $derived(dayjs(startingDate))
+  let topItem = $state<TimelineItemType>(undefined)
+  let displayDate = $state(dayjs())
+  let inPast = $state(false)
 
   const dateFormats = getDateFormats()
 
   let hashDate: any
 
-  $: if (date && date !== hashDate && $TrackableStore.ready) {
-    hashDate = date
-  }
+  $effect(() => {
+    if (date && date !== hashDate && $TrackableStore.ready) {
+      hashDate = date
+    }
+  })
 
   /**
    * Jump to specific point in time
@@ -64,14 +68,8 @@
   const jumpTo = async () => {
     const jumpDate = await selectFuzzyDate(dayjs(date), false)
     if (jumpDate) {
-      date = dayjs(jumpDate)
       startingDate = jumpDate.toDate()
-      displayDate = date
-      if (startingDate.toDateString() !== new Date().toDateString()) {
-        inPast = true
-      } else {
-        inPast = false
-      }
+      inPast = jumpDate.toDate().toDateString() !== new Date().toDateString()
     }
   }
 
@@ -84,6 +82,7 @@
     maps: false,
     trackables: false,
     context: false,
+    pointers: false,
   }
 
   // A function that takes a filter object and returns a new filter object with the search and startingDate properties set to undefined.
@@ -93,7 +92,7 @@
     return f
   }
 
-  let filters: TimelineFilterProps = { ...baseFilters }
+  let filters: TimelineFilterProps = $state({ ...baseFilters })
 
   /**
    * Show the Menu Filter
@@ -133,23 +132,22 @@
     return options
   }
 
-  let filterMenu: Array<PopMenuButton> = showFilterMenu()
+  let filterMenu = $derived(showFilterMenu())
+  let mounted = $state(true)
 
-  $: if ($TimelineOptionsStore.filters) {
-    filters = $TimelineOptionsStore.filters
-    filterMenu = showFilterMenu()
-  }
-
-  let mounted: boolean
-
-  onMount(async () => {
-    mounted = true
+  $effect(() => {
+    if ($TimelineOptionsStore.filters) {
+      const newFilters = $TimelineOptionsStore.filters
+      if (JSON.stringify(newFilters) !== JSON.stringify(filters)) {
+        filters = newFilters
+      }
+    }
   })
 </script>
 
 <Layout pageTitle="Timeline" className="timeline-layout bg-gray-200 dark:bg-gray-800">
   <Toolbar slot="header" className="py-2 h-14">
-    <MenuInline id="timeline-filter" menuButtons={filterMenu} buttonClass="menu-icon-button">
+    <MenuInline id="timeline-filter" y="bottom" menuButtons={filterMenu} buttonClass="menu-icon-button">
       <IonIcon className="text-primary-500" icon={CaretDownCircle} size={32} />
     </MenuInline>
     <div class="ntitle w-full mt-2 px-4  justify-center items-center  grid grid-cols-1">
@@ -196,9 +194,11 @@
     bind:startingDate
     on:topItem={(evt) => {
       topItem = evt.detail
-      displayDate = topItem.time
+      if (topItem?.logs?.[0]) {
+        displayDate = dayjs(topItem.logs[0].end)
+      }
     }}
-    bind:filters
+    {filters}
   />
   <div class="h-14" />
 </Layout>

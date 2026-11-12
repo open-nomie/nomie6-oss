@@ -13,7 +13,6 @@ import { usageAwards } from './helpers/usage-awards'
 import { wait } from '../../utils/tick/tick'
 import { writable } from 'svelte/store'
 import NPaths from '../../paths'
-import { trackEvent } from '../usage/stat-ping'
 
 type AwardStoreProps = {
   ready: boolean
@@ -35,7 +34,6 @@ export const AwardStore = writable(AwardStoreState)
 
 AwardStore.subscribe((store) => {
   if (store.newAwards.length) {
-    trackEvent('new-awards')
     openModal({
       id: `new-awards`,
       component: NewAwardModal,

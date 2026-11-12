@@ -1,56 +1,61 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // svelte
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import { createEventDispatcher, onDestroy, onMount, untrack } from 'svelte'
   import { getElementPosition } from '../../modules/html-elements/position'
   import nid from '../../modules/nid/nid'
   import { Device } from '../../store/device-store'
 
   import { wait } from '../../utils/tick/tick'
 
-  export let activeIndex = undefined
-  export let activeClass: string = 'active'
-  export let className: string = ''
-  export let centerIfPossible: boolean = false
-  export let wrapperClass: string = ''
-  export let wrapperStyle: string = ''
-  export let captureCenter: boolean = false
-  export let captureCenterWindow: boolean = false
-  export let style = ''
-  export let id = `hs-${nid()}`
+
 
   const dispatch = createEventDispatcher()
 
   // Locals
   let wrapper
   let scroller
-  let ready = false
-  let centered = true
+  let ready = $state(false)
+  let centered = $state(true)
+  let localActiveIndex = $state(undefined)
 
-  $: if (activeIndex && ready) {
-    methods.selectIndex(activeIndex)
-    checkForCenter()
-  }
+  const { activeIndex = undefined, activeClass, className, centerIfPossible, wrapperClass, wrapperStyle, captureCenter, captureCenterWindow, style, id } = $props()
 
-  $: if ($Device.width) {
-    checkForCenter()
-  }
+  // Commenting out all effects to isolate the infinite loop source
+  // $effect(() => {
+  //   if (activeIndex !== undefined && ready) {
+  //     untrack(() => {
+  //       methods.selectIndex(activeIndex)
+  //       checkForCenter()
+  //     })
+  //   }
+  // })
+
+  // $effect(() => {
+  //   if ($Device.width) {
+  //     checkForCenter()
+  //   }
+  // })
 
   const checkForCenter = () => {
-    if (centerIfPossible && wrapper) {
-      let width = wrapper.offsetWidth
-      let scrollWidth = wrapper.scrollWidth
+    untrack(() => {
+      if (centerIfPossible && wrapper) {
+        let width = wrapper.offsetWidth
+        let scrollWidth = wrapper.scrollWidth
 
-      if (scrollWidth > width) {
-        centered = false
+        if (scrollWidth > width) {
+          centered = false
+        } else {
+          centered = true
+        }
       } else {
-        centered = true
+        centered = false
       }
-    } else {
-      centered = false
-    }
+    })
   }
 
-  let timer
+  let timer = $state(undefined)
 
   const getTopChild = (element: any): HTMLElement | undefined => {
     if (element) {
@@ -112,11 +117,14 @@
     }
   }
 
-  $: if ($Device.width) {
-    checkForCenter()
-    scrollDebounce()
-    tagChildren()
-  }
+  // Commenting out Device.width effect - causes infinite loop
+  // $effect(() => {
+  //   if ($Device.width) {
+  //     checkForCenter()
+  //     scrollDebounce()
+  //     tagChildren()
+  //   }
+  // })
 
   // const getChildAt = (left: number): Element | undefined => {
   //   const children = document.querySelectorAll(`#${id} [data-child-id]`)
@@ -156,16 +164,16 @@
     },
     // Clear currently selected index
     clearSelected() {
-      if (activeIndex > -1 && wrapper?.children[activeIndex]) {
-        wrapper?.children[activeIndex].classList.remove(activeClass)
+      if (localActiveIndex > -1 && wrapper?.children[localActiveIndex]) {
+        wrapper?.children[localActiveIndex].classList.remove(activeClass)
       }
     },
     // Select new item
     selectIndex(index) {
       clearFocused()
-      activeIndex = index
+      localActiveIndex = index
       try {
-        let child = wrapper.children[activeIndex]
+        let child = wrapper.children[localActiveIndex]
         // let parentOffset = wrapper.offsetLeft
         if (child) {
           setTimeout(() => {

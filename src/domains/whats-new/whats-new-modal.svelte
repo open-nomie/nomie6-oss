@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
 
@@ -11,10 +13,23 @@
   import { Lang } from '../../store/lang'
   import List from '../../components/list/list.svelte'
 
-  export let id: string
+  let newfeatures = whatsNew.features.filter(feature => feature.version == whatsNew.version);
+  let newfixes = whatsNew.fixes.filter(fix => fix.version == whatsNew.version);
 
-  let showFixes = false
-  let showUpdates = false
+  const versionDate = (version: string) => Number(version.match(/(\d{8})$/)?.[1] ?? 0)
+  const versions: Array<string> = [...new Set([...whatsNew.features, ...whatsNew.fixes].map((item) => item.version))]
+    .sort((a, b) => versionDate(b) - versionDate(a))
+  const featuresOf = (version: string) => whatsNew.features.filter((feature) => feature.version == version)
+  const fixesOf = (version: string) => whatsNew.fixes.filter((fix) => fix.version == version)
+
+  let expanded = $state<Record<string, boolean>>({})
+  const toggle = (key: string) => {
+    expanded[key] = !expanded[key]
+  }
+
+  let showUpdates = $state(false)
+
+  const { id } = $props()
 </script>
 
 <BackdropModal>
@@ -36,30 +51,34 @@
   </header>
   {#if whatsNew && !showUpdates}
     <div class="p-6 text-gray-800 dark:text-gray-200">
-      Nomie {import.meta.env.PACKAGE_VERSION} adds {whatsNew.features.length} features, and {whatsNew.fixes.length} bug fixes.
+      Nomie {import.meta.env.PACKAGE_VERSION} adds {newfeatures.length} features, and {newfixes.length} bug fixes.
     </div>
   {/if}
   {#if whatsNew && showUpdates}
-    {#if whatsNew.features.length}
-      <List solo outside title="Features">
-        {#each whatsNew.features as feature}
-          <NItem bottomLine={16} className="text-sm py-1" compact>
-            <!-- <div slot="left" class="text-faded-2">{feature.version}</div> -->
-            {feature.title}
+    {#each versions as version}
+      <List solo outside title={version}>
+        {#if featuresOf(version).length}
+          <NItem bottomLine={16} className="text-sm py-1" compact clickable on:click={() => toggle(`${version}:features`)}>
+            {expanded[`${version}:features`] ? '▾' : '▸'} Features ({featuresOf(version).length})
           </NItem>
-        {/each}
-      </List>
-    {/if}
-    {#if whatsNew.fixes.length}
-      <List outside solo title="Bug Fixes">
-        <Button slot="header-right" on:click={() => (showFixes = true)} clear primary size="sm">Show Fixes</Button>
-        {#if showFixes}
-          {#each whatsNew.fixes as fix}
-            <NItem bottomLine={16} className="text-sm py-1" compact>{fix.title}</NItem>
-          {/each}
+          {#if expanded[`${version}:features`]}
+            {#each featuresOf(version) as feature}
+              <NItem bottomLine={16} className="text-sm py-1 pl-6" compact>{feature.title}</NItem>
+            {/each}
+          {/if}
+        {/if}
+        {#if fixesOf(version).length}
+          <NItem bottomLine={16} className="text-sm py-1" compact clickable on:click={() => toggle(`${version}:fixes`)}>
+            {expanded[`${version}:fixes`] ? '▾' : '▸'} Bug Fixes ({fixesOf(version).length})
+          </NItem>
+          {#if expanded[`${version}:fixes`]}
+            {#each fixesOf(version) as fix}
+              <NItem bottomLine={16} className="text-sm py-1 pl-6" compact>{fix.title}</NItem>
+            {/each}
+          {/if}
         {/if}
       </List>
-    {/if}
+    {/each}
   {/if}
   <footer slot="footer" class="flex-shrink-0 p-4">
     {#if !showUpdates}

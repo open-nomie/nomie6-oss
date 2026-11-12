@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../../components/list-item/list-item.svelte'
   import List from '../../../components/list/list.svelte'
@@ -5,12 +7,9 @@
 
   import type { Trackable } from '../Trackable.class'
 
-  export let trackable: Trackable
+  const { trackable } = $props<{ trackable: Trackable }>()
 
   const remove = () => {}
-  // const duplicate = () => {
-  
-  // }
 </script>
 
 <List className="pb-10">

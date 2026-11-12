@@ -1,8 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let size = 32
-  export let color = '#319ED7'
-  export let className = ''
-  export let style = ''
+  const { size = 32, color = '#319ED7', className = '', style = '' } = $props()
 </script>
 
 <svg

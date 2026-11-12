@@ -1,14 +1,13 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import type NLog from '../../domains/nomie-log/nomie-log'
 
   import math from '../../utils/math/math'
 
-  export let log1: NLog
-  export let log2: NLog
-
-  let diff: number = 0
-  let display: string = ``
+  let diff = $state<number>(0)
+  let display = $state<string>("")
 
   async function main() {
     diff = log1.endDayjs().startOf('day').diff(log2.endDayjs().startOf('day'), 'day')
@@ -22,6 +21,8 @@
   }
 
   onMount(main)
+
+  const { log1, log2 } = $props()
 </script>
 
 {#if diff > 1}

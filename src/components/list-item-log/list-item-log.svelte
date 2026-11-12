@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { getDateFormats } from '../../domains/preferences/Preferences'
   import { getEmojiFromScore, selectPositivity, selectPositivityPopmenu } from '../../utils/positivity/positivity'
@@ -23,19 +25,19 @@
   import is from '../../utils/is/is'
 
   // props
-  export let log = undefined
   // export let trackers = {};
-  export let fullDate: boolean = false
-  export let hideTrackables = false
-  export let className = ''
+
 
   // consts
 
-  let displayLog: NLog
+  let displayLog = $state<NLog>(undefined)
+  let displayScore = $state<number | undefined>(undefined)
   // let editMode:boolean = true;
 
-  let lastLog: string | undefined = undefined
-  let logElements: Array<{ token: Token; trackable: Trackable; value: number }> = []
+  let lastLog = $state<string | undefined>(undefined)
+  let logElements = $state<Array<{ token: Token; trackable: Trackable; value: number }>>([])
+
+  const { log, fullDate, hideTrackables, className } = $props()
 
   /**
    * Watches for a Log Change
@@ -43,30 +45,54 @@
    * expensive function, otherwise don't
    * do it!
    */
-  $: if (log && objectHash(log) !== lastLog) {
-    lastLog = objectHash(log)
-    // Setup the display log
-    displayLog = new NLog(log)
+  $effect(() => {
+    if (log && objectHash(log) !== lastLog) {
+      lastLog = objectHash(log)
+      // Setup the display log
+      displayLog = new NLog(log)
 
-    // Format the log Elements
-    logElements = log.elements
-      .filter((t) => t.type !== 'generic')
-      .map((token, index) => {
-        const trk = tokenToTrackable(token, $TrackableStore.trackables)
-        return {
-          trackable: trk,
-          token,
-          value: parseNumber(token.value || trk?.value || 0),
-        }
-      })
-      .filter((le) => le.trackable)
-  }
+      // Convert trackables to ITrackers format (map keyed by tag)
+      const knownTrackers = {}
+      if ($TrackableStore.trackables) {
+        // Handle both object and array formats
+        const trackablesArray = Array.isArray($TrackableStore.trackables)
+          ? $TrackableStore.trackables
+          : Object.values($TrackableStore.trackables)
+
+        trackablesArray.forEach((trackable: any) => {
+          if (trackable && trackable.type === 'tracker' && trackable.tracker) {
+            // Store by tag without # prefix
+            const cleanTag = trackable.tag ? trackable.tag.replace(/^#/, '') : trackable.tag
+            if (cleanTag) {
+              knownTrackers[cleanTag] = trackable.tracker
+            }
+          }
+        })
+      }
+
+      // Recalculate score using custom conditions
+      const calculated = displayLog.calculateScore(knownTrackers)
+      displayScore = calculated
+
+      // Format the log Elements
+      logElements = log.elements
+        .filter((t) => t.type !== 'generic')
+        .map((token, index) => {
+          const trk = tokenToTrackable(token, $TrackableStore.trackables)
+          return {
+            trackable: trk,
+            token,
+            value: parseNumber(token.value || trk?.value || 0),
+          }
+        })
+        .filter((le) => le.trackable)
+    }
+  })
 
   const changePositivity = async (log: NLog) => {
     const results: any = await selectPositivityPopmenu(log.score)
     if (results && is.truthy(results.score)) {
       log.score = results.score
-      console.log({ score: log.score })
       await onLogNoteChange(log.note, log)
     }
   }
@@ -96,6 +122,8 @@
       inputResults = trackable.tag
     } else if (trackable.type == 'context') {
       inputResults = trackable.tag
+    } else if (trackable.type == 'pointer') {
+      inputResults = trackable.tag
     }
     if (inputResults) {
       let newNote = `${displayLog.note} ${inputResults}`
@@ -110,7 +138,7 @@
   <div id="log-{displayLog._id}" class:pinned={displayLog.pinned} class="note-bubble space-y-2 bubble {className}">
     <div class="flex items-center justify-between text-xs  space-x-3 -mt-2">
       <button on:click={() => changePositivity(log)} class="text-base text-gray-600 dark:text-gray-400"
-        >{getEmojiFromScore(log.score).emoji}</button
+        >{getEmojiFromScore(log.score !== undefined && log.score !== null && log.score !== 0 ? log.score : displayScore).emoji}</button
       >
       <div class="text-gray-500 stiff line-clamp-1">
         {#if fullDate}
@@ -166,6 +194,7 @@
     {#if !hideTrackables}
       <div class="trackables -px-1 w-full flex flex-wrap">
         {#each logElements as logElement, index (`${logElement.trackable.tag}-${index}`)}
+        {#if logElement.trackable.type != "pointer"}
           <TinyTrackable
             trackable={logElement.trackable}
             value={logElement.value}
@@ -174,7 +203,20 @@
               showTrackablePopmenu(logElement.trackable, { date: log.endDayjs() })
             }}
           />
+          {/if}
         {/each}
+        {#each logElements as logElement, index (`${logElement.trackable.tag}-${index}`)}
+        {#if logElement.trackable.type == "pointer"}
+        <TinyTrackable
+          trackable={logElement.trackable}
+          value={logElement.value}
+          date={log.end}
+          on:click={() => {
+            showTrackablePopmenu(logElement.trackable, { date: log.endDayjs() })
+          }}
+        />
+        {/if}
+      {/each}
         <button on:click={() => addItem()} class="tiny-trackable bg-transparent">
           <span class="value w-5">+</span>
         </button>

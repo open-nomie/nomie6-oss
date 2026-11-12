@@ -377,6 +377,7 @@ export const showTrackablePopmenu = async (
         if (trackable.type === 'tracker') openTrackableEditor(trackable)
         if (trackable.type === 'person') openTrackableEditor(trackable)
         if (trackable.type === 'context') openTrackableEditor(trackable)
+        if (trackable.type === 'pointer') openTrackableEditor(trackable)
         click()
       },
     },

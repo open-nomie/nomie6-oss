@@ -12,14 +12,14 @@ A new fork called Daily Nomie is being maintained over here https://github.com/d
 
 Nomie 6 can be run on any web server without special server side code.
 
-Latest build: [`bin/nomie6-oss.latest.zip`](https://github.com/open-nomie/nomie6-oss/raw/master/bin/nomie6-oss.latest.zip)
+Latest build: [`bin/nomie6-oss.latest.zip`](https://github.com/dailynomie/nomie6-oss/raw/master/bin/nomie6-oss.latest.zip)
 
 ## Building and Running
 
 You'll need Node >= 16 and NPM. I have not tested running this on Windows.
 
 ```bash
-git clone git@github.com:happydata/nomie6-oss.git
+git clone git@github.com:dailynomie/nomie6-oss.git
 cd nomie6-oss
 npm install
 npm run dev

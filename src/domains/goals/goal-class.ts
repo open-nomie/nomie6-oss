@@ -6,7 +6,7 @@ import math from '../../utils/math/math'
 import nid from '../../modules/nid/nid'
 import { parseNumber } from '../../utils/parseNumber/parseNumber'
 
-export type GoalDurationType = 'day' | 'week' | 'month'
+export type GoalDurationType = 'day' | 'week' | 'month' | 'year'
 
 export type GoalComparisonType = 'lt' | 'lte' | 'eq' | 'gt' | 'gte'
 
@@ -17,6 +17,7 @@ export type GoalType = {
   duration?: GoalDurationType
   target?: number // the goal target
   comparison?: GoalComparisonType
+  usedailyaverage?: boolean
 }
 
 export type GoalScoreType = {
@@ -36,6 +37,7 @@ export class GoalClass {
   duration?: GoalDurationType
   target?: number // the goal target
   comparison?: GoalComparisonType
+  usedailyaverage?: boolean
 
   constructor(starter: GoalType = {}) {
     this.id = starter.id || nid()
@@ -43,9 +45,10 @@ export class GoalClass {
     this.trackable = starter.trackable ? new Trackable(starter.trackable) : undefined
     this.tag = starter.tag || this.trackable?.tag || undefined
 
-    this.duration = 'day' // todo:// make this work for week
+    this.duration = starter.duration || "day" // todo:// make this work for week
     this.target = parseNumber(starter.target)
     this.comparison = starter.comparison
+    this.usedailyaverage = starter.usedailyaverage || false
   }
 
   get asObject() {
@@ -55,6 +58,7 @@ export class GoalClass {
       target: this.target,
       comparison: this.comparison,
       tag: this.tag,
+      usedailyaverage: this.usedailyaverage
     }
   }
 
@@ -70,6 +74,8 @@ export class GoalClass {
         return 'Weekly'
       case 'month':
         return 'Monthly'
+        case 'year':
+          return 'Yearly'  
     }
   }
 
@@ -96,14 +102,19 @@ export class GoalClass {
     let scores: Array<GoalScoreType> = []
     let usage: TrackableUsage
 
+    if (this.duration === 'year' && trackableUsage) {
+      usage = trackableUsage.groupBy('year', 'YYYY')
+    }
     if (this.duration === 'month' && trackableUsage) {
-      usage = trackableUsage.groupBy('month', 'YYYY-MM').backfill()
+      usage = trackableUsage.groupBy('month', 'YYYY-MM')
     }
     if (this.duration === 'week' && trackableUsage) {
-      usage = trackableUsage.groupBy('week', 'YYYY-MM-w').backfill()
+      usage = trackableUsage.groupBy('week', 'YYYY-MM-w')
+      
     }
     if (this.duration === 'day' && trackableUsage) {
-      usage = trackableUsage.byDay.backfill()
+      usage = trackableUsage.byDay
+      
     }
 
     // if we don't have any usage
@@ -118,7 +129,6 @@ export class GoalClass {
 
         // Does it meet the criteria?
         const meetsCriteria = this.compare(value)
-
         const payload: GoalScoreType = {
           success: meetsCriteria,
           failure: !meetsCriteria,

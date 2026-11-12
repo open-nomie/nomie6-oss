@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -128,6 +130,9 @@
     } else if (trackable.type == 'context') {
       response.note = trackable.getNoteValue()
       response.value = trackable.ctx.duration
+    } else if (trackable.type == 'pointer') {
+      response.note = trackable.getNoteValue()
+      response.value = trackable.ptr.duration
     } else {
       response.note = trackable.getNoteValue()
     }
@@ -150,10 +155,12 @@
 
   const pluginGetTrackable = async (plugin: PluginType, payload: { id: string; tag: string; lid: string }) => {
     const trackable = tagToTrackable(payload.tag)
+    // Convert Proxy objects to plain objects for postMessage serialization
+    const plainTrackable = JSON.parse(JSON.stringify(trackable))
     broadcast(plugin, 'getTrackableReply', {
       id: payload.id,
       lid: payload.lid,
-      trackable: trackable,
+      trackable: plainTrackable,
     })
   }
 
@@ -290,12 +297,14 @@
       const type = payload.type
       const selected = await selectTrackables(type, payload.multiple == false ? false : true)
       if (selected) {
+        // Convert Proxy objects to plain objects for postMessage serialization
+        const plainSelected = JSON.parse(JSON.stringify(selected))
         broadcastPluginMessage(
           {
             action: 'trackablesSelected',
             data: {
               id: payload.id,
-              selected,
+              selected: plainSelected,
             },
           },
           plugin.id,
@@ -325,12 +334,14 @@
       usage.dates = usage.dates.map((djs) => djs.toDate())
 
       try {
+        // Convert Proxy objects to plain objects for postMessage serialization
+        const plainTrackable = JSON.parse(JSON.stringify(trackable))
         broadcastPluginMessage(
           {
             action: 'getTrackableUsageReply',
             data: {
               id: payload.id,
-              trackable: trackable,
+              trackable: plainTrackable,
               usage: usage,
             },
           },
@@ -372,17 +383,18 @@
     }
   }
 
-  let autoLoadPlugin: Array<PluginClass> = []
-
-  $: if ($PluginStore) {
-    autoLoadPlugin = $PluginStore
-      .filter((p) => {
-        return p.active && !p.locked
-      })
-      .filter((p) => {
-        return p.uses.includes('onLaunch') || p.uses.includes('onNote')
-      })
-  }
+  let autoLoadPlugin: Array<PluginClass> = $derived.by(() => {
+    if ($PluginStore) {
+      return $PluginStore
+        .filter((p) => {
+          return p.active && !p.locked
+        })
+        .filter((p) => {
+          return p.uses.includes('onLaunch') || p.uses.includes('onNote')
+        })
+    }
+    return []
+  })
 
   let unsub: any
   onMount(() => {

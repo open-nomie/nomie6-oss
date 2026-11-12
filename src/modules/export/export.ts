@@ -3,9 +3,13 @@ import type { IPeople, ITrackers } from '../import/import'
 import { AppVersion } from '../app-version/app-version'
 import type { ContextClass } from '../../domains/context/context-class'
 import { ContextStore } from '../../domains/context/context-store'
+import type { PointerClass } from '../../domains/pointers/pointer-class'
+import { PointerStore } from '../../domains/pointers/pointer-store'
 import type { DashboardClass } from '../../domains/dashboard2/dashboard-class'
 import type { GoalClass } from '../../domains/goals/goal-class'
 import { GoalStore } from '../../domains/goals/GoalStore'
+import type { PivotClass } from '../../domains/analytics/pivot-class'
+import { PivotStore } from '../../domains/analytics/PivotStore'
 import { Interact } from '../../store/interact'
 import { LedgerStore } from '../../domains/ledger/LedgerStore'
 import type Location from '../../domains/locations/LocationClass'
@@ -33,6 +37,7 @@ export interface IBackupItems {
     endDate: string
   }
   goals: Array<GoalClass>
+  pivots: Array<PivotClass>
   boards: Array<UniboardType>
   events: Array<NLog>
   trackers: ITrackers
@@ -40,6 +45,8 @@ export interface IBackupItems {
   locations: Array<Location>
   dashboards: Array<DashboardClass>
   context: Array<ContextClass>
+  pointers: Array<PointerClass>
+  plugins?: Array<any>
 }
 
 export default class Export {
@@ -59,6 +66,7 @@ export default class Export {
         endDate: new Date().toJSON(),
       },
       goals: options.goals || [],
+      pivots: options.pivots || [],
       boards: options.boards || [],
       events: options.events || [],
       trackers: options.trackers || {},
@@ -66,6 +74,8 @@ export default class Export {
       locations: options.locations || [],
       dashboards: options.dashboards || [],
       context: options.context || [],
+      pointers: options.pointers || [],
+      plugins: options.plugins || [],
     }
   }
 
@@ -84,13 +94,44 @@ export default class Export {
       let goals = await GoalStore.rawState()
       this.backup.goals = goals
 
+      this.fireChange('Pivots...')
+      let pivots = await PivotStore.rawState()
+      this.backup.pivots = pivots
+
       this.fireChange('Context...')
       let context = await ContextStore.rawState()
       this.backup.context = context
 
+      this.fireChange('Pointers...')
+      let pointers = await PointerStore.rawState()
+      this.backup.pointers = pointers
+
       this.fireChange('Locations...')
       let locations = await LocationStore.rawState()
       this.backup.locations = locations || []
+
+      this.fireChange('Plugins...')
+      let plugins = await Storage.get(NPaths.storage.plugins())
+      this.backup.plugins = plugins || []
+
+      // Export plugin preferences for each plugin
+      this.backup.pluginPreferences = {}
+      for (const plugin of (this.backup.plugins || [])) {
+        try {
+          const prefsPath = `plugins/${plugin.id}/prefs.json`
+          const prefs = await Storage.get(prefsPath)
+          if (prefs) {
+            this.backup.pluginPreferences[plugin.id] = prefs
+          }
+        } catch (e) {
+          // Plugin may not have prefs, which is fine
+        }
+      }
+
+      console.log('[export] Exporting plugins and preferences')
+      console.log('[export] Plugins count:', this.backup.plugins?.length || 0)
+      console.log('[export] Plugins with prefs:', Object.keys(this.backup.pluginPreferences || {}).length)
+      console.log('[export] Plugin prefs included:', this.backup.pluginPreferences)
 
       // Get Trackers
       this.fireChange('Trackers...')
@@ -114,7 +155,7 @@ export default class Export {
         'href',
         URL.createObjectURL(new Blob([JSON.stringify(this.backup)], { type: 'text/json' }))
       )
-      downloadButton.setAttribute('download', `nomie-${AppVersion}-${dayjs().format('YYYY-MM-DD-H:mm')}.json`)
+      downloadButton.setAttribute('download', `nomie-${AppVersion}-${dayjs().format('YYYY-MM-DD-HHmm')}.json`)
       downloadButton.click()
     } catch (e) {
       Interact.alert('Export Error', e.message)
@@ -168,8 +209,11 @@ export default class Export {
               loadNext()
             })
             .catch((e) => {
-              console.error(`Error importing ${bookPath}`)
+              console.error(`Error exporting ${bookPath}`, e)
               failures.push(bookPath)
+              // Keep going: without this the export never finished when one book failed
+              finished.push([])
+              loadNext()
             })
         } else {
           let events = flatten(finished)

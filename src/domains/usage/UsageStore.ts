@@ -220,7 +220,16 @@ export const processLogForLastUsage = async (log: NLog, state: PreviousUsageMapT
         longest: { v: 1, d: new Date() }, // default longest will be 1 day
       }
     } else if (log.end.toDateString() !== new Date().toDateString()) {
-      // It's in the past don't count anything
+      /**
+       * It's in the past, but it can still be the latest value (e.g. a plugin or API log
+       * dated earlier). Update last, min and max; streaks are only counted for today.
+       */
+      if (lastUsed.last) {
+        const merged = lastUsedCompareAndMerge(lastUsed, defaultCountUnit)
+        toUpdate[tag] = { ...merged, streak: lastUsed.streak, longest: lastUsed.longest }
+      } else {
+        toUpdate[tag] = { ...lastUsed, tag, last: defaultCountUnit, min: defaultCountUnit, max: defaultCountUnit }
+      }
     } else {
       /**
        * It's Today and we have a previous Last Used to Compre against.

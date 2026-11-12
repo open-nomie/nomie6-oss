@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import CheckmarkCircle from '../../n-icons/CheckmarkCircle.svelte'
@@ -16,24 +18,24 @@
   import { Interact } from '../../store/interact'
   import { getAwardById } from '../../domains/awards/helpers/usage-awards'
 
-  export let buttons: Array<PopMenuButton> = []
-  export let listType: 'grid' | 'list' = 'list'
-
   let dispatch = createEventDispatcher()
+  const { buttons, listType } = $props()
 
-  let buttonGroup: Array<Array<PopMenuButton>> = []
-
-  $: if (buttons) {
-    buttonGroup = [[]]
-    let current: number = buttonGroup.length - 1
-    buttons.forEach((button: PopMenuButton) => {
-      if (button.divider) {
-        buttonGroup.push([])
-        current = buttonGroup.length - 1
-      }
-      buttonGroup[current].push(button)
-    })
-  }
+  let buttonGroup = $derived.by(() => {
+    if (buttons) {
+      const groups: Array<Array<PopMenuButton>> = [[]]
+      let current: number = 0
+      buttons.forEach((button: PopMenuButton) => {
+        if (button.divider) {
+          groups.push([])
+          current = groups.length - 1
+        }
+        groups[current].push(button)
+      })
+      return groups
+    }
+    return [[]]
+  })
 </script>
 
 {#each buttonGroup as group, gIndex}
@@ -71,7 +73,7 @@
         >
           <div slot="left" class="text-gray-500">
             {#if button.checked}
-              <div in:fly={{ y: 50 }} class="mr-4">
+              <div in:fly|global={{ y: 50 }} class="mr-4">
                 <IonIcon className="text-gray-800 dark:text-gray-200" icon={CheckmarkCircle} />
               </div>
             {/if}

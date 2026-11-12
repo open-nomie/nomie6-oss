@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
 
@@ -8,28 +10,26 @@
   import appConfig from '../../config/appConfig'
   import type NLog from '../nomie-log/nomie-log'
 
-  export let logs: Array<NLog>
-  export let date = dayjs()
-  export let days: number = 7
-  export let color: string = appConfig.primary_color
-  export let size: number = 24
+  const { logs, date, days, color, size } = $props()
 
-  let loopOver: Array<any> = []
+  let loopOver = $state<Array<any>>([])
 
-  $: if (days || date) {
-    loopOver = Array(days)
-      .fill(0)
-      .map((d, i) => {
-        let loopDate = date.subtract(i, 'day')
-        return {
-          date: loopDate,
-          used: logs.find((nlog: NLog) => nlog.endDayjs().format('YYYY-MM-DD') === loopDate.format('YYYY-MM-DD'))
-            ? true
-            : false,
-        }
-      })
-      .reverse()
-  }
+  $effect(() => {
+    if (days || date) {
+      loopOver = Array(days)
+        .fill(0)
+        .map((d, i) => {
+          let loopDate = date.subtract(i, 'day')
+          return {
+            date: loopDate,
+            used: logs.find((nlog: NLog) => nlog.endDayjs().format('YYYY-MM-DD') === loopDate.format('YYYY-MM-DD'))
+              ? true
+              : false,
+          }
+        })
+        .reverse()
+    }
+  })
 </script>
 
 <div class="streak-days">

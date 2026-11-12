@@ -2,6 +2,8 @@ import Location from './LocationClass'
 import NPaths from '../../paths'
 import { createArrayStore } from '../../store/ArrayStore'
 import distance from '../../modules/locate/distance'
+import { closeModal, openModal } from "../../components/backdrop/BackdropStore2";
+import locationsModalSvelte from "../../domains/map/location-manager-modal.svelte";
 
 export const LocationStore = createArrayStore(NPaths.storage.locations(), {
   label: 'Locations',
@@ -13,6 +15,20 @@ export const LocationStore = createArrayStore(NPaths.storage.locations(), {
     return JSON.parse(JSON.stringify(item))
   },
 })
+
+export const openLocationModal = () => {
+  openModal({
+    id: 'locations',
+    component: locationsModalSvelte,
+    componentProps: {
+
+    }
+  })
+}
+
+export const closeLocationsModal = () => {
+  closeModal('locations');
+}
 
 export const findNearestLocation = (location: { lat: number; lng: number }, $store: Array<Location>): Location => {
   let match = [...$store]

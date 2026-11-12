@@ -36,8 +36,23 @@ export const createKVStore = (path: string, props: DocStorePropTypes) => {
    */
   const init = async (_data?:any): Promise<KVStoreState> => {
     // Get the Map From Storage
-    const map = (await Storage.get(path)) || {}
+    let map = (await Storage.get(path)) || {}
     data = _data || {};
+
+    // Handle corrupted data: if array was stored instead of object, convert it
+    if (Array.isArray(map)) {
+      const convertedMap: KVStoreState = {}
+      map.forEach((item: any) => {
+        if (item && item[props.key]) {
+          const key = item[props.key]
+          convertedMap[key] = item
+        }
+      })
+      map = convertedMap
+      // Fix the corrupted data by writing the corrected version back
+      await Storage.put(path, map)
+    }
+
     // Loop over each time
     // initialize if there's an initializer
     Object.keys(map).forEach((key: string) => {

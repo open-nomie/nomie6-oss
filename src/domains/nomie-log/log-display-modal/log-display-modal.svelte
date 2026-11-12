@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import BackdropModal from '../../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../../components/backdrop/BackdropStore2'
@@ -12,14 +14,13 @@
 import { getDateFormats } from '../../preferences/Preferences'
   import type NLog from '../nomie-log'
 
-  export let id: string
-  export let log: NLog
-
   let dateFormats = getDateFormats();
 
   const close = async () => {
     closeModal(id)
   }
+
+  const { id, log } = $props()
 </script>
 
 <BackdropModal mainClass="overflow-y-auto relative" className="h-full bg-gray-100 dark:bg-gray-900 w-full rounded-2xl">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
 
@@ -5,9 +7,6 @@
   import HScroller from '../h-scroller/h-scroller.svelte'
 
   const dispatch = createEventDispatcher()
-
-  export let id: string = `sw-${nid()}`
-  export let className: string = ''
 
   export const scrollTo: Function = (index: number) => {
     if (index > -1) {
@@ -26,6 +25,8 @@
       }
     }, 100)
   })
+
+  const { id, className } = $props()
 </script>
 
 <div class="n-swiper {className}" {id}>

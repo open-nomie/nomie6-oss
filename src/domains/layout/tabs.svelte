@@ -1,11 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Dot from '../../components/dot/dot.svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'
   import Container from '../../components/container/container.svelte'
-
-  // Vendors
-
-  import { onMount } from 'svelte'
 
   // Components
   import AppTab from '../../components/app-tab/app-tab.svelte'
@@ -30,40 +28,43 @@
   import { GoalScoreStore } from '../../domains/goals/GoalStore'
   import MenuOutline from '../../n-icons/MenuOutline.svelte'
 
-  export let className: string = ''
+  const { className = '' } = $props<{ className?: string }>()
 
-  const state = {
+  let state = $state({
     mounted: false,
-  }
+  })
 
-  let path: string = '/'
-  let page: 'track' | 'dashboard' | 'goals' | 'timeline' | 'history'
-  $: if (state.mounted) {
-    path = document.location.pathname
-    if (path === '/' && $Prefs.startPage === 'track') {
-      page = 'track'
-    } else if (path === '/' && $Prefs.startPage === 'dashboard') {
-      page = 'dashboard'
-    } else if (path === '/' && $Prefs.startPage === 'goals') {
-      page = 'goals'
-    } else if (path === '/' && $Prefs.startPage === 'timeline') {
-      page = 'timeline'
-    } else if (path === '/' && $Prefs.startPage === 'history') {
-      page = 'history'
-    }
-    if (page) {
-      try {
-        setTimeout(() => {
-          document.querySelector(`.tab-${page} a`).setAttribute('aria-current', 'page')
-        }, 500)
-      } catch (e) {
-        console.error(e)
+  let path: string = $state('/')
+  let page: 'track' | 'dashboard' | 'goals' | 'timeline' | 'history' | undefined = $state(undefined)
+
+  $effect(() => {
+    state.mounted = true
+  })
+
+  $effect(() => {
+    if (state.mounted) {
+      path = document.location.pathname
+      if (path === '/' && $Prefs.startPage === 'track') {
+        page = 'track'
+      } else if (path === '/' && $Prefs.startPage === 'dashboard') {
+        page = 'dashboard'
+      } else if (path === '/' && $Prefs.startPage === 'goals') {
+        page = 'goals'
+      } else if (path === '/' && $Prefs.startPage === 'timeline') {
+        page = 'timeline'
+      } else if (path === '/' && $Prefs.startPage === 'history') {
+        page = 'history'
+      }
+      if (page) {
+        try {
+          setTimeout(() => {
+            document.querySelector(`.tab-${page} a`)?.setAttribute('aria-current', 'page')
+          }, 500)
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
-  }
-
-  onMount(() => {
-    state.mounted = true
   })
 </script>
 

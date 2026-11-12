@@ -8,4 +8,5 @@ export default [
   'You can Enable location tracking in the Settings tab',
   'Use @username in notes to tag people',
   'Include +context to add additional context to your day',
+  'Include ^pointers to leave a tag for a specific note',
 ]

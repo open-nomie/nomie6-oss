@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
 
@@ -8,25 +10,23 @@
   import { Lang } from '../../store/lang'
   import Text from '../text/text.svelte'
   const dispatch = createEventDispatcher()
+  let { style, className, itemClass, list = $bindable(), showHeaderContent } = $props()
 
-  export let style = ''
-  export let className = ''
-  export let itemClass = ''
-  export let list: Array<any> = []
-  export let showHeaderContent: boolean = true
-
-  let ready = false
-  let textList
-  let picks = []
+  let ready = $state(false)
+  let textList = $state(undefined)
+  let picks = $state([])
 
   function textListChanged(evt) {
-    picks = textList.getValue().split('\n')
+    picks = (evt.detail || '').split('\n').filter(item => item.trim())
+    list = picks
     dispatch('change', picks)
   }
 
-  $: if (list && list.length && picks.length == 0) {
-    picks = list || []
-  }
+  $effect(() => {
+    if (list && list.length && picks.length == 0) {
+      picks = list || []
+    }
+  })
 
   onMount(() => {
     ready = true
@@ -36,7 +36,7 @@
 <div class="n-picker-list edit-mode {className}" {style}>
   {#if showHeaderContent}
     <NItem title={Lang.t('picker.title', 'List one item per line')} className={itemClass} bg="transparent">
-      <Text size="sm" faded>Include #trackers @people +context. Add a : to make a Title:</Text>
+      <Text size="sm" faded>Include #trackers @people +context ^pointers. Add a : to make a Title:</Text>
     </NItem>
   {/if}
   {#if ready}

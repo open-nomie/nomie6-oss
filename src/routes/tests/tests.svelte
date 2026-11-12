@@ -1,4 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
+
   import Scroller from '../../components/scroller/scroller.svelte'
 
   import dayjs from 'dayjs'

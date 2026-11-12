@@ -148,7 +148,7 @@ export default class TrackerInputer {
         /**
          * Note Tracker Types
          * These might require multiple input popups
-         * loop through the note, get tracker values, add people and context
+         * loop through the note, get tracker values, add people,  pointers and context
          */
       } else if (this.tracker.type == 'note') {
         // Get values as a string

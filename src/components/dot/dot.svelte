@@ -1,6 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let size: number = 10
-  export let className: string = ''
+
+
+  const { size, className } = $props()
 </script>
 
 <div

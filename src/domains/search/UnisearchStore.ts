@@ -7,7 +7,6 @@ import { closeModal, openModal } from '../../components/backdrop/BackdropStore2'
 import { toTrackableArray } from '../trackable/trackable-utils'
 import { unisearchCommands } from './unisearch-commands'
 import { writable } from 'svelte/store'
-import { trackEvent } from '../usage/stat-ping'
 
 export type UnisearchResultsType = {
   trackables: Array<Trackable>
@@ -41,7 +40,6 @@ export const closeUnisearch = () => {
  * @param {string} [term] - The search term to pre-fill the search bar with.
  */
 export const openUnisearch = (term?: string) => {
-  trackEvent('open_unisearch');
   openModal({
     id: 'unisearch',
     component: UnisearchModal,

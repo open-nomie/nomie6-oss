@@ -1,4 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
+
   //Vendors
 
   import { onMount } from 'svelte'

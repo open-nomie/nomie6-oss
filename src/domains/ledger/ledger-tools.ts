@@ -84,6 +84,17 @@ export function getTrackablesAndValuesFromLogs(logs: Array<NLog>): ITrackableSum
       }
     })
 
+    log.pointers.forEach((trackableElement: Token) => {
+      let tag = `^${trackableElement.id}`
+      trackables[tag] = trackables[tag] || {
+        values: [1],
+        tag: `^${tag}`,
+        hours: [],
+        logs: [],
+        dates: [],
+      }
+    })
+
     // Loop over the Trackers Found
     log.trackers.forEach((trackableElement: Token) => {
       let tag = `#${trackableElement.id}`
@@ -239,9 +250,11 @@ export default class LedgerTools {
     // Let's get the cache if one exists
     let defaultPayload = { date: null, lastChecked: null }
     let bookDetails = this.storage.local.get(`firstBook`) || defaultPayload
+    // A missing or invalid cached date (such as 0, which reads as 1970) is not usable
+    const cacheHasDate = Boolean(bookDetails.date) && dayjs(bookDetails.date).isValid()
     // If the cache is older than 2 days - let's refresh
     let age = bookDetails.lastChecked ? Math.abs(dayjs(bookDetails.lastChecked).diff(dayjs(), 'day')) : 100
-    if (age > 2 || fresh) {
+    if (age > 2 || fresh || !cacheHasDate) {
       // Get list of books
       const books = await this.listBooks()
       if (books.length) {
@@ -264,7 +277,7 @@ export default class LedgerTools {
               return null
             }
           })
-          .filter((d) => d)
+          .filter((d) => d && d.isValid())
           .sort((a: Dayjs, b: Dayjs) => {
             return a.unix() > b.unix() ? 1 : -1
           })

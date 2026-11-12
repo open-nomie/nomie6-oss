@@ -29,14 +29,24 @@ export const createArrayStore = (path: string, props: DocStorePropTypes) => {
     // If any data passed, save it for later
     data = _data
     // Get the Map From Storage
-    const items = ((await Storage.get(path)) || []).map((item: any) => {
+    let storageData = (await Storage.get(path)) || []
+
+    // Handle corrupted data: if object was stored instead of array, convert it
+    if (storageData && typeof storageData === 'object' && !Array.isArray(storageData)) {
+      // Convert object to array using values
+      storageData = Object.values(storageData)
+      // Fix the corrupted data by writing the corrected version back
+      await Storage.put(path, storageData)
+    }
+
+    const items = (storageData || []).map((item: any) => {
       if (props.itemInitializer) return props.itemInitializer(item)
       return item
     })
 
     update((s) => items)
     if(props.onInitalized) props.onInitalized(items, data);
-    return items   
+    return items
   }
 
   /**

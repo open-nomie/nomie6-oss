@@ -14,7 +14,7 @@ import nid from '../../modules/nid/nid'
 import { objectHash } from '../../modules/object-hash/object-hash'
 import { toTrackableArray } from '../trackable/trackable-utils'
 
-import { getRawPrefs, PreferencesStateType } from '../preferences/Preferences'
+import { getRawPrefs, type PreferencesStateType } from '../preferences/Preferences'
 
 import AllBoardIcon from '../../n-icons/board-tab-icons/AllBoardIcon.svelte'
 import PeopleBoardIcon from '../../n-icons/board-tab-icons/PeopleBoardIcon.svelte'
@@ -189,8 +189,14 @@ const combineStoreBoards = ($Uniboard, $Prefs: PreferencesStateType): Array<Unib
 
   boards = [...boards, ...$Uniboard.boards]
 
+  // Always put 'main' board last for predictable positioning
+  const mainBoard = boards.find((b) => b?.id === 'main')
+  const otherBoards = boards.filter((b) => b?.id !== 'main')
+
+  const finalBoards = mainBoard ? [...otherBoards, mainBoard] : otherBoards
+
   return dedupArray(
-    boards.filter((t) => t),
+    finalBoards.filter((t) => t),
     'id'
   )
   // return $Uniboard.boards
@@ -252,6 +258,58 @@ export const initUniboardStore = async (knownTrackables: ITrackables) => {
 
     return s
   })
+  syncMainBoardWithTrackers(knownTrackables).catch((e) => console.error(e))
+}
+
+const MAIN_SEEN_TRACKERS_KEY = 'main-board-seen-trackers'
+
+/**
+ * Main board gets every tracker, once. Trackers that have not been seen before
+ * (created, imported or synced) are added to it. A tracker removed from Main
+ * stays removed, because it has been seen already.
+ */
+// Runs are queued: they read and write the same stored boards, and overlapping runs overwrite each other
+let mainBoardSyncQueue: Promise<void> = Promise.resolve()
+const syncMainBoardWithTrackers = (knownTrackables: ITrackables): Promise<void> => {
+  mainBoardSyncQueue = mainBoardSyncQueue.then(() => runMainBoardSync(knownTrackables)).catch((e) => console.error(e))
+  return mainBoardSyncQueue
+}
+
+const runMainBoardSync = async (knownTrackables: ITrackables) => {
+  const all = toTrackableArray(knownTrackables)
+  if (!all.length) return
+  const known = new Set(all.map((t) => t.tag))
+  const tags = all.filter((t) => t.type === 'tracker').map((t) => t.tag)
+
+  const seenRaw = localStorage.getItem(MAIN_SEEN_TRACKERS_KEY)
+  const seen: Array<string> | null = seenRaw ? JSON.parse(seenRaw) : null
+  const newTags = seen ? tags.filter((t) => !seen.includes(t)) : tags
+  localStorage.setItem(MAIN_SEEN_TRACKERS_KEY, JSON.stringify([...new Set([...(seen || []), ...tags])]))
+
+  const boards = await getBoardsFromStorage()
+  let changed = false
+
+  // Drop elements whose trackable has been deleted
+  boards.forEach((board) => {
+    const kept = board.elements.filter((tag) => known.has(tag))
+    if (kept.length !== board.elements.length) {
+      board.elements = kept
+      changed = true
+    }
+  })
+
+  if (newTags.length) {
+    const existingMain = boards.find((b) => b.id === 'main')
+    const main: UniboardType = existingMain || { id: 'main', label: 'Main', elements: [] }
+    if (!existingMain) boards.push(main)
+    const toAdd = newTags.filter((t) => !main.elements.includes(t))
+    if (toAdd.length) {
+      main.elements = [...main.elements, ...toAdd]
+      changed = true
+    }
+  }
+
+  if (changed) await saveBoardsToStorageAndUpdate(boards)
 }
 
 /**

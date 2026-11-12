@@ -1,18 +1,18 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   // svlete
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../vendor/svelte-navigator'
   // components
   import NToolbar from '../../components/toolbar/toolbar.svelte'
   import NLayout from './layout.svelte'
   //props
-  export let className = undefined
-  // export let withBack = false;
-  export let title = undefined
-  // Dynamic
-  $: hasHeader = (arguments[1].$$slots || {}).hasOwnProperty('header') || title
-  $: hasSubHeader = (arguments[1].$$slots || {}).hasOwnProperty('sub-header')
-
-  // methods
+  const { className = undefined, title = undefined } = $props<{
+    className?: any
+    title?: any
+  }>()
+  let hasHeader = $derived(!!$$slots.header || title)
+  let hasSubHeader = $derived(!!$$slots['sub-header'])
 </script>
 
 <NLayout pageTitle={title} {className}>

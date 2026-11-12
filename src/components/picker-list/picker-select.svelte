@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import ListItem from '../list-item/list-item.svelte'
@@ -11,24 +13,19 @@
   import type TrackerClass from '../../modules/tracker/TrackerClass'
 import ToggleSwitch from '../toggle-switch/toggle-switch.svelte'
 
-
   const dispatch = createEventDispatcher()
 
-  export let tracker: ITracker | TrackerClass
+  let picks = $state([])
+  let searchFilter = $state<string>(undefined)
 
-  export let active = []
-
-  let picks = []
-  let searchFilter: string
-
-  $: {
+  $effect(() => {
     picks = tracker && tracker.picks ? tracker.picks : []
     if (searchFilter) {
       picks = picks.filter((p) => {
         return p.toLowerCase().search(`${searchFilter}`.toLowerCase()) > -1
       })
     }
-  }
+  })
 
   function toggle(pick) {
     if (active.indexOf(pick) > -1) {
@@ -56,6 +53,8 @@ import ToggleSwitch from '../toggle-switch/toggle-switch.svelte'
     let lastCharacter = pick.trim().substr(pick.trim().length - 1, 1)
     return lastCharacter === ':'
   }
+
+  let { tracker, active = $bindable() } = $props()
 </script>
 
 <div class="w-full p-2 bg-gray-100 dark:bg-gray-800 ">

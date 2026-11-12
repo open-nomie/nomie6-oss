@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 import dayjs from 'dayjs';
 
@@ -12,12 +14,10 @@ import { getDateFormats } from '../preferences/Preferences';
 import TimelineLoader from './timeline-loader.svelte';
 import type { TimelineFilterProps } from './timeline-utils';
 
-  export let id: string
-  export let filters: TimelineFilterProps = {};
-  export let startingDate: Date = new Date();
+  let { id, filters = $bindable({}), startingDate = $bindable(new Date()) } = $props<{ id: string, filters?: TimelineFilterProps, startingDate?: Date }>()
   const dateFormats = getDateFormats();
 
-  let titleDate = dayjs(startingDate || new Date())
+  let titleDate = $state(dayjs(startingDate || new Date()))
 
   const close = () => {
     closeModal(id)

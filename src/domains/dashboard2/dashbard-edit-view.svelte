@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 
 
@@ -9,7 +11,7 @@
   import { Interact } from '../../store/interact'
   import { Lang } from '../../store/lang'
   import { TrackableStore } from '../trackable/TrackableStore'
-  import { getWidgetTypes , IWidgetType } from './widget/widget-types'
+  import { getWidgetTypes , type IWidgetType } from './widget/widget-types'
   import Button from '../../components/button/button.svelte'
   import Container from '../../components/container/container.svelte'
   import Input from '../../components/input/input.svelte'
@@ -19,22 +21,26 @@
   import { PluginStore } from '../plugins/PluginStore'
   import { deleteWidget } from './DashStore'
 
-  export let dashboard: DashboardClass
+  const { dashboard } = $props<{ dashboard: DashboardClass }>()
 
   const dispatch = createEventDispatcher()
 
-  let workingDashboard: DashboardClass
-  let allWidgetTypes: Array<IWidgetType> = []
-  let mounted = false
+  let workingDashboard: DashboardClass | undefined = $state(undefined)
+  let allWidgetTypes: Array<IWidgetType> = $state([])
+  let mounted = $state(false)
 
-  $: if (mounted && !allWidgetTypes.length) {
-    allWidgetTypes = getWidgetTypes($PluginStore)
-  }
+  $effect(() => {
+    if (mounted && !allWidgetTypes.length) {
+      allWidgetTypes = getWidgetTypes($PluginStore)
+    }
+  })
 
-  $: if (dashboard && !workingDashboard) {
-    workingDashboard = new DashboardClass(dashboard)
-    workingDashboard.widgets = dedupArray(workingDashboard.widgets, 'id')
-  }
+  $effect(() => {
+    if (dashboard && !workingDashboard) {
+      workingDashboard = new DashboardClass(dashboard)
+      workingDashboard.widgets = dedupArray(workingDashboard.widgets, 'id')
+    }
+  })
 
   const removeWidget = async (widget) => {
     const confirmed = await Interact.confirm('Remove Widget?', 'You can always add it back later.')
@@ -50,6 +56,7 @@
   })
 </script>
 
+{#if workingDashboard}
 <section class="max-w-full w-96 lg:w-full lg:max-w-screen-xl mx-auto">
   <Container size="md" className="px-4 lg:px-0">
     <div class="bg-white rounded-md dark:bg-black mt-4 ">
@@ -118,6 +125,7 @@
     </SortableList2>
   {/key}
 </section>
+{/if}
 
 <style lang="postcss" global>
   .mock-widget {

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 import { onMount } from 'svelte';
 
@@ -7,11 +9,6 @@ import { onMount } from 'svelte';
   import Button from '../button/button.svelte'
   import IonIcon from '../icon/ion-icon.svelte'
   import ToolbarGrid from '../toolbar/toolbar-grid.svelte'
-
-  export let title: string
-  export let url: string
-  export let id: string
-  export let messagePayload: any;
 
   let frame:HTMLIFrameElement;
 
@@ -28,6 +25,8 @@ import { onMount } from 'svelte';
       }
     }
   })
+
+  const { title, url, id, messagePayload } = $props()
 </script>
 
 <BackdropModal>

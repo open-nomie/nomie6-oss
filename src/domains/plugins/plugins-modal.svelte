@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import Avatar from '../../components/avatar/avatar.svelte'
@@ -25,16 +27,13 @@
 
   import Badge from '../../components/badge/badge.svelte'
 
-  export let tab: 'installed' | 'avail' = 'installed'
-  export let showAdd: boolean = false
-
-  let officialPlugins = []
+  let officialPlugins = $state([])
   onMount(async () => {
     officialPlugins = []
   })
 
-  let editMode: boolean = false
-  let hasLocked: boolean = false
+  let editMode = $state(false)
+  let hasLocked = $state(false)
 
   const toggleEditMode = () => {
     editMode = !editMode
@@ -46,6 +45,10 @@
   }
 
   const deletePlugin = async (plugin: PluginClass) => {
+    if (plugin.buildin) {
+      Interact.error('This plugin cannot be removed')
+      return
+    }
     const confirmed = await Interact.confirm(`Uninstall ${plugin.name} from Nomie?`)
     if (confirmed) {
       try {
@@ -65,11 +68,14 @@
     return ''
   }
 
-  let pluginUrl: undefined | string
+  let pluginUrl = $state<undefined | string>(undefined)
   const installPlugin = (url?: string) => {
     // pluginUrl = url
     openPluginInstaller(url)
   }
+
+  let tab = $state('installed')
+  let showAdd = $state(false)
 </script>
 
 <BackdropModal>
@@ -155,7 +161,7 @@
                   value={plugin.active}
                 />
               {/if}
-              {#if editMode}
+              {#if editMode && !plugin.buildin}
                 <Button on:click={() => deletePlugin(plugin)} icon
                   ><IonIcon className="text-red-500" icon={TrashOutline} /></Button
                 >

@@ -1,5 +1,12 @@
 export default {
   translation: {
+    "backup-notice": {
+      "title": "Fai un backup oggi",
+      "message": "Abbiamo trovato un errore: alcuni backup non contenevano tutto, e i backup di agosto e settembre a volte non potevano essere ripristinati. Un backup regolare protegge i tuoi dati, quindi falloi adesso. Richiede un momento e contiene tutti i tuoi tracker, log, board, template e impostazioni.",
+      "now": "Fai backup ora",
+      "later": "Più tardi",
+      "discard": "Scarta",
+    },
     general: {
       "whats-up": `Come va?`,
       date: "Data",

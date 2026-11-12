@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Layout from '../domains/layout/layout.svelte'
   import ToolbarGrid from '../components/toolbar/toolbar-grid.svelte'

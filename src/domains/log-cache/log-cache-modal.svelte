@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
   import { onMount } from 'svelte'
@@ -25,8 +27,6 @@
   import { LedgerStore } from '../ledger/LedgerStore'
   import type NLog from '../nomie-log/nomie-log'
   import { getDateFormats } from '../preferences/Preferences'
-
-  export let id: string
 
   let dateFormats = getDateFormats()
   const close = () => {
@@ -80,6 +80,8 @@
     await deleteLogFromCache(log)
     init()
   }
+
+  const { id } = $props()
 </script>
 
 <BackdropModal>

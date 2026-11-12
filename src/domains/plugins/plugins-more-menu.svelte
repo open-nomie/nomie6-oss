@@ -1,13 +1,17 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ListItem from '../../components/list-item/list-item.svelte'
   import type { PluginClass } from './plugin-helpers'
   import { openPluginModal, PluginStore } from './PluginStore'
 
-  let list: Array<PluginClass> = []
+  let list = $state<Array<PluginClass>>([])
 
-  $: if ($PluginStore) {
-    list = $PluginStore.filter((p) => p.addToMoreMenu && p.active)
-  }
+  $effect(() => {
+    if ($PluginStore) {
+      list = $PluginStore.filter((p) => p.addToMoreMenu && p.active)
+    }
+  })
 </script>
 
 {#each list as plugin}

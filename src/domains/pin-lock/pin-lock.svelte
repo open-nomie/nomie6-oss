@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Text from '@/components/text/text.svelte'
   // Components
@@ -15,19 +17,19 @@
   import { closeModal } from '../../components/backdrop/BackdropStore2'
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
 
-  let _pin = ''
-  export let id: string
-  export let onPin: Function
-  export let title: string = 'Enter a Pin'
-  export let canClose: boolean = false
+  const { id, onPin, title, canClose } = $props()
+
+  let _pin = $state('')
 
   onMount(() => {
     _pin = ''
   })
 
-  $: if (_pin.length > 6) {
-    _pin = _pin.substring(0, 6)
-  }
+  $effect(() => {
+    if (_pin.length > 6) {
+      _pin = _pin.substring(0, 6)
+    }
+  })
 
   const methods = {
     submit() {

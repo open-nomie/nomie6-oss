@@ -1,14 +1,16 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import EmojiList from './EmojiList.svelte'
   import emojiData from './data/emoji-light'
 
   import Empty from '../empty/empty.svelte'
-  export let searchText = ''
 
   const dispatch = createEventDispatcher()
+  const { searchText } = $props()
 
-  $: searchResults = emojiData.filter((emoji) => emoji.n.indexOf((searchText || '').toLowerCase()) >= 0)
+  let searchResults = $derived(emojiData.filter((emoji) => emoji.n.indexOf((searchText || '').toLowerCase()) >= 0))
 </script>
 
 <div class="">

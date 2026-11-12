@@ -19,7 +19,7 @@ export const TimelineOptionsStore = createLSStore('timeline-settings', {
  */
 export function openTimelineModal(props:TimelineFilterProps) {
   openModal({
-    id: `timeline-modal-${md5(props.search)}`,
+    id: `timeline-modal-${md5(props.search ?? '')}`,
     component: TimelineModal,
     componentProps: {
       filters: props

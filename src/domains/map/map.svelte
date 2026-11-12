@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   //svelte
   import { onMount } from 'svelte'
@@ -27,17 +29,7 @@
   import { LocationStore } from '../locations/LocationStore'
 
   // props
-  export let locations: Array<NLocationType> = []
 
-  export let records: Array<NLog> = []
-
-  export let small: boolean = undefined
-  export let picker: boolean = undefined
-  export let height = undefined
-  export let className = ''
-  export let style = ''
-  export let lock: boolean = false
-  export let hideFavorite: boolean = false
   // export let activeLogs: Array<NLog> = []
 
   // const L: any = window['L']
@@ -54,6 +46,13 @@
   import L from 'leaflet'
   import * as esri_geo from 'esri-leaflet-geocoder'
 
+  // Configure Leaflet default icon paths for PWA compatibility
+  L.Icon.Default.mergeOptions({
+    iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
+    iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
+    shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href,
+  })
+
   // consts
   const dispatch = createEventDispatcher()
   const id = `map-${Math.random().toString().replace('.', '')}`
@@ -62,8 +61,8 @@
   const geocodeService = esri_geo.geocodeService()
 
   // Leaflet Map Holder
-  let MAP = undefined
-  let _el
+  let MAP = $state(undefined)
+  let _el = $state(undefined)
 
   type NLocationType = {
     name: string
@@ -73,70 +72,116 @@
   }
 
   // Local State
-  let data = {
+  let data = $state({
     locationName: null,
-    activeLocation: locations[locations.length - 1] || null,
+    activeLocation: null,
     locating: false,
     lat: null,
     lng: null,
     showLocations: false,
     height: `100px`,
-  }
+  })
 
-  let lastLocations
+  let lastLocations = $state(undefined)
+  let markers = $state<Array<any>>([])
 
-  $: if (locations && JSON.stringify(locations) !== lastLocations) {
-    try {
-      lastLocations = JSON.stringify(locations)
-      initAndRender()
-    } catch (e) {
-      console.error(`Location change error`, e.message)
+  let { locations = $bindable(), records = $bindable(), small, picker, height, className, style, lock = $bindable(), hideFavorite, methods } = $props()
+
+  $effect(() => {
+    if (locations && JSON.stringify(locations) !== lastLocations) {
+      try {
+        lastLocations = JSON.stringify(locations)
+        initAndRender()
+      } catch (e) {
+        console.error(`Location change error`, e.message)
+      }
     }
-  }
+  })
 
   async function initAndRender() {
     try {
-      await methods.init()
-      methods.renderMap()
+      if (methods) {
+        await methods.init()
+        methods.renderMap()
+      } else if (_el && (locations.length > 0 || picker)) {
+        // Default map initialization when methods not provided
+        // Initialize for: (1) locations to display, (2) picker mode to select location
+        const mapElement = _el.querySelector('.n-map')
+        if (mapElement && !MAP) {
+          // Use requestAnimationFrame to ensure element is laid out before Leaflet initializes
+          requestAnimationFrame(() => {
+            const rect = mapElement.getBoundingClientRect()
+            if (rect.width > 0 && rect.height > 0) {
+              // Default view: first location, or center of map for picker mode
+              const centerLat = locations.length > 0 ? locations[0].lat : 20
+              const centerLng = locations.length > 0 ? locations[0].lng : 0
+              const zoom = locations.length > 0 ? 8 : 2
+
+              MAP = L.map(mapElement).setView([centerLat, centerLng], zoom)
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+              }).addTo(MAP)
+
+              // Add markers for each location
+              locations.forEach((loc) => {
+                L.marker([loc.lat, loc.lng]).addTo(MAP).bindPopup(loc.name || 'Location')
+              })
+
+              // Fit map to show all locations
+              if (locations.length > 1) {
+                const bounds = L.latLngBounds(
+                  locations.map((loc) => [loc.lat, loc.lng])
+                )
+                MAP.fitBounds(bounds, { padding: [50, 50] })
+              }
+            }
+          })
+        }
+      }
     } catch (e) {
       console.error(`init and render error`, e.message)
     }
   }
 
-  $: if (!locations.length && records.length) {
-    try {
-      let locs = records
-        .filter((r) => r.lat)
-        .map((record) => {
-          return {
-            lat: record.lat,
-            lng: record.lng,
-            name: record.location,
-            log: record,
-          }
-        })
-      locations = locs
-    } catch (e) {
-      console.error(`Location || record length reaction error`, e.mesasge)
-    }
-  }
-
-  $: if (picker && MAP && locations.length == 0) {
-    try {
-      locate()
-        .then((location: { latitude: number; longitude: number }) => {
-          locations.push({
-            lat: location.latitude,
-            lng: location.longitude,
-            name: 'Unnamed',
+  $effect(() => {
+    if ((!locations || !locations.length) && records && records.length) {
+      try {
+        let locs = records
+          .filter((r) => r.lat)
+          .map((record) => {
+            return {
+              lat: record.lat,
+              lng: record.lng,
+              name: record.location,
+              log: record,
+            }
           })
-          MAP.setView(L.latLng(location.latitude, location.longitude), 12)
-        })
-        .catch((e) => {})
-    } catch (e) {
-      console.error('Picker reaction error', e.message)
+        locations = locs
+      } catch (e) {
+        console.error(`Location || record length reaction error`, e.message)
+      }
     }
-  }
+  })
+
+  $effect(() => {
+    if (picker && MAP && locations.length == 0) {
+      try {
+        locate()
+          .then((location: { latitude: number; longitude: number }) => {
+            locations.push({
+              lat: location.latitude,
+              lng: location.longitude,
+              name: 'Unnamed',
+            })
+            MAP.setView(L.latLng(location.latitude, location.longitude), 8)
+          })
+          .catch((e) => {})
+      } catch (e) {
+        console.error('Picker reaction error', e.message)
+      }
+    }
+  })
 
   async function selectSavedLocation() {
     let buttons = $LocationStore.map((loc: Location) => {
@@ -158,265 +203,6 @@
     })
   }
 
-  let markers: Array<any> = []
-
-  // methods
-  export let methods = {
-    init() {
-      markers = []
-      if (_el) {
-        data.height = _el?.parentElement?.clientHeight
-      }
-
-      /** Initialize map **/
-      return new Promise((resolve, reject) => {
-        if (document.getElementById(id)) {
-          MAP = new L.Map(id).fitWorld()
-
-          var arcgisOnline = esri_geo.arcgisOnlineProvider()
-
-          let searchController = esri_geo.geosearch({
-            zoomToResult: true,
-            placeholder: 'Search',
-            useMapBounds: 25,
-            providers: [
-              arcgisOnline,
-              esri_geo.mapServiceProvider({
-                label: 'States and Counties',
-                url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
-                layers: [2, 3],
-                searchFields: ['NAME', 'STATE_NAME'],
-              }),
-            ],
-          })
-
-          searchController.on('results', (data) => {
-            if (data.latlng) {
-              let location = new Location({
-                lat: data.latlng.lat,
-                lng: data.latlng.lng,
-                name: data.text,
-              })
-              methods.setLocation(location)
-            }
-          })
-
-          let moveTimeout
-          const onMove = () => {
-            let center = MAP.getCenter()
-            let lat = center.lat
-            let lng = center.lng
-            data.lat = lat
-            data.lng = lng
-            // Stop this from being called multiple times.
-
-            /**
-             * Fire the Move action -
-             * encased so we can only do it so often
-             **** */
-            const fireMove = async () => {
-              // let loc = await methods.getLocation(lat, lng);
-              // data.locationName = loc.Match_addr;
-              dispatch(
-                'change',
-                new Location({
-                  ...MAP.getCenter(),
-                  ...{ location: data.locationName },
-                  ...{ name: data.locationName },
-                })
-              )
-            }
-            // Clear Timeout
-            clearTimeout(moveTimeout)
-            // Set 1s timeout
-            moveTimeout = setTimeout(() => {
-              // Fire Move
-              fireMove()
-            }, 1000)
-          }
-
-          // Clear any moveend listeners
-          MAP.off('moveend', onMove)
-          // If we're picking an address do the following
-          if (picker) {
-            // Add the Search Controller
-            searchController.addTo(MAP)
-            MAP.on('moveend', onMove)
-          }
-
-          // Clean up the layers
-          MAP.eachLayer(function (layer) {
-            MAP.removeLayer(layer)
-          })
-
-          // return map
-
-          resolve(MAP)
-        } // end no map
-      })
-    },
-    deleteLocation(location) {
-      Interact.confirm(`${Lang.t('general.delete')} ${location.name}?`).then((res) => {
-        if (res) {
-          LocationStore.remove(location)
-        }
-      })
-    },
-    editName(location) {
-      Interact.prompt('Location Name', null, { value: location.name }).then((res) => {
-        location.name = res
-        LocationStore.upsert(location)
-      })
-    },
-    setLocation(location) {
-      data.locationName = location.name
-      data.lat = location.lat
-      data.lng = location.lng
-      locations = [location]
-      data.showLocations = false
-      MAP.setView(L.latLng(location.lat, location.lng), 12)
-      dispatch('location', location)
-    },
-    /**
-     * Save the current Location
-     */
-    saveLocation() {
-      LocationStore.upsert(
-        new Location({
-          name: data.locationName,
-          lat: data.lat,
-          lng: data.lng,
-        })
-      ).then((loc) => {
-        showToast({ message: `${Lang.t('general.saved', 'Saved')}` })
-      })
-      // Locations.save({
-      //   name: data.locationName,
-      //   lat:
-      // })
-    },
-
-    renderMap() {
-      let copy =
-        '&copy; <a href="https://www.openstreetmap.org/">OSM</a> <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-      let mapTheme = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`
-      if (_el) {
-        if (document.documentElement.classList.contains('mode-dark')) {
-          mapTheme = `https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png`
-        }
-        // Add Attribution
-        L.tileLayer(mapTheme, {
-          attribution: copy,
-          maxZoom: 18,
-        }).addTo(MAP)
-
-        var myIcon = L.icon({
-          iconUrl: '/images/map/map-marker.svg',
-          iconRetinaUrl: '/images/map/map-marker.svg',
-          iconSize: [32, 32],
-          iconAnchor: [9, 21],
-          popupAnchor: [0, -14],
-        })
-
-        // let latLngArray = locations.map((loc) => {
-        //   return new L.marker([loc.lat, loc.lng])
-        // })
-
-        // Quick Add Marker Function
-        let addMarker = (latLng, name, click) => {
-          let mkr = new L.marker(latLng, {
-            icon: myIcon,
-          })
-
-          // If location name is present (TODO) show it in a popup
-          if (name) {
-            mkr.bindPopup(name)
-          }
-          mkr.on('click', click)
-          mkr.addTo(MAP)
-
-          markers.push(mkr)
-        }
-
-        /**
-         * PIN RENDERING
-         * If maxDistance between them is greater than 0.1 km
-         */
-        let latLngArray = locations.map((l: NLocationType): Array<number> => {
-          return [l.lat, l.lng]
-        })
-        //@ts-ignore
-        let maxDistance: any = distance.furthest(latLngArray, 'nm')
-
-        if (maxDistance > 0.5) {
-          // Loop over locaitons provided in props
-          locations.forEach((loc) => {
-            addMarker([loc.lat, loc.lng], loc.name, () => {
-              // On Marker Click
-              data.activeLocation = loc
-              // If a log exists - show the Share Log popup
-              if (loc.log) {
-                // Interact.shareLog(loc.log)
-                openLogDisplay(loc.log)
-              }
-            })
-          })
-
-          let connectTheDots = (data) => {
-            // TODO: Look at making this curved dotted lines - and not just straight ones
-            var c = []
-            data.forEach((location) => {
-              c.push([location.lat, location.lng])
-            })
-            return c
-          }
-          //let pathLine =
-          L.polyline(connectTheDots(locations), {
-            color: 'rgba(2.7%, 52.5%, 100%, 0.378)',
-          }).addTo(MAP)
-        } else {
-          // Max Distance is not enough to justify rendering a bunch of pins
-          if (locations.length) {
-            let runner: any
-            addMarker([locations[0].lat, locations[0].lng], locations[0].name, () => {
-              data.activeLocation = locations[0]
-              const megaNote = locations.map((l) => l.log.note).join('\n\n')
-              const firstLog = locations.find((l) => l.log.end).log
-              clearTimeout(runner)
-              runner = setTimeout(() => {
-                openLogDisplay(new NLog({ note: megaNote, created: firstLog?.end }))
-              }, 100)
-            })
-          }
-        }
-
-        // Make the map fit the bounds of all locations provided
-
-        MAP.invalidateSize()
-        methods.centerMap()
-      }
-    },
-    centerMap() {
-      if (markers.length) {
-        try {
-          var group = new L.featureGroup(markers)
-          MAP.fitBounds(group.getBounds())
-        } catch (e) {
-          console.error(`Caught error trying to center ma`, e)
-        }
-      }
-    },
-    getLocation(lat, lng) {
-      return new Promise((resolve, reject) => {
-        geocodeService
-          .reverse()
-          .latlng([lat, lng])
-          .run((error, result) => {
-            resolve((result || {}).address || 'Unknown')
-          })
-      })
-    },
-  }
 
   // Reactive Location Lookup
   // $: getLocation = () => {
@@ -452,7 +238,7 @@
 >
   {#if lock}
     <button
-      transition:slide={{ duration: 200, easing: quintOut }}
+      transition:slide|global={{ duration: 200, easing: quintOut }}
       on:click={() => {
         lock = false
       }}
@@ -501,6 +287,7 @@
 
 <style lang="postcss" global>
   .n-map-container {
+    height: 100%;
   }
 
   .geocoder-control-input {
@@ -511,7 +298,7 @@
   .leaflet-touch .geocoder-control::after {
     content: '🔎';
     display: block;
-    z-idnex: 1000;
+    z-index: 1000;
   }
 
   .n-map-container .n-map-wrapper {
@@ -519,6 +306,7 @@
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     z-index: 1;
   }
   .picker-cover {

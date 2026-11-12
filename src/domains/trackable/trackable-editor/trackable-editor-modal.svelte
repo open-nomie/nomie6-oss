@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import ScanOutline from './../../../n-icons/ScanOutline.svelte'
   import TrackableAvatar from '../../../components/avatar/trackable-avatar.svelte'
@@ -24,6 +26,7 @@
   import { Lang } from '../../../store/lang'
   import { removePrefix, truncateText } from '../../../utils/text/text'
   import { wait } from '../../../utils/tick/tick'
+  import { toTag } from '../../../modules/tracker/TrackerClass'
   import { getAwardChain, giveAward } from '../../awards/AwardsStore'
   import { removeTrackableFromNomie } from '../../board/boardActions'
 
@@ -31,8 +34,10 @@
 
   import { downloadTrackables, strToTagSafe } from '../trackable-utils'
   import { Trackable } from '../Trackable.class'
+  import { PointerClass } from '../../pointers/pointer-class'
   import { InitTrackableStore, saveTrackable, TrackableStore } from '../TrackableStore'
   import TrackableEditorContext from './context/trackable-editor-context.svelte'
+  import TrackableEditorPointer from './pointer/trackable-editor-pointer.svelte'
   import TrackableEditorPerson from './person/trackable-editor-person.svelte'
 
   import { openTrackableVisuals } from './TrackableVisualStore'
@@ -43,45 +48,98 @@
   import CopyOutline from '../../../n-icons/CopyOutline.svelte'
   import { openTrackableEditor } from './TrackableEditorStore'
 
-  export let trackable: Trackable
-  export let id: string
-  export let saveByPass: Function
+  const { trackable, id, saveByPass } = $props<{ trackable: Trackable, id: string, saveByPass: Function }>()
 
-  let workingTrackable: Trackable
-  let canSave: boolean = false
-  let ogTag: string
+  let workingTrackable: Trackable | undefined = $state(undefined)
+  let ogTag: string | undefined = $state(undefined)
 
-  let workingTag: string
-  let label: string = 'Label'
-  let tagExists: boolean = false
+  let workingTag: string = $state('')
+  let label: string = $state('Label')
+  let editingLabel: string = $state('')
+  let initializedLabel: boolean = $state(false)
 
-  let saving: boolean = false
+  let saving: boolean = $state(false)
+  let workingTrackableVersion: number = $state(0)
 
-  $: if (trackable && !workingTrackable) {
-    workingTrackable = new Trackable(trackable)
-    workingTag = workingTrackable.tag || strToTagSafe(workingTrackable.label)
-    ogTag = workingTag
+  $effect(() => {
+    if (trackable && !workingTrackable) {
+      workingTrackable = new Trackable(trackable)
+      workingTag = (workingTrackable.tag && removePrefix(workingTrackable.tag).replace(/^\^/, '')) || strToTagSafe(workingTrackable.label)
+      ogTag = workingTag
 
-    if (!ogTag && !workingTrackable.emoji) {
-      workingTrackable.emoji = randomEmoji()
-      workingTrackable.color = randomColor()
-    }
-    if (workingTrackable.type == 'tracker') label = 'Tracker Label'
-    if (workingTrackable.type == 'person') label = `Person's Name`
-  }
-
-  $: if (objectHash(workingTrackable)) {
-    canSave = workingTrackable.canSave
-    if (canSave && ogTag !== workingTag) {
-      if ($TrackableStore.trackables[`${workingTrackable.prefix}${workingTag}`]) {
-        canSave = false
-        tagExists = true
-        console.error('That tag already exists!')
+      // Set editing label based on type
+      if (workingTrackable.type === 'pointer') {
+        editingLabel = workingTrackable.ptr?.label || ''
+        label = 'Pointer Name'
+      } else if (workingTrackable.type === 'context') {
+        editingLabel = workingTrackable.ctx?.label || ''
+        label = 'Context Label'
+      } else if (workingTrackable.type === 'person') {
+        editingLabel = workingTrackable.person?.displayName || ''
+        label = `Person's Name`
+      } else if (workingTrackable.type === 'tracker') {
+        editingLabel = workingTrackable.tracker?.label || ''
+        label = 'Tracker Label'
       } else {
-        tagExists = false
+        editingLabel = workingTrackable.label || ''
+      }
+
+      if (!ogTag && !workingTrackable.emoji) {
+        workingTrackable.emoji = randomEmoji()
+        workingTrackable.color = randomColor()
+      }
+
+      initializedLabel = true
+    }
+  })
+
+  $effect(() => {
+    // Only sync from trackable to editingLabel when first loading the trackable
+    // Don't constantly sync during editing, as that prevents deleting to empty string
+    if (workingTrackable && !initializedLabel && editingLabel === '') {
+      const currentLabel =
+        workingTrackable.type === 'pointer' ? workingTrackable.ptr?.label :
+        workingTrackable.type === 'context' ? workingTrackable.ctx?.label :
+        workingTrackable.type === 'person' ? workingTrackable.person?.displayName :
+        workingTrackable.type === 'tracker' ? workingTrackable.tracker?.label :
+        workingTrackable.label
+
+      if (currentLabel && currentLabel !== '') {
+        editingLabel = currentLabel
       }
     }
-  }
+  })
+
+
+  let canSave = $derived.by(() => {
+    if (!workingTrackable) return false
+
+    // Access version to track changes
+    workingTrackableVersion
+
+    let baseCanSave = workingTrackable.canSave
+
+    if (baseCanSave && ogTag !== workingTag) {
+      if ($TrackableStore.trackables[`${workingTrackable.prefix}${workingTag}`]) {
+        return false
+      }
+    }
+
+    return baseCanSave
+  })
+
+  let tagExists = $derived.by(() => {
+    if (!workingTrackable) return false
+
+    // Access version to track changes
+    workingTrackableVersion
+
+    if (ogTag !== workingTag) {
+      return !!$TrackableStore.trackables[`${workingTrackable.prefix}${workingTag}`]
+    }
+
+    return false
+  })
 
   const generateCode = async (trackable: Trackable) => {
     try {
@@ -94,6 +152,7 @@
    * Save the Working Trackable
    */
   const save = async () => {
+
     if (!workingTrackable.id) workingTrackable.id = `${workingTrackable.prefix}${workingTag}`
     if (!ogTag) {
       workingTrackable.tag = workingTag
@@ -108,9 +167,23 @@
         trackable: workingTrackable,
         known: $TrackableStore.trackables,
       })
+
+      if (saved && trackable) {
+        // Copy the saved values back to the original trackable so parent components see updates
+        if (workingTrackable.type === 'tracker' && workingTrackable.tracker && trackable.tracker) {
+          Object.assign(trackable.tracker, workingTrackable.tracker)
+        } else if (workingTrackable.type === 'person' && workingTrackable.person && trackable.person) {
+          Object.assign(trackable.person, workingTrackable.person)
+        } else if (workingTrackable.type === 'context' && workingTrackable.ctx && trackable.ctx) {
+          Object.assign(trackable.ctx, workingTrackable.ctx)
+        } else if (workingTrackable.type === 'pointer' && workingTrackable.ptr && trackable.ptr) {
+          Object.assign(trackable.ptr, workingTrackable.ptr)
+        }
+      }
+
       // Toast the Place!
       close()
-      InitTrackableStore()
+      await InitTrackableStore()
 
       saving = false
       if (saved) {
@@ -179,20 +252,27 @@
     }
   }
 
+  const handleCancel = async () => {
+    // Simply close without saving — workingTrackable is a temporary copy
+    closeModal(id)
+    workingTrackable = undefined
+  }
+
   const close = async () => {
     closeModal(id)
+    workingTrackable = undefined
   }
 </script>
 
 <BackdropModal mainClass="bg-gray-200 dark:bg-gray-800">
   <ToolbarGrid slot="header" className="bg-gray-50 stiff dark:bg-black">
-    <Button slot="left" id="cancel-button" clear primary on:click={close}>{Lang.t('general.cancel', 'Cancel')}</Button>
+    <Button slot="left" id="cancel-button" clear primary on:click={handleCancel}>{Lang.t('general.cancel', 'Cancel')}</Button>
     <h2
       class="font-bold  text-sm flex-grow-0 line-clamp-1 text-black  dark:text-white capitalize flex items-center space-x-2"
     >
-      {#if !saving}
+      {#if !saving && workingTrackable}
         {workingTrackable.label} Editor
-      {:else}
+      {:else if saving}
         <Spinner size={24} />
       {/if}
     </h2>
@@ -201,119 +281,171 @@
     >
   </ToolbarGrid>
 
-  <!-- Trackable Visuals Collector 
+  <!-- Trackable Visuals Collector
   Avatar, Emoji, Color, Label  -->
-  <section class="label-emoji-color filler overflow-y-auto  px-4 dark:text-gray-200 py-4 bg-gray-50 dark:bg-black mb-4">
-    <div class="visuals-editor flex items-center space-x-4">
-      <button
-        class="bg-primary-500 w-20 h-20 stiff"
-        style="border-radius:33%; {workingTrackable.color
-          ? `background-color:${workingTrackable.color} !important;`
-          : ''}"
-        on:click={async () => {
-          const visuals = await openTrackableVisuals(workingTrackable)
-          if (visuals) {
-            if (visuals.color) workingTrackable.color = visuals.color
-            if (visuals.emoji) workingTrackable.emoji = visuals.emoji
-            if (visuals.avatar) workingTrackable.avatar = visuals.avatar
-          }
-        }}
-      >
-        {#key workingTrackable}
-          <TrackableAvatar trackable={workingTrackable} size={64} />
-        {/key}
-      </button>
-
-      <!-- Lable Collection -->
-      <div class="flex flex-col w-full">
-        <Input
-          className="outline"
-          id="trackable-label-input"
-          value={workingTrackable.label}
-          on:input={(evt) => {
-            workingTrackable.label = evt.detail
-            if (!ogTag) {
-              workingTag = `${strToTagSafe(workingTrackable.label)}`
-              workingTrackable.tag = workingTag
+  {#if workingTrackable}
+    <section class="label-emoji-color filler overflow-y-auto  px-4 dark:text-gray-200 py-4 bg-gray-50 dark:bg-black mb-4">
+      <div class="visuals-editor flex items-center space-x-4">
+        <button
+          class="bg-primary-500 w-20 h-20 stiff"
+          style="border-radius:33%; {workingTrackable.color
+            ? `background-color:${workingTrackable.color} !important;`
+            : ''}"
+          on:click={async () => {
+            const visuals = await openTrackableVisuals(workingTrackable)
+            if (visuals) {
+              if (visuals.color) workingTrackable.color = visuals.color
+              if (visuals.emoji) workingTrackable.emoji = visuals.emoji
+              if (visuals.avatar) workingTrackable.avatar = visuals.avatar
+              // Trigger reactivity by creating new reference
+              workingTrackable = Object.assign(Object.create(Object.getPrototypeOf(workingTrackable)), workingTrackable)
             }
           }}
-          placeholder={label}
-          {label}
-        />
-        {#if ogTag || workingTag}
-          <div class="tag-control flex justify-end items-center space-x-2">
-            {#if tagExists}
-              <div class="text-red-500 text-xs">Tag already exists</div>
-            {/if}
-            <button
-              on:click={() => editTag()}
-              class="flex items-center focus:outline-none focus:ring ring-primary-500 rounded-md"
-            >
-              {#if ogTag && ogTag.length}
-                <span class="opacity-50 ">Tag:</span> <span>{truncateText(ogTag, $Device.size == 'lg' ? 40 : 20)}</span>
-                <IonIcon icon={LockClosedSolid} size={12} />
-              {:else if workingTag}
-                <span class="opacity-50">Tag:</span>
-                <span>{truncateText(`${workingTrackable.prefix}${workingTag}`, $Device.size == 'lg' ? 40 : 20)}</span>
-                <IonIcon icon={CreateOutline} size={12} />
+        >
+          {#key workingTrackable}
+            <TrackableAvatar trackable={workingTrackable} size={64} />
+          {/key}
+        </button>
+
+        <!-- Lable Collection -->
+        <div class="flex flex-col w-full">
+          <Input
+            className="outline"
+            id="trackable-label-input"
+            bind:value={editingLabel}
+            on:input={() => {
+              // Sync editingLabel to the trackable on every keystroke
+              const newTag = !ogTag ? strToTagSafe(editingLabel) : workingTag
+
+              if (workingTrackable?.type === 'pointer') {
+                // Always recreate PointerClass with all properties to ensure proper initialization
+                workingTrackable.ptr = new PointerClass({
+                  label: editingLabel,
+                  tag: newTag,
+                  duration: workingTrackable.ptr?.duration || 1,
+                  description: workingTrackable.ptr?.description || '',
+                  reminder: workingTrackable.ptr?.reminder ?? false,
+                  reminderdate: workingTrackable.ptr?.reminderdate || new Date(),
+                  emoji: workingTrackable.ptr?.emoji,
+                  color: workingTrackable.ptr?.color,
+                  avatar: workingTrackable.ptr?.avatar,
+                })
+              } else if (workingTrackable?.type === 'context') {
+                if (!workingTrackable.ctx) {
+                  workingTrackable.ctx = { tag: newTag, label: editingLabel }
+                } else {
+                  workingTrackable.ctx.label = editingLabel
+                }
+              } else if (workingTrackable?.type === 'person') {
+                if (!workingTrackable.person) {
+                  workingTrackable.person = { displayName: editingLabel, username: editingLabel }
+                } else if (!ogTag) {
+                  workingTrackable.person.displayName = editingLabel
+                  workingTrackable.person.username = editingLabel
+                } else {
+                  workingTrackable.person.displayName = editingLabel
+                }
+              } else if (workingTrackable?.type === 'tracker') {
+                if (!workingTrackable.tracker) {
+                  workingTrackable.tracker = { label: editingLabel, tag: newTag }
+                } else {
+                  workingTrackable.tracker.label = editingLabel
+                  workingTrackable.tracker.tag = newTag || workingTrackable.tracker.tag
+                }
+              }
+
+              if (!ogTag) {
+                workingTag = newTag
+              }
+
+              // Force canSave to re-evaluate
+              workingTrackableVersion++
+            }}
+            placeholder={label}
+            {label}
+          />
+          {#if ogTag || workingTag}
+            <div class="tag-control flex justify-end items-center space-x-2">
+              {#if tagExists}
+                <div class="text-red-500 text-xs">Tag already exists</div>
               {/if}
-            </button>
-          </div>
-        {/if}
+              <button
+                on:click={() => editTag()}
+                class="flex items-center focus:outline-none focus:ring ring-primary-500 rounded-md"
+              >
+                {#if ogTag && ogTag.length}
+                  <span class="opacity-50 ">Tag:</span> <span>{truncateText(`${workingTrackable.prefix}${ogTag}`, $Device.size == 'lg' ? 40 : 20)}</span>
+                  <IonIcon icon={LockClosedSolid} size={12} />
+                {:else if workingTag}
+                  <span class="opacity-50">Tag:</span>
+                  <span>{truncateText(`${workingTrackable.prefix}${workingTag}`, $Device.size == 'lg' ? 40 : 20)}</span>
+                  <IonIcon icon={CreateOutline} size={12} />
+                {/if}
+              </button>
+            </div>
+          {/if}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  {/if}
 
-  <section class="px-2 h-50vh ">
-    {#if workingTrackable.type == 'context'}
-      <TrackableEditorContext bind:trackable={workingTrackable} />
-    {/if}
-    {#if workingTrackable.type == 'person'}
-      <TrackableEditorPerson bind:trackable={workingTrackable} />
-    {/if}
-    {#if workingTrackable.type == 'tracker'}
-      <TrackableEditorTracker bind:trackable={workingTrackable} />
-    {/if}
-  </section>
+  {#if workingTrackable}
+    <section class="px-2 h-50vh ">
+      {#if workingTrackable.type == 'context'}
+        <TrackableEditorContext bind:trackable={workingTrackable} />
+      {/if}
+      {#if workingTrackable.type == 'pointer'}
+        <TrackableEditorPointer bind:trackable={workingTrackable} />
+      {/if}
+      {#if workingTrackable.type == 'person'}
+        <TrackableEditorPerson bind:trackable={workingTrackable} />
+      {/if}
+      {#if workingTrackable.type == 'tracker'}
+        <TrackableEditorTracker bind:trackable={workingTrackable} />
+      {/if}
+    </section>
+  {/if}
 
-  <section class="mt-4 bg-white dark:bg-black pb-10">
-    <ListItem
-      bottomLine={16}
-      clickable
-      on:click={() => {
-        downloadTrackables([workingTrackable], `${AppVersion}`)
-      }}
-    >
-      Share Tracker
-      <IonIcon slot="right" icon={DownloadOutline} className="text-primary" />
-    </ListItem>
-
-    {#if $Prefs.betaFeatures}
-      <ListItem bottomLine={16} on:click={() => generateCode(workingTrackable)}>
-        <span> Generate QR Code or NFC </span>
-        <IonIcon slot="right" icon={ScanOutline} className="text-primary" />
-      </ListItem>
-    {/if}
-    {#if workingTrackable.type == 'tracker'}
+  {#if workingTrackable}
+    <section class="mt-4 bg-white dark:bg-black pb-10">
       <ListItem
         bottomLine={16}
+        clickable
         on:click={() => {
-          duplicateTrackable()
+          downloadTrackables([workingTrackable], `${AppVersion}`)
         }}
       >
-        Duplicate Trackable...
-        <IonIcon slot="right" icon={CopyOutline} className="text-primary-500" />
+        Share Tracker
+        <IonIcon slot="right" icon={DownloadOutline} className="text-primary" />
       </ListItem>
-    {/if}
 
-    <ListItem
-      on:click={async () => {
-        await removeTrackableFromNomie(workingTrackable)
-        close()
-      }}
-    >
-      <span class="text-red-500">Delete Trackable</span>
-      <IonIcon slot="right" icon={TrashOutline} className="text-red-500" />
-    </ListItem>
-  </section>
+      {#if $Prefs.betaFeatures}
+        <ListItem bottomLine={16} on:click={() => generateCode(workingTrackable)}>
+          <span> Generate QR Code or NFC </span>
+          <IonIcon slot="right" icon={ScanOutline} className="text-primary" />
+        </ListItem>
+      {/if}
+      {#if workingTrackable.type == 'tracker'}
+        <ListItem
+          bottomLine={16}
+          on:click={() => {
+            duplicateTrackable()
+          }}
+        >
+          Duplicate Trackable...
+          <IonIcon slot="right" icon={CopyOutline} className="text-primary-500" />
+        </ListItem>
+      {/if}
+
+      <ListItem
+        on:click={async () => {
+          await removeTrackableFromNomie(workingTrackable)
+          close()
+        }}
+      >
+        <span class="text-red-500">Delete Trackable</span>
+        <IonIcon slot="right" icon={TrashOutline} className="text-red-500" />
+      </ListItem>
+    </section>
+  {/if}
 </BackdropModal>

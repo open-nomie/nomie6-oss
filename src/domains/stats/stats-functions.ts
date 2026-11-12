@@ -57,7 +57,7 @@ export const getUsageMap = (rows: Array<NLog>, props: GetValueMapProps): UsageMa
         values: [],
       }
 
-      // If it's a person or context, just count 1
+      // If it's a person, pointer or context, just count 1
       if (props.token && props.token.type === 'tracker') {
         row.trackers
           // filter only matches for the trackableElement
@@ -126,7 +126,7 @@ export const getTrackableUsageMap = (rows: Array<NLog>, props: ITrackableUsageMa
         values: [],
       }
 
-      // If it's a person or context, just count 1
+      // If it's a person, pointer or context, just count 1
       if (props.trackable && props.trackable.tracker) {
         row.trackers
           // filter only matches for the trackableElement

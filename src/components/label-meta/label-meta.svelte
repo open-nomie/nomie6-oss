@@ -1,34 +1,34 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { Trackable } from '../../domains/trackable/Trackable.class'
   import { TrackableStore } from '../../domains/trackable/TrackableStore'
   import { strToTrackable } from '../../domains/trackable/trackable-utils'
-  import { Token, tokenizeLite } from '../../modules/tokenizer/lite'
+  import { type Token, tokenizeLite } from '../../modules/tokenizer/lite'
 
   import TrackableAvatar from '../avatar/trackable-avatar.svelte'
 
-  export let str = undefined
-  export let titleClass = ''
-  export let className = ''
-  export let selected: boolean = false
+  const { str, titleClass, className, selected } = $props()
 
-  let tokenized: Array<Token> = []
-  let label = ''
-  let meta = ''
-  let trackable: Trackable | undefined = undefined
+  let tokenized = $state<Array<Token>>([])
+  let label = $state('')
+  let meta = $state('')
+  let trackable = $state<Trackable | undefined>(undefined)
 
-  let lastStr
-  $: if (str !== lastStr) {
-    lastStr = str
-    tokenized = tokenizeLite(str)
-    label = tokenized
-      .filter((t) => {
-        return t.type == 'generic'
-      })
-      .map((t) => {
-        return t.raw
-      })
-      .join(' ')
-      .trim()
+  let lastStr = $state(undefined)
+  $effect(() => {
+    if (str !== lastStr) {
+      lastStr = str
+      tokenized = tokenizeLite(str)
+      label = tokenized
+        .filter((t) => {
+          return t.type == 'generic'
+        })
+        .map((t) => {
+          return t.raw
+        })
+        .join(' ')
+        .trim()
 
     meta = tokenized
       .filter((t) => {
@@ -40,10 +40,11 @@
       .join(' ')
       .trim()
 
-    if (meta.length) {
-      trackable = strToTrackable(meta, $TrackableStore.trackables)
+      if (meta.length) {
+        trackable = strToTrackable(meta, $TrackableStore.trackables)
+      }
     }
-  }
+  })
 </script>
 
 <div class="n-label-meta space-x-2 flex items-center {selected ? 'selected' : ''} {className} h-8">

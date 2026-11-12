@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import BulbSolid from './../../n-icons/BulbSolid.svelte'
 
@@ -13,6 +15,7 @@
    */
 
   // Svelte
+  import { untrack } from 'svelte'
 
   // import { slide } from "svelte/transition";
 
@@ -62,44 +65,90 @@
 
   import TimeSelect from '../../components/time-select/time-select.svelte'
   import CaptureAddonMenuController from './capture-addon-menu-controller.svelte'
+  import NomieAiButton from '../../components/aibutton2/NomieAiButton2.svelte'
+  import { navigate } from '../../vendor/svelte-navigator'
+  import { openModal } from '../../components/backdrop/BackdropStore2'
+  import AIChatModal from '../ai/ai-chat-modal-compliant.svelte'
 
   // Consts
 
   let textarea: any
-  let saving = false
-  let saved = false
-  let showDateSelector = false
-  let isFocused = false
-  let isPopulated = false
-  export let className = ''
+  let saving = $state(false)
+  let saved = $state(false)
+  let showDateSelector = $state(false)
+  let isFocused = $state(false)
+  let showCaptureTextarea = $state(false)
 
-  let promptMenu: Array<PopMenuButton> = []
-  // let activeLogDayjs: Dayjs;
+  let promptMenu = $state<Array<PopMenuButton>>([])
 
-  $: if ($LedgerStoreSaving) {
-    saving = true
-  } else {
-    saving = false
-  }
+  // Only update promptMenu on PluginStore changes, not WritingPromptStore (which getPromptMenu updates)
+  $effect(() => {
+    if ($PluginStore) {
+      const newMenu: Array<PopMenuButton> = untrack(() => {
+        return [
+          ...getPromptMenu(),
+          {
+            title: 'Integrated Blockly',
+            emoji: '📦',
+            divider: true,
+            click() {
+              navigate('/nomie-blockly')
+            },
+          },
+          ...$PluginStore
+            .filter((p) => p.addToCaptureMenu && p.active)
+            .map((p, index) => ({
+              title: p.name,
+              disabled: p.locked,
+              divider: false,
+              emoji: p.emoji,
+              click() {
+                openPluginModal(p)
+              },
+            })),
+          {
+            divider: true,
+            click() {},
+            component: CaptureAddonMenuController,
+          },
+        ]
+      })
+      // Only update if menu actually changed to avoid circular updates
+      if (JSON.stringify(promptMenu) !== JSON.stringify(newMenu)) {
+        promptMenu = newMenu
+      }
+    }
+  })
+
+  $effect(() => {
+    if ($LedgerStoreSaving) {
+      saving = true
+    } else {
+      saving = false
+    }
+  })
 
   /**
    * If TodayStore is on a Different Day
    * Adjust the Active Log end date
    */
 
-  $: if ($TodayStore.date.format('YYYY-MM-DD') !== dayjs().format('YYYY-MM-DD')) {
-    $ActiveLogStore.end = $TodayStore.date.toDate()
-  }
+  $effect(() => {
+    if ($TodayStore.date.format('YYYY-MM-DD') !== dayjs().format('YYYY-MM-DD')) {
+      $ActiveLogStore.end = $TodayStore.date.toDate()
+    }
+  })
 
   /**
    * Is the Form Populated?
    */
-  $: isPopulated = $ActiveLogStore.note?.trim().length > 0
+  let isPopulated = $derived($ActiveLogStore.note?.trim().length > 0)
 
   /**
    * Active Dates Formatted
    */
-  $: selectedDateFormated = dayjs(new Date($ActiveLogStore.end || new Date().getTime())).format(dateTimeFormat)
+  let dateTimeFormat = $state($Prefs.use24hour ? 'HH:mm' : 'h:mm a')
+  let selectedDateFormated = $derived(dayjs(new Date($ActiveLogStore.end || new Date().getTime())).format(dateTimeFormat))
 
   const setFocused = () => {
     showCaptureTextarea = true
@@ -108,8 +157,6 @@
     }
     isFocused = true
   }
-
-  let dateTimeFormat = $Prefs.use24hour ? 'HH:mm' : 'h:mm a'
 
   // $: if(!showCaptureTextarea && $ActiveLogStore.note?.length) {
   //   showCaptureTextarea = true;
@@ -142,29 +189,6 @@
     }
   }
 
-  $: if ($WritingPromptStore) {
-    promptMenu = getPromptMenu()
-    if ($PluginStore && $PluginStore.length) {
-      $PluginStore
-        .filter((p) => p.addToCaptureMenu && p.active)
-        .map((p, index) => {
-          promptMenu.push({
-            title: p.name,
-            disabled: p.locked,
-            divider: index === 0,
-            emoji: p.emoji,
-            click() {
-              openPluginModal(p)
-            },
-          })
-        })
-    }
-    promptMenu.push({
-      divider: true,
-      click() {},
-      component: CaptureAddonMenuController,
-    })
-  }
 
   /**
    * Monitor Note Change
@@ -310,7 +334,17 @@
     })
   }
 
-  let showCaptureTextarea: boolean = false
+  const { className } = $props()
+
+  function goToAiInsights() {
+    openModal({
+      id: 'ai-chat-modal',
+      position: 'fullscreen',
+      component: AIChatModal,
+      componentProps: { id: 'ai-chat-modal' },
+      tappable: true
+    })
+  }
 </script>
 
 <div class="capture-wrapper {className} relative" id="note-capture">
@@ -327,11 +361,11 @@
     <div class="capture-log" class:negative={$ActiveLogStore.score < 0} class:positive={$ActiveLogStore.score > 0}>
       <div class="p-0 relative">
         {#if !isPopulated}
-          <div class="absolute right-1 top-1 flex items-center ">
+          <div class="absolute right-1 -top-1 flex items-center gap-0 ">
             <MenuInline
               compact
-              buttonStyle="width:40px !important;"
-              y="bottom"
+              buttonStyle="width:40px !important;{!$Prefs.ai?.enabled ? 'position: relative; top: 8px;' : ''}"
+              y="top"
               x="right"
               id="prompt-button"
               buttonClass="stiff block max-w-8 h-8 w-8 z-40  text-primary bg-transparent rounded-full"
@@ -339,6 +373,15 @@
             >
               <IonIcon icon={BulbSolid} size={22} />
             </MenuInline>
+            {#if $Prefs.ai?.enabled}
+              <div class="-ml-3">
+                <NomieAiButton
+                  size="36px"
+                  label="AI Insights"
+                  onclick={goToAiInsights}
+                />
+              </div>
+            {/if}
           </div>
         {/if}
 
@@ -374,7 +417,7 @@
           </div>
 
           <!-- Toolbar for advanced options -->
-          <!-- transition:fly|local={{ y: -47, duration: 200, opacity: 0, easing: quadInOut }} -->
+          <!-- transition:fly={{ y: -47, duration: 200, opacity: 0, easing: quadInOut }} -->
           {#if isFocused || isPopulated}
             <section aria-label="Note tools" class="bottom-section">
               <div class="flex-grow flex items-center space-x-1 py-1 px-0">
@@ -443,7 +486,7 @@
             </section>
           {/if}
           {#if showDateSelector}
-            <div transition:slide={{ delay: 250, duration: 300, easing: quintOut }}>
+            <div transition:slide|global={{ delay: 250, duration: 300, easing: quintOut }}>
               <CaptureDatePicker
                 bind:time={$TodayStore.date}
                 is24Hour={$Prefs.use24hour}
@@ -456,7 +499,7 @@
     </div>
   </Container>
   {#if isFocused || isPopulated}
-    <!-- transition:slide={{ delay: 75, duration: 75, easing: quintOut }} -->
+    <!-- transition:slide|global={{ delay: 75, duration: 75, easing: quintOut }} -->
     <div class="glass absolute -bottom-14 xl:-bottom-8 z-50 h-14 w-full pt-2">
       <Container>
         <div class=" xl:ml-auto xl:w-80 grid grid-cols-2 justify-center gap-4 items-center px-4">

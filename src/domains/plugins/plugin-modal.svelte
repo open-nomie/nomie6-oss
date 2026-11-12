@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../components/backdrop/BackdropStore2'
@@ -9,8 +11,8 @@
   import PluginFrame from './plugin-frame.svelte'
   import type { PluginClass } from './plugin-helpers'
 
-  export let plugin: PluginClass
-  export let id: string
+
+  const { plugin, id } = $props()
 </script>
 
 <BackdropModal>

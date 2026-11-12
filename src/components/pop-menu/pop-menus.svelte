@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import KeyDown from '../../modules/keyDown/keyDown.svelte'
   import { Device } from '../../store/device-store'
@@ -7,14 +9,18 @@
   import PopMenu2 from './pop-menu2.svelte'
   import { closePopMenu, PopMenuStore } from './usePopmenu'
 
-  let visible = false
-  $: if ($PopMenuStore.length) {
-    setTimeout(() => {
-      visible = true
-    }, 10)
-  } else {
-    visible = false
-  }
+  let visible = $state(false)
+
+  $effect(() => {
+    if ($PopMenuStore.length) {
+      const timer = setTimeout(() => {
+        visible = true
+      }, 10)
+      return () => clearTimeout(timer)
+    } else {
+      visible = false
+    }
+  })
 
   const closeNext = () => {
     closePopMenu($PopMenuStore[$PopMenuStore.length - 1])

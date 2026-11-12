@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
   import escapeRegExp from 'lodash/escapeRegExp'
@@ -39,26 +41,26 @@
 
   import { onTrackerTap } from '../tracker/input/TrackerInputStore'
 
-  import { getUnisearchResults, UnisearchResultsType, UnisearchStore } from './UnisearchStore'
+  import { getUnisearchResults, type UnisearchResultsType, UnisearchStore } from './UnisearchStore'
 import { openTimelineModal } from '../timeline/timeline-helpers';
 
-  export let searchTerm: string
-  export let id: string
+  let results = $state<UnisearchResultsType | undefined>(undefined)
+  let exactMatchOptions = $state<Array<PopMenuButton>>([])
+  let currentIndex = $state(-1)
+  let dateFormats = $state(getDateFormats())
+  let showLogs = $state(true)
+  let showTrackables = $state(true)
+  let showCommands = $state(true)
+  let searchInitialized = $state(false)
+  let searchTimeout = $state<any>(undefined)
 
-  let results: UnisearchResultsType | undefined
-  let exactMatchOptions: Array<PopMenuButton> = []
+  let { searchTerm = $bindable(), id } = $props()
 
-  let currentIndex: number = -1
-
-  let dateFormats = getDateFormats()
-
-  let showLogs = true
-  let showTrackables = true
-  let showCommands = true
-
-  $: if (searchTerm?.length === 0) {
-    results = undefined
-  }
+  $effect(() => {
+    if (searchTerm?.length === 0) {
+      results = undefined
+    }
+  })
 
   onMount(() => {
     document.getElementById('search-field').focus()
@@ -67,13 +69,10 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
     }
   })
 
-  let searchInitialized = false
-
   const close = async () => {
     closeModal(id)
   }
 
-  let searchTimeout
   const debounceSearch = async (term: string) => {
     searchTerm = term
     clearTimeout(searchTimeout)
@@ -94,14 +93,19 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
     }
   }
 
-  $: if (!searchTerm && $UnisearchStore.term && !searchInitialized) {
-    searchInitialized = true
-    searchTerm = $UnisearchStore.term
-  }
-  $: if (searchTerm && !searchInitialized) {
-    searchInitialized = true
-    debounceSearch(searchTerm)
-  }
+  $effect(() => {
+    if (!searchTerm && $UnisearchStore.term && !searchInitialized) {
+      searchInitialized = true
+      searchTerm = $UnisearchStore.term
+    }
+  })
+
+  $effect(() => {
+    if (searchTerm && !searchInitialized) {
+      searchInitialized = true
+      debounceSearch(searchTerm)
+    }
+  })
 
   const clickSelected = () => {
     const selectable = document.querySelectorAll('.unisearch .selectable')[currentIndex]
@@ -174,13 +178,15 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
     ]
   }
 
-  $: if ($BackdropStore[$BackdropStore.length - 1] === 'unisearch') {
-    //@ts-ignore
-    document.querySelector('.unisearch input')?.focus()
-  } else {
-    //@ts-ignore
-    document.querySelector('.unisearch input')?.blur()
-  }
+  $effect(() => {
+    if ($BackdropStore[$BackdropStore.length - 1] === 'unisearch') {
+      //@ts-ignore
+      document.querySelector('.unisearch input')?.focus()
+    } else {
+      //@ts-ignore
+      document.querySelector('.unisearch input')?.blur()
+    }
+  })
 </script>
 
 <BackdropModal
@@ -290,7 +296,7 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
         <Divider left={1} />
       {/if}
 
-      {#if results.trackables.length > 0 || searchTerm?.substring(0, 1) === '#' || searchTerm?.substring(0, 1) === '@' || searchTerm?.substring(0, 1) === '+'}
+      {#if results.trackables.length > 0 || searchTerm?.substring(0, 1) === '#' || searchTerm?.substring(0, 1) === '@' || searchTerm?.substring(0, 1) === '+' || searchTerm?.substring(0, 1) === '^'}
         <header
           on:click={() => {
             showTrackables = !showTrackables
@@ -351,7 +357,7 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
         }}
         class="list-header {!showLogs ? 'opacity-50' : ''}"
       >
-        Notes
+        Notes from the last 30 days
       </header>
 
       <List>
@@ -374,7 +380,9 @@ import { openTimelineModal } from '../timeline/timeline-helpers';
           {/each}
           <button
             class="selectable"
+            disabled={!searchTerm}
             on:click={() => {
+              if (!searchTerm) return
               openTimelineModal({
                   search: searchTerm,
                   notes: true

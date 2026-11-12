@@ -8,7 +8,7 @@ import type { ICondition } from '../scoring/score-tracker'
 import type { Token } from '../tokenizer/lite'
 import type { IFocusUnit } from '../../domains/focus/focus-utils'
 
-export type ITrackerType = 'tick' | 'value' | 'range' | 'picker' | 'note' | 'timer'
+export type ITrackerType = 'tick' | 'habit' | 'value' | 'range' | 'picker' | 'note' | 'timer'
 export type ITrackerMath = 'sum' | 'mean'
 
 export function toTag(str: string) {
@@ -45,6 +45,7 @@ export type ITracker = {
   score_calc?: any // Positivity Score calc
   goal?: any // NOT USED
   one_tap?: boolean // One tapper?
+  combo_touch_only?: boolean // Combo: range and value items are only logged once touched
   include?: string // Content to always include when tracking this tracker
   note?: string // Content to include when a note tracker
   hidden?: boolean // Hidden from All Board
@@ -52,6 +53,7 @@ export type ITracker = {
   timeTracked?: number
   picks?: Array<string> // Picks for a Picker type of tracker
   focus?: Array<IFocusUnit>
+  habitChoice?: Array<string> // i.e, yes/no or done/failed etc
 }
 
 export default class TrackerClass {
@@ -75,12 +77,14 @@ export default class TrackerClass {
   public score_calc?: Array<ICondition> // Positivity Score calc
   public goal?: any // NOT USED
   public one_tap?: boolean // One tapper?
+  public combo_touch_only?: boolean // Combo: range and value items are only logged once touched
   public include?: string // Content to always include when tracking this tracker
   public note?: string // Content to include when a note tracker
   public hidden?: boolean // Hidden from All Board
   public started?: number // If its started (and a timer based tracker)
   public timeTracked?: number // amount of time previously tracker if paused (and a timer based tracker)
   public picks?: Array<string> // Picks for a Picker type of tracker
+  public habitChoice?: Array<string> // i.e, yes/no or done/failed etc
   public _dirty?: boolean
   public focus?: Array<IFocusUnit>
 
@@ -133,6 +137,8 @@ export default class TrackerClass {
     this.goal = starter.goal
     // one tap
     this.one_tap = starter.one_tap === true ? true : false
+    // combo: off by default, so range and value items log their default when not touched
+    this.combo_touch_only = starter.combo_touch_only === true ? true : false
     // include
     this.include = starter.include || ''
     // Primary NOte
@@ -148,6 +154,7 @@ export default class TrackerClass {
     }
 
     this.picks = starter.picks || undefined
+    this.habitChoice = starter.habitChoice || ["Done","Failed"]
 
     if (starter.label) {
       this.label = starter.label

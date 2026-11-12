@@ -1,4 +1,4 @@
-import { BookOutline, ChatboxOutline, MapOutline, PeopleOutline } from '../../components/icon/nicons'
+import { BookOutline, ChatboxOutline, MapOutline, PeopleOutline, TagOutline } from '../../components/icon/nicons'
 import BookmarksOutline from "../../n-icons/BookmarksOutline.svelte";
 import { Lang } from '../../store/lang'
 import type NLog from '../nomie-log/nomie-log'
@@ -8,7 +8,7 @@ import TrackerClass from '../../modules/tracker/TrackerClass'
 import { isLongFormat } from '../nomie-log/nomie-log-utils'
 import math from '../../utils/math/math'
 
-export type OTDViewOption = 'all' | 'notes' | 'trackers' | 'people' | 'locations' | 'context'
+export type OTDViewOption = 'all' | 'notes' | 'trackers' | 'people' | 'locations' | 'context' | 'pointers'
 
 export interface OTDView {
   view: OTDViewOption
@@ -30,6 +30,14 @@ export let OTDViews: Array<OTDView> = [
     view: 'context',
     icon: BookmarksOutline,
     label: `${Lang.t('general.context', 'Context')}`,
+    reduce: (items: Array<NLog>) => {
+      return items.length
+    },
+  },
+  {
+    view: 'pointers',
+    icon: TagOutline,
+    label: `${Lang.t('general.pointers', 'Pointers')}`,
     reduce: (items: Array<NLog>) => {
       return items.length
     },
@@ -104,6 +112,23 @@ export function getContext(day): Array<string> {
   })
   return contexts
 }
+
+export function getPointers(day): Array<string> {
+  let pointers = []
+  day.forEach((log: NLog) => {
+    log.pointers.forEach((element: Token) => {
+      const pointer = element.id
+      if (pointer) {
+        if (pointers.indexOf(pointer) === -1) {
+          pointers.push(pointer)
+        }
+      }
+    })
+  })
+  return pointers
+}
+
+
 
 export function getPeople(day, peopleStorePeople: any = {}): Array<Person> {
   let people = []

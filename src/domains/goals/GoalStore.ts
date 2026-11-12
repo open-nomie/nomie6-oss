@@ -21,7 +21,6 @@ import { showConfetti } from '../../components/confetti/ConfettiStore'
 import { showToast } from '../../components/toast/ToastStore'
 import { wait } from '../../utils/tick/tick'
 import { writable } from 'svelte/store'
-import { trackEvent } from '../usage/stat-ping'
 
 export type GoalUsageResponseType = {
   id: string
@@ -201,7 +200,6 @@ export const openGoalDetail = (goal: GoalClass) => {
  * @param goal
  */
 export const openGoalEditor = (goal?: GoalClass) => {
-  trackEvent('open_goal_editor');
   openModal({
     id: `goal-${goal.id}-editor`,
     position: 'fullscreen',

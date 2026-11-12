@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import dayjs from 'dayjs'
   import { onMount } from 'svelte'
@@ -24,19 +26,17 @@
 
 import RelatedView from './related-view.svelte'
 
+  const { id } = $props()
 
+  let trackable = $state<Trackable>()
 
-  export let id: string
+  $effect(() => {
+    if ($RelatedStore) {
+      trackable = $RelatedStore.trackable
+    }
+  })
 
-  let trackable: Trackable
-
-
-  $: if ($RelatedStore) {
-    trackable = $RelatedStore.trackable
-  }
-
-  
-    const close = () => {
+  const close = () => {
     closeModal(id)
   }
 </script>

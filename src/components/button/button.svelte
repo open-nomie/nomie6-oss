@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { press } from 'svelte-hammer'
@@ -6,33 +8,11 @@
   import { md5 } from '../../modules/nid/nid'
 
   const dispatch = createEventDispatcher()
-  export let id = undefined
-  export let size = 'md'
-  export let type = ''
-  export let shape: 'round' | 'rounded' = 'rounded'
-  export let color = ''
-  export let className = ''
-  export let mainClass = ''
-  export let block = false
-  export let style = ''
-  export let disabled = false
-  export let delay = 300
-  export let icon = false
-  export let title = undefined
-  export let ariaLabel = undefined
-  export let prevent = false
-  export let inline = false
-  export let text = false
-  export let confirm = false
-  export let role = ''
-  export let autofocus = false
-  export let primary = false
-  export let clear = false
 
-  let confirming = false
-  let confirmTimeout
+  let confirming = $state(false)
+  let confirmTimeout = $state()
 
-  $: id = id || `auto-${md5(`${title}${className}${text}`)}`
+  const { id = `auto-${md5('default')}`, size = 'md', type = '', color = '', className = '', mainClass = '', block = false, style = '', disabled = false, delay = 300, icon = false, title = undefined, ariaLabel = undefined, prevent = false, inline = false, text = false, confirm = false, role = '', autofocus = false, primary = false, clear = false, shape = '' } = $props()
 
   const onClick = async (evt) => {
     if (confirm) {

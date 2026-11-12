@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Modal2 from '../../../components/modal/modal2.svelte'
   import Panel from '../../../components/panel/panel.svelte'

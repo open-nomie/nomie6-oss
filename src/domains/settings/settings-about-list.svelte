@@ -1,35 +1,52 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 	import { LaunchCount } from './../preferences/LaunchCount.ts';
-  import { navigate } from 'svelte-navigator'
+  import { navigate } from '../../vendor/svelte-navigator'
 
   import { Device } from '../../store/device-store'
   import { LedgerStore } from '../ledger/LedgerStore'
   import { Lang } from '../../store/lang'
   import ListItem from '../../components/list-item/list-item.svelte'
   import List from '../../components/list/list.svelte'
-  import { onMount } from 'svelte'
   import { TrackableStore } from '../trackable/TrackableStore'
   import { TrackerStore } from '../tracker/TrackerStore'
   import { PeopleStore } from '../people/PeopleStore'
   import { ContextStore } from '../context/context-store'
+  import { PointerStore } from '../pointers/pointer-store'
   import { LocationStore } from '../locations/LocationStore'
+  import { PluginStore } from '../plugins/PluginStore'
+  import { TemplateStore } from '../templates/templates-svelte-helpers'
+  import { AwardStore } from '../awards/AwardsStore'
   import { openModal } from '../../components/backdrop/BackdropStore2'
   import WhatsNewModal from '../whats-new/whats-new-modal.svelte'
 
-  let counts = {
+  let counts = $state({
     trackers: 0,
     people: 0,
     context: 0,
+    pointers: 0,
+    reminders: 0,
     locations: 0,
+    plugins: 0,
+    templates: 0,
+    awards: 0,
     total: 0,
-  }
+  })
 
-  onMount(() => {
+  $effect(() => {
     counts.trackers = Object.keys($TrackerStore).length
     counts.context = Object.keys($ContextStore).length
+    counts.pointers = $PointerStore.length
     counts.people = Object.keys($PeopleStore).length
     counts.total = Object.keys($TrackableStore).length
     counts.locations = $LocationStore.length
+    counts.plugins = $PluginStore.length
+    counts.templates = $TemplateStore.length
+    counts.awards = $AwardStore.awards.length
+    counts.reminders = $PointerStore.filter((pointer) => {
+      return pointer.reminder == true
+    }).length
   })
 </script>
 
@@ -37,19 +54,15 @@
   <!-- <ListItem bottomLine={16} detail title="Frequently Asked Questions" to="/faq">
     <span slot="right" class="text-inverse-3">FAQ</span>
   </ListItem> -->
-  <ListItem bottomLine={16} detail title="N6 Docs" href="https://docs.nomie.app">
+  <ListItem bottomLine={16} detail title="N6 Docs" href="https://www.dailynomie.com/%f0%9f%93%96-docs/">
     <span slot="right" class="text-inverse-3">Read</span>
   </ListItem>
-  <ListItem bottomLine={16} detail title="Learn More" href="https://nomie.app?s=dap">
-    <span slot="right" class="text-inverse-3">Nomie.app</span>
+  <ListItem bottomLine={16} detail title="Learn More" href="https://www.dailynomie.com">
+    <span slot="right" class="text-inverse-3">DailyNomie.com</span>
   </ListItem>
 
   <ListItem bottomLine={16} title="Reddit r/nomie" detail href="https://reddit.com/r/nomie">
     <span slot="right" class="flex text-inverse-3">/r/nomie</span>
-  </ListItem>
-
-  <ListItem bottomLine={16} title="Nomie on TikTok" detail href="https://www.tiktok.com/@nomieapp">
-    <span slot="right" class="flex text-inverse-3">@nomieapp</span>
   </ListItem>
 
   <!-- <ListItem title="Open Source" detail href="https://github.com/open-nomie/nomie">
@@ -92,7 +105,6 @@
     <span slot="right">{$Device.pwa}</span>
   </ListItem>
 
-  <ListItem bottomLine={16} title="UI Test" to="/test" detail />
   <ListItem><span class="text-gray-500 text-sm">Counts</span></ListItem>
   <ListItem bottomLine={16} title="Trackers">
     <div slot="right">{counts.trackers}</div>
@@ -103,8 +115,23 @@
   <ListItem bottomLine={16} title="Context">
     <div slot="right">{counts.context}</div>
   </ListItem>
+  <ListItem bottomLine={16} title="Pointers">
+    <div slot="right">{counts.pointers}</div>
+  </ListItem>
+  <ListItem bottomLine={16} title="Reminders">
+    <div slot="right">{counts.reminders}</div>
+  </ListItem>
   <ListItem bottomLine={16} title="Locations">
     <div slot="right">{counts.locations}</div>
+  </ListItem>
+  <ListItem bottomLine={16} title="Templates">
+    <div slot="right">{counts.templates}</div>
+  </ListItem>
+  <ListItem bottomLine={16} title="Awards">
+    <div slot="right">{counts.awards}</div>
+  </ListItem>
+  <ListItem title="Plugins">
+    <div slot="right">{counts.plugins}</div>
   </ListItem>
 </List>
 

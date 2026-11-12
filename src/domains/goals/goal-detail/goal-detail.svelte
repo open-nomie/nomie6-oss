@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Empty from '../../../components/empty/empty.svelte'
   import Spinner from '../../../components/spinner/spinner.svelte'
@@ -7,7 +9,7 @@
   import MonthGoal from './month-goal.svelte'
   import WeekGoal from './week-goal.svelte'
 
-  export let goal: GoalClass
+  let { goal = $bindable() } = $props<{ goal: GoalClass }>()
 </script>
 
 <div class="goal-detail flex flex-col h-full filler ">

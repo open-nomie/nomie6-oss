@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../components/backdrop/BackdropStore2'
@@ -13,9 +15,9 @@
   import { wait } from '../../utils/tick/tick'
   import { AwardStore, saveNewAwards } from './AwardsStore'
 
-  export let id: string
+  const { id } = $props<{ id: string }>()
 
-  $: awardCount = $AwardStore.newAwards.length
+  let awardCount = $derived($AwardStore.newAwards.length)
 
   const close = async () => {
     await wait(200)

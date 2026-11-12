@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Button from '../../components/button/button.svelte'
 
@@ -11,28 +13,28 @@
 
   // import { TrackerStore } from '../tracker/TrackerStore'
 
-  let mode = 'view'
-  let savedTerms: Array<SearchTerm>
+  let mode = $state('view')
+  let savedTerms = $state<Array<SearchTerm>>([])
   // let savedTrackers: Array<TrackerClass>
 
-  $: if ($SearchStore.saved.length || $SearchStore.view) {
-    // Get SavedTerms array
-    savedTerms = $SearchStore.saved
-      .filter((st: SearchTerm) => {
-        return st.type === $SearchStore.view
-      })
-      .reverse()
+  $effect(() => {
+    if ($SearchStore.saved.length || $SearchStore.view) {
+      // Get SavedTerms array
+      savedTerms = $SearchStore.saved
+        .filter((st: SearchTerm) => {
+          return st.type === $SearchStore.view
+        })
+        .reverse()
 
-    // if ($SearchStore.view === 'trackers') {
-    //   savedTrackers = savedTerms.map((searchTerm: SearchTerm) => {
-    //     let tag: string = searchTerm.term.replace('#', '')
-    //     return $TrackerStore[tag] || new TrackerClass({ tag })
-    //   })
-    // } else if ($SearchStore.view === 'people') {
-    // }
-
-    savedTerms = savedTerms
-  }
+      // if ($SearchStore.view === 'trackers') {
+      //   savedTrackers = savedTerms.map((searchTerm: SearchTerm) => {
+      //     let tag: string = searchTerm.term.replace('#', '')
+      //     return $TrackerStore[tag] || new TrackerClass({ tag })
+      //   })
+      // } else if ($SearchStore.view === 'people') {
+      // }
+    }
+  })
 
   function toggleEditMode() {
     mode = mode === 'view' ? 'edit' : 'view'

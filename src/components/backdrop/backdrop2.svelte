@@ -1,31 +1,31 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { quadInOut } from 'svelte/easing'
-import type { SvelteComponentDev } from 'svelte/internal';
-
   import { fade, fly } from 'svelte/transition'
 
   import { BackdropStore2 } from './BackdropStore2'
   import ScrollStopper from './scroll-stopper.svelte'
 
   const zIndex: number = 5000
-  let focusedId: string;
-  let last = $BackdropStore2[$BackdropStore2.length - 1]
-  $: last = $BackdropStore2[$BackdropStore2.length - 1];
+  let focusedId: string = $state()
+  let last = $derived($BackdropStore2[$BackdropStore2.length - 1])
 
-  
-  
   // Monitor the Opening and closing of this modal
   // We do this because we use fly:out -
-  // this keeps the component alive, so we need 
-  // to manually $destroy it. 
-  let modalComponent:SvelteComponentDev;
-  $: if(last && focusedId !== last.id) {
-    focusedId = last.id;
-  } else if(!last && focusedId) {
-    try {
-      modalComponent.$destroy();
-    } catch(e) {}
-  }
+  // this keeps the component alive, so we need
+  // to manually $destroy it.
+  let modalComponent: any = $state();
+  $effect(() => {
+    if(last && focusedId !== last.id) {
+      focusedId = last.id;
+    } else if(!last && focusedId) {
+      try {
+        // Svelte 5: $destroy() no longer exists, handled by lifecycle
+        // modalComponent.$destroy();
+      } catch(e) {}
+    }
+  })
   
 </script>
 
@@ -48,8 +48,8 @@ import type { SvelteComponentDev } from 'svelte/internal';
 
   {#each $BackdropStore2 as modal, index (modal.id)}
     <div
-      in:fly={{ y: 200, duration: 60, easing: quadInOut }}
-      out:fly={{ y: 200, duration: 60, easing: quadInOut }}
+      in:fly|global={{ y: 200, duration: 60, easing: quadInOut }}
+      out:fly|global={{ y: 200, duration: 60, easing: quadInOut }}
       class:in-background={index < $BackdropStore2.length - 1}
       class:in-forground={index == $BackdropStore2.length - 1}
       class="backdrop-modal modal-{modal.position || 'fullscreen'}"
@@ -60,7 +60,7 @@ import type { SvelteComponentDev } from 'svelte/internal';
     </div>
     {#if index < $BackdropStore2.length - 1}
       <div
-        transition:fade
+        transition:fade|global
         class="background-cover pointer-events-none absolute top-0 right-0 left-0 bottom-0 bg-black bg-opacity-10 backdrop-filter backdrop-blur-sm"
         style="z-index:{zIndex + (index + 3)}"
       />
@@ -121,6 +121,12 @@ import type { SvelteComponentDev } from 'svelte/internal';
   }
   .backdrop2 .modal-top {
     @apply top-2;
+  }
+
+  .backdrop2 .modal-center {
+    @apply top-1/2 left-1/2;
+    transform: translate(-50%, -50%);
+    @apply absolute;
   }
 
   .backdrop2.bg-transparent {

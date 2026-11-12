@@ -1,8 +1,10 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let points = 0
-  export let className = undefined
-  $: dir = points > 0 ? '+' : points < 0 ? '' : ''
-  $: positiveClass = points > 0 ? 'positive' : points < 0 ? 'negative' : 'neutral'
+  const { points, className } = $props()
+
+  const dir = $derived(points > 0 ? '+' : points < 0 ? '' : '')
+  const positiveClass = $derived(points > 0 ? 'positive' : points < 0 ? 'negative' : 'neutral')
 </script>
 
 {#if points !== 0}

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 
 
@@ -10,8 +12,7 @@ import { openPluginsModal } from "../plugins/PluginStore";
 import { openWritingPromptModal } from "../writing-prompts/useWritingPrompts";
 
 
-export let id:string; 
-export let closeEvent:()=>void;
+const { id, closeEvent } = $props<{ id: string; closeEvent: () => void }>()
 
 
 </script>

@@ -50,6 +50,7 @@ export type WidgetPayloadType = {
   token?: Token
   tokens?: Array<Token>
   data?: any
+  pointer?: any
 }
 
 export class WidgetClass {
@@ -74,6 +75,7 @@ export class WidgetClass {
   public type?: string = 'value'
   public loading?: boolean = false
   public data?: any;
+  public pointer?: any;
 
   constructor(payload?: WidgetPayloadType) {
     payload = payload || {}
@@ -87,6 +89,7 @@ export class WidgetClass {
       payload.compareValue = parseNumber(payload.compareValue)
     }
     this.data = payload.data || {};
+    this.pointer = payload.pointer || "";
     this.compareValue = payload.compareValue
     this.compareOverColor = payload.compareOverColor
     this.compareUnderColor = payload.compareUnderColor
@@ -147,7 +150,23 @@ export class WidgetClass {
     } else if(def) {
       return def;
     } else if(this.type) {
-      return this.type
+      // Map of widget type IDs to display labels
+      const typeLabels: Record<string, string> = {
+        'insight': 'Nomie Insights',
+        'barchart': 'Bar Chart',
+        'linechart': 'Line Chart',
+        'value': 'Display Value',
+        'note': 'Latest Note',
+        'min-max': 'Min / Max',
+        'map': 'Map',
+        'todos': 'Todos',
+        'habit': 'Habits',
+        'pointer': 'Pointers',
+        'focus': 'Mind, Body, Spirit',
+        'positivity': 'Positivity Chart',
+        'last-used': 'Last Used',
+      }
+      return typeLabels[this.type] || this.type
     }
     return 'unknown'
   }

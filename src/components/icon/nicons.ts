@@ -1,5 +1,7 @@
 import AccessibilityOutlineIcon from '../../n-icons/AccessibilityOutline.svelte'
 import AddCircleOutlineIcon from '../../n-icons/AddCircleOutline.svelte'
+import AddOutlineIcon from '../../n-icons/AddOutline.svelte'
+import RemoveOutlineIcon from '../../n-icons/RemoveOutline.svelte'
 import AddSquareOutlineIcon from '../../n-icons/AddSquareOutline.svelte'
 import AddIconSolid from '../../n-icons/AddIcon.svelte'
 import AlarmOutlineIcon from '../../n-icons/AlarmOutline.svelte'
@@ -12,6 +14,9 @@ import BarChartIcon from '../../n-icons/BarChart.svelte'
 import BarChartOutlineIcon from '../../n-icons/BarChartOutline.svelte'
 import BarChartSolidIcon from '../../n-icons/BarChartSolid.svelte'
 import BookOutlineIcon from '../../n-icons/BookOutline.svelte'
+import BulbOutlineIcon from '../../n-icons/BulbOutline.svelte'
+import CubeOutlineIcon from '../../n-icons/CubeOutline.svelte'
+import CubeSolidIcon from '../../n-icons/CubeSolid.svelte'
 import CalendarOutlineIcon from '../../n-icons/CalendarOutline.svelte'
 import CalendarSolidIcon from '../../n-icons/CalendarSolid.svelte'
 import CaretDownIcon from '../../n-icons/CaretDown.svelte'
@@ -34,6 +39,7 @@ import EaselOutlineIcon from '../../n-icons/EaselOutline.svelte'
 import EaselSolidIcon from '../../n-icons/EaselSolid.svelte'
 import ExpandOutlineIcon from '../../n-icons/ExpandOutline.svelte'
 import EyeSolidIcon from '../../n-icons/EyeSolid.svelte'
+import EyeClosedSolidIcon from '../../n-icons/EyeClosedSolid.svelte'
 import GitCompareOutlineIcon from '../../n-icons/Git.svelte'
 import HappyOutlineIcon from '../../n-icons/HappyOutline.svelte'
 import LineChartOutlineIcon from '../../n-icons/LineChartOutline.svelte'
@@ -58,6 +64,8 @@ import PeopleOutlineIcon from '../../n-icons/PeopleOutline.svelte'
 import PersonAddOutlineIcon from '../../n-icons/PersonAddOutline.svelte'
 import PieChartOutlineIcon from '../../n-icons/PieChartOutline.svelte'
 import PulseOutlineIcon from '../../n-icons/PulseOutline.svelte'
+import QRIcon from '../../n-icons/QRCode.svelte'
+import QRFilledIcon from '../../n-icons/QRCodeSolid.svelte'
 import RemoveCircleOutlineIcon from '../../n-icons/RemoveCircleOutline.svelte'
 import ReplyOutlineIcon from '../../n-icons/ReplyOutline.svelte'
 import RibbonOutlineIcon from '../../n-icons/RibbonOutline.svelte'
@@ -74,6 +82,7 @@ import StopSolidIcon from '../../n-icons/StopSolid.svelte'
 import SunnyOutlineIcon from '../../n-icons/SunnyOutline.svelte'
 import SwapOutlineIcon from '../../n-icons/SwapOutline.svelte'
 import TabsOutlineIcon from '../../n-icons/TabsOutline.svelte'
+import TagOutlineIcon from '../../n-icons/TagOutline.svelte'
 import TextOutlineIcon from '../../n-icons/TextOutline.svelte'
 import ThermometerOutlineIcon from '../../n-icons/ThermometerIcon.svelte'
 import TrashOutlineIcon from '../../n-icons/TrashOutline.svelte'
@@ -104,6 +113,8 @@ export const MoreCircleOutline = MoreCircleOutlineIcon
 
 export const TextOutline = TextOutlineIcon
 
+export const TagOutline = TagOutlineIcon
+
 export const AccessibilityOutline = AccessibilityOutlineIcon
 
 export const PieChartOutline = PieChartOutlineIcon
@@ -122,6 +133,10 @@ export const PersonAddOutline = PersonAddOutlineIcon
 
 export const People = PeopleIcon
 
+export const QRCode = QRIcon
+
+export const QRCodeSolid = QRFilledIcon
+
 export const CopyOutline = CopyOutlineIcon
 
 export const TabsOutline = TabsOutlineIcon
@@ -135,6 +150,12 @@ export const ChatboxOutline = ChatboxOutlineIcon
 export const MapOutline = MapOutlineIcon
 
 export const BookOutline = BookOutlineIcon
+
+export const BulbOutline = BulbOutlineIcon
+
+export const CubeOutline = CubeOutlineIcon
+
+export const CubeSolid = CubeSolidIcon
 
 export const CalendarOutline = CalendarOutlineIcon
 
@@ -150,6 +171,8 @@ export const AddIcon = AddIconSolid
 export const PlusIcon = AddIconSolid
 
 export const AddCircleOutline = AddCircleOutlineIcon
+export const AddOutline = AddOutlineIcon
+export const RemoveOutline = RemoveOutlineIcon
 
 export const RemoveCircleOutline = RemoveCircleOutlineIcon
 
@@ -188,6 +211,8 @@ export const SettingsSolid = SettingsSolidIcon
 export const StopSolid = StopSolidIcon
 
 export const EyeSolid = EyeSolidIcon
+
+export const EyeClosedSolid = EyeClosedSolidIcon
 
 export const AlarmOutline = AlarmOutlineIcon
 

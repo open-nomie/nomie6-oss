@@ -521,12 +521,6 @@ const ledgerInit = () => {
       })
     },
 
-    // async queryContext(context, start, end) {
-    //   let logs = await methods.query({ start, end, search: `+${context}` })
-    //   return logs.sort((a, b) => {
-    //     return a.end < b.end ? 1 : -1
-    //   })
-    // },
 
     async getDay(date) {
       return methods.query({

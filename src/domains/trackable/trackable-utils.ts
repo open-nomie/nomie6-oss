@@ -49,6 +49,9 @@ export const trackableToToken = (trackable: Trackable): Token => {
     case 'context':
       id = trackable.id.replace('+', '')
       break
+    case 'pointer':
+      id = trackable.id.replace('^', '')
+      break 
   }
   const token: Token = {
     id,
@@ -75,8 +78,10 @@ export const strToTrackable = (str: string, known: ITrackables): Trackable | und
     // See if the trackable exists in the provided known iTrackable
     const foundTrackable = toTrackableArray(known).find((t: Trackable) => t.id === `${token.prefix}${token.id}`)
     if (foundTrackable) {
-      foundTrackable.value = parseNumber(token.value)
-      return foundTrackable
+      // Create a copy to avoid mutating the shared trackable in the store
+      const trackableCopy = new Trackable(foundTrackable)
+      trackableCopy.value = parseNumber(token.value)
+      return trackableCopy
     }
     // If not found
     if (token.type === 'tracker') {
@@ -89,6 +94,9 @@ export const strToTrackable = (str: string, known: ITrackables): Trackable | und
     } else if (token.type === 'context') {
       trackable.type = 'context'
       trackable.context = token.id
+    } else if (token.type === 'pointer') {
+      trackable.type = 'pointer'
+      trackable.pointer = token.id
     }
     const finalTrackable = new Trackable(trackable)
     if (trackable.value && trackable.value > 1 && trackable.type == 'tracker') {
@@ -146,6 +154,11 @@ export const setTrackableVisuals = (_trackable: Trackable, visuals: TrackableVis
     if (visuals.hasOwnProperty('emoji')) trackable.ctx.emoji = visuals.emoji
     if (visuals.hasOwnProperty('avatar')) trackable.ctx.avatar = visuals.avatar
     if (visuals.hasOwnProperty('label')) trackable.ctx.label = visuals.label
+  } else if (trackable.type === 'pointer') {
+    if (visuals.hasOwnProperty('color')) trackable.ptr.color = visuals.color
+    if (visuals.hasOwnProperty('emoji')) trackable.ptr.emoji = visuals.emoji
+    if (visuals.hasOwnProperty('avatar')) trackable.ptr.avatar = visuals.avatar
+    if (visuals.hasOwnProperty('label')) trackable.ptr.label = visuals.label
   } else if (trackable.type === 'person') {
     if (visuals.hasOwnProperty('color')) trackable.person.color = visuals.color
     if (visuals.hasOwnProperty('emoji')) trackable.person.emoji = visuals.emoji

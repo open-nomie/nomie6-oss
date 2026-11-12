@@ -66,7 +66,7 @@ function DayOfWeek(rows, tag = null, mathType: ITrackerMath = 'sum'): IDow {
 
   Object.keys(dow).forEach((key, index) => {
     dow[key].percent = countPercentages[index]
-    dow[key].total = mathType == 'sum' ? math.sum(dow[key].values) : math.average(dow[key].valuels)
+    dow[key].total = mathType == 'sum' ? math.sum(dow[key].values) : math.average(dow[key].values)
   })
 
   return dow

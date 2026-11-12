@@ -1,0 +1,253 @@
+<svelte:options runes={true} />
+
+<script lang="ts">
+  import { onMount } from 'svelte'
+
+  import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
+  import { closeModal } from '../../components/backdrop/BackdropStore2'
+  import Button from '../../components/button/button.svelte'
+  import Divider from '../../components/divider/divider.svelte'
+  import ToggleSwitch from '../../components/toggle-switch/toggle-switch.svelte'
+  import Input from '../../components/input/input.svelte'
+  import ListItem from '../../components/list-item/list-item.svelte'
+  import List from '../../components/list/list.svelte'
+  import EmojiSelector from '../../components/emoji-selector/EmojiSelector.svelte'
+
+  import { showToast } from '../../components/toast/ToastStore'
+  import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
+
+  import { Interact } from '../../store/interact'
+
+  import { Lang } from '../../store/lang'
+  import { wait } from '../../utils/tick/tick'
+  import { PivotClass  } from './pivot-class'
+  import { PivotStore } from './PivotStore'
+  import { openPopMenu, type PopMenuButton } from '../../components/pop-menu/usePopmenu'
+
+  const { id, pivot } = $props();
+
+  let name = $state('')
+  let emoji = $state('')
+  let days = $state(0)
+  let searchterms = $state("")
+  let searchenabled = $state(false)
+  let countsearchterms = $state(0)
+  let filters: Object = $state({})
+  let amountoffilters = $state(0)
+  let workingPivot: PivotClass | undefined = $state(undefined)
+  let emojiselector = $state(false)
+
+  let mounted = $state(false)
+
+  $effect(() => {
+    if (pivot && mounted && !workingPivot) {
+      workingPivot = new PivotClass(pivot)
+      name = workingPivot.tag;
+      emoji = workingPivot.emoji;
+      days = workingPivot.days;
+      searchterms = workingPivot.searchterm.terms || "";
+      searchenabled = workingPivot.searchterm.enabled || false;
+      filters = workingPivot.options.valueFilter;
+      amountoffilters = Object.keys(filters).length;
+      searchtermcounts()
+    }
+  })
+
+
+  function searchtermcounts() {
+    countsearchterms = (searchterms.match(/;/g) || []).length;
+    if (searchterms != "" && searchterms.slice(-1) !=";") {countsearchterms = countsearchterms +1}}
+
+  onMount(() => {
+    mounted = true
+  })
+
+  const deletePivot = async () => {
+    const confirmed = await Interact.confirm('Delete this pivot?', 'You can always recreate it later.')
+    if (confirmed) {
+      await PivotStore.remove(workingPivot)
+      closeModal(id)
+    }
+  }
+
+  const save = async () => {
+    const plain = JSON.parse(JSON.stringify(workingPivot))
+    let newPivot = new PivotClass({
+      id: workingPivot.id,
+      tag: name,
+      emoji: emoji,
+      days:days,
+      searchterm:{"enabled":searchenabled,"terms":searchterms},
+      default:workingPivot.default,
+      grouping: workingPivot.grouping,
+      compactRows: workingPivot.compactRows,
+      rowGroupBefore: workingPivot.rowGroupBefore,
+      colGroupBefore: workingPivot.colGroupBefore,
+      rendererName: workingPivot.rendererName,
+      aggregatorName: workingPivot.aggregatorName,
+      hiddenAttributes: plain.hiddenAttributes,
+      hiddenFromAggregators: plain.hiddenFromAggregators,
+      hiddenFromDragDrop: plain.hiddenFromDragDrop,
+      unusedOrientationCutoff: workingPivot.unusedOrientationCutoff,
+      menuLimit: workingPivot.menuLimit,
+      options: plain.options,
+    })
+    newPivot.options.data = []
+    newPivot.options.valueFilter = $state.snapshot(filters);
+    Interact.blocker(`Saving ${workingPivot.tag} pivot...`)
+    try {
+      await PivotStore.upsert(newPivot)
+    } catch (e) {
+      Interact.error(e.message)
+      return
+    } finally {
+      Interact.stopBlocker()
+    }
+    showToast({ message: 'Pivot Saved' })
+    close()
+  }
+
+  const selectemoji = async () => {
+    await wait(100)
+    emojiselector = true;
+  }
+
+  const selectdays = () => {
+    let createlist = [{"title":"30 Days","checked":30==days,click() {
+        if (days !== 30) {days = 30} },},
+        {"title":"60 Days","checked":60==days,click() {
+        if (days !== 60) {days = 60} },},
+        {"title":"90 Days","checked":90==days,click() {
+        if (days !== 90) {days = 90} },},
+        {"title":"120 Days","checked":120==days,click() {
+        if (days !== 120) {days = 120} },},
+        {"title":"150 Days","checked":150==days,click() {
+        if (days !== 150) {days = 150} },},
+        {"title":"180 Days","checked":180==days,click() {
+        if (days !== 180) {days = 180} },},
+        {"title":"270 Days","checked":270==days,click() {
+        if (days !== 270) {days = 270} },},
+        {"title":"365 Days","checked":365==days,click() {
+        if (days !== 365) {days = 365} },},
+        {"title":"2 Years","checked":730==days,click() {
+        if (days !== 730) {days = 730} },},
+        {"title":"3 Years","checked":1095==days,click() {
+        if (days !== 1095) {days = 1095} },}];
+        
+    const buttons:Array<PopMenuButton> = createlist;
+    
+    openPopMenu({
+      id:"days-list",
+      buttons,
+    })
+  }
+
+  const resetfilters = async () =>{
+    const confirmed = await Interact.confirm('Reset all filters?', 'You can always recreate it later.')
+    if (confirmed) {
+      filters = {};
+      amountoffilters = Object.keys(filters).length;
+    }
+    
+  }
+  
+  const close = () => {
+    closeModal(id)
+  }
+</script>
+
+<BackdropModal mainClass="px-2 lg:px-4 py-2 lg:py-4">
+  <ToolbarGrid slot="header">
+    <Button slot="left" primary clear on:click={close}>
+      {Lang.t('general.close', 'Close')}
+    </Button>
+
+    <h1 class="ntitle capitalize">{emoji} {name} Pivot</h1>
+
+    <Button slot="right" primary clear disabled={!name || !emoji} on:click={save}>
+      {Lang.t('general.save', 'Save')}
+    </Button>
+  </ToolbarGrid>
+  {#if emojiselector}
+  <EmojiSelector
+      on:emoji={(evt) => {
+        emoji = evt.detail
+        emojiselector = false
+      }}
+    />
+  {/if}  
+  <List solo>
+    <ListItem clickable on:click={selectemoji}>
+      <div class="py-2">Which Emoji?</div>
+      <div slot="right">
+        {#if emoji}
+        <span class="text-primary-500">{emoji}</span>
+        {:else}
+          <span class="text-primary-500">Select</span>
+        {/if}
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <Input
+      type="text"
+      value={name}
+      on:input={(evt) => (name = evt.detail)}
+      listItem
+      label="Pivot Name"
+      placeholder="Pivot Name"
+    >
+      <div slot="right" class="flex items-center space-x-2 whitespace-nowrap text-xs">
+        {#if name && !emoji}
+          <div class="text-gray-500">{name}</div>
+        {:else if name && emoji}
+        <div class="text-gray-500">{emoji}{name}</div>
+        {/if}
+        
+      </div>
+    </Input>
+    <Divider left={16} />
+    <ListItem clickable on:click={selectdays}>
+      <div class="py-2">How Many Days of History?</div>
+      <div slot="right">
+        {#if days}
+        <span class="text-primary-500">{days}</span>
+        {:else}
+          <span class="text-primary-500">Select</span>
+        {/if}
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <ListItem clickable on:click={resetfilters}>
+      <div class="py-2">Reset (all) {amountoffilters} Filters?</div>
+      <div slot="right">
+          <span class="text-primary-500">Reset</span>
+        
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <ListItem bottomLine={52} title={"🕵🏻‍♂️ Enable Search Terms"}>
+      
+      <div slot="right">
+        <ToggleSwitch bind:value={searchenabled} title="Toggle Search Terms" />
+      </div>
+    </ListItem>
+    <Divider left={16} />
+    <Input
+      type="text"
+      on:input={(evt) => {searchterms = evt.detail; searchtermcounts();}}
+      value={searchterms}
+      listItem
+      label="Searchterms"
+      placeholder="Search Terms"
+    >
+      <div slot="right" class="flex items-center space-x-2 whitespace-nowrap text-xs">
+       
+        <div class="text-gray-500">{countsearchterms} SearchTerms</div>
+    
+        
+      </div>
+    </Input>
+  </List>
+
+  <Button clear className="text-red-500 mt-10 mx-auto text-sm" on:click={() => deletePivot()}>Delete Pivot</Button>
+</BackdropModal>

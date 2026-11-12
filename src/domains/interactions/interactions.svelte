@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   /**
    * Jun 12 2020 - Good god this file has turned into a nightmare.

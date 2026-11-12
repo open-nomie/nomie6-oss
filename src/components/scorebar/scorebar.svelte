@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   /**
    * The Score Bar
@@ -14,18 +16,12 @@
     className?: string
     color?: string
   }
-  export let scores: Array<ScoreType>
-  export let barClass: string = 'h-2'
-  export let className: string = ''
-  export let style: string = ''
-  export let total: number | undefined = undefined
 
-  export let expanded: boolean = false
+  const { scores, barClass, className, style, total, expanded } = $props()
 
-  let localScores: Array<ScoreType> = []
-  $: {
+  const localScores = $derived.by(() => {
     const percentages = math.percentile(scores.map((s) => s.score))
-    localScores = scores.map((s, index) => {
+    return scores.map((s, index) => {
       return {
         score: percentages[index],
         label: s.label,
@@ -33,7 +29,7 @@
         color: s.color,
       }
     })
-  }
+  })
 </script>
 
 <button {style} on:click={() => (expanded = !expanded)} class="scorebar {className} {expanded ? 'expanded' : ''}">

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import type { Dayjs } from 'dayjs'
   import dayjs from 'dayjs'
@@ -8,12 +10,11 @@
   import TimeSelect from '../../components/time-select/time-select.svelte'
   import { TodayStore } from '../usage/today/TodayStore'
 
-  export let time: any = new Date().getTime()
-  export let is24Hour: boolean = false
+  let { time = $bindable(new Date().getTime()), is24Hour = false } = $props<{ time?: any; is24Hour?: boolean }>()
 
   const dispatch = createEventDispatcher()
 
-  $: activeDate = dayjs(new Date(time))
+  let activeDate = $derived(dayjs(new Date(time)))
 
   const days: Array<Dayjs> = Array(30)
     .fill(0)
@@ -22,7 +23,7 @@
     })
     .reverse()
 
-  $: selectedDayIndex = days.findIndex((d) => d.format('YYYY-MM-DD') === $TodayStore.date.format('YYYY-MM-DD'))
+  let selectedDayIndex = $state(days.findIndex((d) => d.format('YYYY-MM-DD') === $TodayStore.date.format('YYYY-MM-DD')))
 
   const onDayMonthSelected = (day: Dayjs, index: number) => {
     selectedDayIndex = index

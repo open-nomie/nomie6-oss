@@ -1,5 +1,6 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let size = "100%";
   export const solid = false;
   let customClass = "";
   export { customClass as class };
@@ -7,6 +8,8 @@
   if (size !== "100%") {
     size = size.slice(-1) === "x" ? size.slice(0, size.length - 1) + "em" : parseInt(size) + "px";
   }
+
+  const { size } = $props()
 </script>
 
 <svg

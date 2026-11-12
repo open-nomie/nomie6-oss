@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Container from '../../components/container/container.svelte'
   import IonIcon from '../../components/icon/ion-icon.svelte'

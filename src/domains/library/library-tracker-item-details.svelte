@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Avatar from '../../components/avatar/avatar.svelte'
 
@@ -13,9 +15,8 @@
   import TrackerTypes from '../../modules/tracker-types/tracker-types'
   import { createEventDispatcher } from 'svelte'
 
-  export let libraryTracker: LibraryTrackerType
-
   const dispatch = createEventDispatcher()
+  const { libraryTracker } = $props()
 
   function getTypeLabel(id: string) {
     if (TrackerTypes.hasOwnProperty(id)) {
@@ -25,8 +26,7 @@
     }
   }
 
-  let trackables: ITrackables = {}
-  $: trackables = $TrackableStore.trackables
+  let trackables = $derived<ITrackables>($TrackableStore.trackables)
 </script>
 
 <List solo className="">
@@ -48,7 +48,7 @@
   {#each libraryTracker.trackers as tracker}
     <ListItem bottomLine={78}>
       <div slot="left" class="bg-primary-400 bg-opacity-20 flex items-center justify-center p-1 rounded-lg">
-        <Avatar slot="left" size={36} emoji={tracker.emoji} className="" />
+        <Avatar size={36} emoji={tracker.emoji} className="" />
       </div>
       <h1 class="ntitle">{tracker.label}</h1>
       <p class="text-sm text-gray-500 leading-tight">

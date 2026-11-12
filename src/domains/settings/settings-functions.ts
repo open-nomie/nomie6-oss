@@ -9,7 +9,6 @@ import { wait } from '../../utils/tick/tick'
 import { deleteAllFromCache } from '../ledger/ledger-cache'
 
 import { getRawPrefs, Prefs, saveStorageType } from '../preferences/Preferences'
-import { trackEvent } from '../usage/stat-ping'
 
 type selectNewStorageProps = {
   current: 'local' | 'pouchdb' | string
@@ -59,17 +58,18 @@ export const useStorageSelectMenu = async (props: selectNewStorageProps) => {
 
   // perfs.betaFeatures
 
+
   let buttons = StorageEngines.map((storageEngine) => {
     let disabled: boolean = false;
 
 
     return {
       title: storageEngine.name,
-      disabled: disabled,
+      disabled: ['firebase', 's3', 'nomie-server'].indexOf(storageEngine.id) > -1,
+      //disabled: disabled,
       description: `${storageEngine.price} ${storageEngine.description}`,
       click() {
         if (prefs.storageType !== storageEngine.id) {
-          trackEvent(`switch-engine-${storageEngine.id}`)
           props.onSelect(storageEngine.id)
         }
       },

@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Divider from '../../components/divider/divider.svelte'
 
@@ -5,7 +7,7 @@
   import List from '../../components/list/list.svelte'
   import type { ContextClass } from './context-class'
 
-  export let context: ContextClass
+  const { context } = $props<{ context: ContextClass }>()
 </script>
 
 <List outside solo title="Context Settings" className="context-editor">

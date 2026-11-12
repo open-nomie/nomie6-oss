@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import {
     CategoryScale,
@@ -13,6 +15,7 @@
   } from 'chart.js'
   import type { ChartConfiguration } from 'chart.js'
   import { createEventDispatcher, onMount } from 'svelte'
+  import annotationPlugin from 'chartjs-plugin-annotation';
 
   Chart.register(
     BarElement,
@@ -23,11 +26,9 @@
     LinearScale,
     LogarithmicScale,
     BarController,
-    LineController
+    LineController,
+    annotationPlugin
   )
-
-  export let id: string
-  export let chartjsPayload: ChartConfiguration
 
   let chart: Chart
   let ctx: HTMLCanvasElement
@@ -67,6 +68,8 @@
   onMount(() => {
     render()
   })
+
+  const { id, chartjsPayload } = $props()
 </script>
 
 <canvas height="100%" id={`chart-${id}`} bind:this={ctx} />

@@ -1,66 +1,50 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { initials } from '../../utils/text/text'
   import { strToColor } from '../dymoji/dymoji'
   import emojiCount from '../../modules/emoji-count/emoji-count'
 
-  // export let size: "xs" | "sm" | "md" | "lg" | "xl" = "md";
-  export let size: number = 32
-  export let label: string = undefined
-  export let src: string = undefined
-  export let emoji: string = undefined
-  export let transparent: boolean = false
-  export let style: string = ''
-  export let color: string | undefined = undefined
-  export let circle: boolean = false
-  export let className: string = ''
+  const { size = 32, label = undefined, src = undefined, emoji = undefined, transparent = false, style = '', color = undefined, circle = false, className = '' } = $props<{ size?: number; label?: string; src?: string; emoji?: string; transparent?: boolean; style?: string; color?: string; circle?: boolean; className?: string }>()
 
   const dispatch = createEventDispatcher()
 
-  let styles: Array<string> = []
-  let classList: Array<string> = []
-  $: {
-    classList = [className]
-    styles.push(`--avatar-size:${size}px`)
-    styles.push(`height:${size}px; min-width:${size}px; width:${size}px`)
-    // if (!emoji) {
-    //   styles.push(``)
-    // }
-    // If it's a source
+  let styles = $derived.by(() => {
+    const arr: Array<string> = [`--avatar-size:${size}px`, `height:${size}px; min-width:${size}px; width:${size}px`]
     if (src && src.length) {
-      classList.push('src')
-      styles.push(`background-image:url(${src})`)
-
-      /// If it's an emoji
+      arr.push(`background-image:url(${src})`)
     } else if (emoji && emoji.length) {
-      classList.push('emoji')
-
-      // styles.push(`background-color:${color}`);
       if (color) {
-        styles.push(`color:${color}`)
+        arr.push(`color:${color}`)
       }
-
-      // If a Label is provided
     } else if (label && label.length) {
-      classList.push('label')
       const thisColor = color || strToColor(label)
-      styles.push(`background-color:${thisColor}; text-shadow:0px 2px 2px rgba(0,0,0,0.2); color:#FFF !important`)
-      styles.push(`font-size: ${size * 0.5}px`)
+      arr.push(`background-color:${thisColor}; text-shadow:0px 2px 2px rgba(0,0,0,0.2); color:#FFF !important`)
+      arr.push(`font-size: ${size * 0.5}px`)
     }
+    return arr
+  })
 
-    // If Transparent
+  let classList = $derived.by(() => {
+    const arr: Array<string> = [className]
+    if (src && src.length) {
+      arr.push('src')
+    } else if (emoji && emoji.length) {
+      arr.push('emoji')
+    } else if (label && label.length) {
+      arr.push('label')
+    }
     if (transparent) {
-      classList.push('transparent')
+      arr.push('transparent')
     }
-
-    // If is Circle
     if (circle) {
-      classList.push('circle')
+      arr.push('circle')
     } else {
-      classList.push('rounded')
+      arr.push('rounded')
     }
-    // Merge with props styl
-  }
+    return arr
+  })
 
   function click() {
     dispatch('click')

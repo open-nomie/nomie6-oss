@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Panel from '../../components/panel/panel.svelte'
   import LogListLoader from '../../components/log-list/log-list-loader.svelte'
@@ -9,13 +11,13 @@
   import { tokenToTrackable } from '../../modules/tokenizer/tokenToTrackable'
   import { TrackableStore } from '../trackable/TrackableStore'
 
-  export let term: string
+  let results = $state<Array<NLog>>([])
 
-  let results: Array<NLog> = []
+  const { term } = $props()
 </script>
 
 <Panel className="h-full">
-  <main class="h-full mb-4 bg-gray-200 filler dark:bg-gray-800">
+  <main class="h-full mb-4 bg-gray-200 filler dark:bg-gray-800"> 
     {#if term}
       <section class="h-full p-4 search-results">
         <LogListLoader

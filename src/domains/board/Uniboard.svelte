@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { saveLog } from '../ledger/LedgerStore'
   import { Trackable } from '../trackable/Trackable.class'
@@ -22,7 +24,6 @@
   import { Prefs } from '../preferences/Preferences'
   import { objectHash } from '../../modules/object-hash/object-hash'
 
-  import { ArchiveOutline } from '../../components/icon/nicons'
 
   // import { openPersonModal } from '../people/usePersonModal'
   import UniboardEditorView from './uniboard-editor-view.svelte'
@@ -35,53 +36,50 @@
   import { PeopleStore } from '../people/PeopleStore'
   import { TrackerStore } from '../tracker/TrackerStore'
   import { onTrackerLongPress } from '../../modules/tracker/tracker-utils'
-  import { importStorage } from '../storage/import-export'
   import NLog from '../nomie-log/nomie-log'
   import { UsageStore } from '../usage/UsageStore'
 
+  let { searching = $bindable(undefined), sort = $bindable(undefined), filter = $bindable((ele: Trackable) => true) } = $props<{
+    searching?: string
+    sort?: Function
+    filter?: Function
+  }>()
+
   const dispatch = createEventDispatcher()
-  export let searching: undefined | string = undefined
-  export let sort: Function
-  /**
-   * Param of filter - a function to filter the trackables
-   * @param ele
-   */
-  export let filter: Function = (ele: Trackable) => {
-    return true
-  }
 
-  /**
-   * Get Trackables
-   * from the trackablesStore
-   * React and set the trackables to the filters
-   * */
-  let trackables: Array<Trackable> = []
+  let trackables = $state<Array<Trackable>>([])
 
-  $: if ($TrackableStore.trackables) {
-    const usage = $UsageStore
-    const activeBoard = $ActiveBoard
-    trackables = toTrackableArray($TrackableStore.trackables)
-      .filter((trackable) => {
-        return filter(trackable)
-      })
-      .map((trackable) => {
-        return trackable
-      })
-      .sort((a, b) => {
-        if ((activeBoard?.id || '').substring(0, 1) === '_') {
-          let aUsage = usage[a.tag]?.last?.d ? new Date(usage[a.tag].last.d) : 1
-          let bUsage = usage[b.tag]?.last?.d ? new Date(usage[b.tag].last.d) : 0
-          return aUsage > bUsage ? -1 : 1
-        } else if (sort) {
-          // Sort is imported as an attribute
-          return sort(a, b)
-        } else {
-          let aBoardIndex = activeBoard.elements.indexOf(a.tag)
-          let bBoardIndex = activeBoard.elements.indexOf(b.tag)
-          return aBoardIndex > bBoardIndex ? 1 : -1
-        }
-      })
-  }
+  // Elements whose trackable still exists; stale tags from deleted trackables don't count
+  let liveElementCount = $derived(
+    ($ActiveBoard?.elements || []).filter((tag) => Object.values($TrackableStore.trackables).some((t) => t.tag === tag)).length
+  )
+
+  $effect(() => {
+    if ($TrackableStore.trackables) {
+      const usage = $UsageStore
+      const activeBoard = $ActiveBoard
+      trackables = toTrackableArray($TrackableStore.trackables)
+        .filter((trackable) => {
+          return filter(trackable)
+        })
+        .map((trackable) => {
+          return trackable
+        })
+        .sort((a, b) => {
+          if ((activeBoard?.id || '').substring(0, 1) === '_') {
+            let aUsage = usage[a.tag]?.last?.d ? new Date(usage[a.tag].last.d) : 1
+            let bUsage = usage[b.tag]?.last?.d ? new Date(usage[b.tag].last.d) : 0
+            return aUsage > bUsage ? -1 : 1
+          } else if (sort) {
+            return sort(a, b)
+          } else {
+            let aBoardIndex = activeBoard.elements.indexOf(a.tag)
+            let bBoardIndex = activeBoard.elements.indexOf(b.tag)
+            return aBoardIndex > bBoardIndex ? 1 : -1
+          }
+        })
+    }
+  })
 
   /**
    * On Trackable Tapped
@@ -155,82 +153,67 @@
       //     title: `${Lang.t('general.add-a-person', 'Add New Person')}`,
       //   },
       // },
-      {
-        title: `${Lang.t('general.import-from-backup', ' Import from Backup')}`,
-        description: `${Lang.t('general.import-from-backup-description', 'Have a Nomie backup file? Import it here')}`,
-        icon: ArchiveOutline,
-        click() {
-          importStorage()
-        },
-      },
     ]
 
-    if (Object.keys($TrackableStore.trackables).length) {
-      //@ts-ignore
-      emptyBoardMenuButtons.unshift(getAddExistingButton($ActiveBoard))
-    }
+    //@ts-ignore
+    emptyBoardMenuButtons.unshift(getAddExistingButton($ActiveBoard))
     return emptyBoardMenuButtons
   } // end get Empty Boad Menu
 
   // const getEmptyBoard
 
-  let swiper: Swiper
-  let initialBoardActived: boolean = false
-  let lastActiveId: string = ''
+  let swiper = $state<Swiper | undefined>(undefined)
+  let initialBoardActived = $state(false)
+  let lastActiveId = $state('')
 
-  /**
-   * Reaction
-   * If not initial board activated (the initial scroll of the boards, triggers an on:index
-   * so, we're keeping track if an initial value is set if not then we know its really the
-   * frist launch)
-   */
-  $: if (
-    $UniboardStore.activeId &&
-    $CombinedBoards.length &&
-    $TrackableStore.ready &&
-    !initialBoardActived &&
-    !lastActiveId.length &&
-    swiper
-  ) {
-    setActiveBoard($UniboardStore.activeId)
-    initialBoardActived = true
-  }
-
-  /**
-   * Reaction - if the UniboardStore.activeId Changes
-   */
-  $: if ($ActiveBoard && $ActiveBoard.id !== lastActiveId) {
-    lastActiveId = $ActiveBoard.id
-
-    setTimeout(() => {
-      let ele = document.querySelector(`#uniboard-swiper .wrapper #b-${$ActiveBoard.id}`)
-      if (ele) ele.scrollIntoView(false)
-      Device.scrollToTop()
-    }, 200)
-  }
-
-  /**
-   * Watch for Trackable Changes
-   * When the hash Changes, initializing the
-   * UniboardStore
-   */
-  let lastTrackableHash = ''
-  $: if (objectHash($TrackableStore.trackables) !== lastTrackableHash) {
-    if (Object.keys($TrackableStore.trackables).length > 0) {
-      lastTrackableHash = objectHash($TrackableStore.trackables)
-      initUniboardStore($TrackableStore.trackables)
+  $effect(() => {
+    if (
+      $UniboardStore.activeId &&
+      $CombinedBoards.length &&
+      $TrackableStore.ready &&
+      !initialBoardActived &&
+      !lastActiveId.length &&
+      swiper
+    ) {
+      setActiveBoard($UniboardStore.activeId)
+      initialBoardActived = true
     }
-  }
-  let lastPeopleHash = ''
-  $: if (objectHash($PeopleStore) !== lastPeopleHash) {
-    if (Object.keys($PeopleStore).length > 0) {
-      lastPeopleHash = objectHash($PeopleStore)
-      InitTrackableStore()
+  })
+
+  $effect(() => {
+    if ($ActiveBoard && $ActiveBoard.id !== lastActiveId) {
+      lastActiveId = $ActiveBoard.id
+
       setTimeout(() => {
-        initUniboardStore($TrackableStore.trackables)
+        let ele = document.querySelector(`#uniboard-swiper .wrapper #b-${$ActiveBoard.id}`)
+        if (ele) ele.scrollIntoView(false)
+        Device.scrollToTop()
       }, 200)
     }
-  }
+  })
+
+  let lastTrackableHash = $state('')
+  $effect(() => {
+    if (objectHash($TrackableStore.trackables) !== lastTrackableHash) {
+      if (Object.keys($TrackableStore.trackables).length > 0) {
+        lastTrackableHash = objectHash($TrackableStore.trackables)
+        initUniboardStore($TrackableStore.trackables)
+      }
+    }
+  })
+
+  let lastPeopleHash = $state('')
+  $effect(() => {
+    if (objectHash($PeopleStore) !== lastPeopleHash) {
+      if (Object.keys($PeopleStore).length > 0) {
+        lastPeopleHash = objectHash($PeopleStore)
+        InitTrackableStore()
+        setTimeout(() => {
+          initUniboardStore($TrackableStore.trackables)
+        }, 200)
+      }
+    }
+  })
 </script>
 
 <section class="nomie-board-tab  py-2" style="min-height:45vh">
@@ -257,7 +240,7 @@
                 on:more={(evt) => onMore(evt.detail)}
                 on:add={(evt) => onAdd()}
                 on:longpress={(evt) => onLongpress(evt.detail)}
-                hideAdd={!$ActiveBoard.elements.length}
+                hideAdd={!liveElementCount}
                 {trackables}
               >
                 <div slot="no-results">
@@ -297,7 +280,7 @@
               />
             {/if}
 
-            {#if $ActiveBoard.elements.length === 0}
+            {#if liveElementCount === 0}
               <div class="px-4 max-w-md mx-auto pb-10">
                 <div class="text-center py-4">
                   <!-- <div class="text-6xl text-center lg:mt-10">👋</div> -->

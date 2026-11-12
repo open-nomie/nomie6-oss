@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import TrackableAvatar from '../../../components/avatar/trackable-avatar.svelte'
   import Button from '../../../components/button/button.svelte'
@@ -17,9 +19,9 @@
   import BackdropModal from '../../../components/backdrop/backdrop-modal.svelte'
   import { closeModal } from '../../../components/backdrop/BackdropStore2'
 
-  export let id: string
+  const { id } = $props()
 
-  $: trackables = $RunningTimers.map((tracker: TrackerClass) => tracker.toTrackable())
+  let trackables = $derived($RunningTimers.map((tracker: TrackerClass) => tracker.toTrackable()))
 
   const close = () => {
     closeModal(id)

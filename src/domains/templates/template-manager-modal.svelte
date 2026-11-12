@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { openTemplateEditor, openTemplateRef, TemplateStore } from './templates-svelte-helpers'
   import BackdropModal from '../../components/backdrop/backdrop-modal.svelte'
@@ -9,6 +11,7 @@
   import Empty from '../../components/empty/empty.svelte'
 
   import { Template, templateRefs } from './templates-utils'
+  import { Trackable } from '../trackable/Trackable.class'
 
   import { onMount } from 'svelte'
   import ListItem from '../../components/list-item/list-item.svelte'
@@ -18,7 +21,8 @@
 import TemplateEditorList from './template-editor-list.svelte'
 import AvailableTemplatesList from './available-templates-list.svelte'
 
-  let view: 'templates' | 'mine' = 'templates'
+  let view = $state<'templates' | 'mine'>('templates')
+  let fileInput: HTMLInputElement
 
   onMount(() => {
     TemplateStore.init()
@@ -26,6 +30,36 @@ import AvailableTemplatesList from './available-templates-list.svelte'
 
   const newTemplate = () => {
     openTemplateEditor(new Template())
+  }
+
+  const uploadTemplate = () => {
+    fileInput?.click()
+  }
+
+  const handleFileUpload = async (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+    if (!file) return
+
+    try {
+      const content = await file.text()
+      const templateData = JSON.parse(content)
+
+      // Convert trackables to Trackable instances
+      if (templateData.trackables && Array.isArray(templateData.trackables)) {
+        templateData.trackables = templateData.trackables.map((t: any) =>
+          t instanceof Trackable ? t : new Trackable(t)
+        )
+      }
+
+      const template = new Template(templateData)
+      await TemplateStore.upsert(template)
+      openTemplateEditor(template)
+      target.value = '' // Reset file input
+    } catch (error) {
+      console.error('Failed to upload template:', error)
+      alert('Failed to upload template. Please ensure it\'s a valid template JSON file.')
+    }
   }
 
 
@@ -67,16 +101,28 @@ import AvailableTemplatesList from './available-templates-list.svelte'
             buttonLabel="Create a Custom Template"
             buttonClick={() => newTemplate()}
           />
+          <div class="py-4 px-4 text-center">
+            <p class="text-gray-500 text-sm mb-2">Or</p>
+            <button class="text-primary py-2 px-4" on:click={() => uploadTemplate()}> Upload Template </button>
+          </div>
         {:else}
           <TemplateEditorList />
         {/if}
       </List>
 
       {#if $TemplateStore.length}
-      <div class="py-2 px-4 flex justify-center">
+      <div class="py-2 px-4 flex justify-center gap-4">
         <button class="text-primary py-2 px-4" on:click={() => newTemplate()}> Create Template </button>
+        <button class="text-primary py-2 px-4" on:click={() => uploadTemplate()}> Upload Template </button>
       </div>
       {/if}
+      <input
+        bind:this={fileInput}
+        type="file"
+        accept=".json"
+        style="display: none"
+        on:change={handleFileUpload}
+      />
       
       <div class="px-4 py-4 text-center note-muted">
         Build a custom Nomie Configuration that can be downloaded and shared with others

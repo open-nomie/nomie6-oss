@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { Interact } from '../../../store/interact'
   import { Lang } from '../../../store/lang'
@@ -11,35 +13,38 @@
   import { PencilOutline } from '../../../components/icon/nicons'
   import { strToTagSafe } from '../../trackable/trackable-utils'
 
-  export let tracker: ITracker | any
-  export let className: string = ''
-
   const dispatch = createEventDispatcher()
+  const { tracker, className } = $props()
 
-  let isDirty: boolean = false
-  let localTracker: TrackerClass
+  let isDirty = $state(false)
+  let localTracker = $state<TrackerClass>()
 
   const getFreshTracker = () => {
     return new TrackerClass(tracker)
   }
 
-  $: if (
-    ((tracker?.emoji || '').length && localTracker?.emoji !== tracker.emoji) ||
-    ((tracker?.avatar || '').length && localTracker?.avatar !== tracker.avatar)
-  ) {
-    localTracker = getFreshTracker()
-  }
+  $effect(() => {
+    if (
+      ((tracker?.emoji || '').length && localTracker?.emoji !== tracker.emoji) ||
+      ((tracker?.avatar || '').length && localTracker?.avatar !== tracker.avatar)
+    ) {
+      localTracker = getFreshTracker()
+    }
+  })
 
-  $: if ((tracker?.color || '').length && localTracker?.color !== tracker.color) {
-    localTracker = getFreshTracker()
-  }
+  $effect(() => {
+    if ((tracker?.color || '').length && localTracker?.color !== tracker.color) {
+      localTracker = getFreshTracker()
+    }
+  })
 
   onMount(() => {
     localTracker = getFreshTracker()
     isDirty = localTracker.tag?.length === 0
-    setTimeout(() => {
-      document.getElementById('trackable-label-input').focus()
+    const timer = setTimeout(() => {
+      document.getElementById('trackable-label-input')?.focus()
     }, 10)
+    return () => clearTimeout(timer)
   })
 
   const labelChanged = (evt: any) => {

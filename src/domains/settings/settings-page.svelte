@@ -1,7 +1,7 @@
-<script lang="ts">
-  import { navigate } from 'svelte-navigator'
+<svelte:options runes={true} />
 
-  import IonIcon from '../../components/icon/ion-icon.svelte'
+<script lang="ts">
+  import { navigate } from '../../vendor/svelte-navigator'
 
   import SettingsTweakList from './settings-tweak-list.svelte'
 
@@ -9,8 +9,6 @@
   import ToolbarGrid from '../../components/toolbar/toolbar-grid.svelte'
 
   //Vendors
-
-  import { onMount } from 'svelte'
 
   import SocialShare from '../../modules/share/share'
 
@@ -39,17 +37,16 @@
 
   // Components
   import Text from '../../components/text/text.svelte'
-  import Button from '../../components/button/button.svelte'
 
   import SettingsDataList from './settings-data-list.svelte'
   import SettingsAboutList from './settings-about-list.svelte'
   import SettingsFeaturesList from './settings-features-list.svelte'
+  import SettingsAIList from './settings-ai-list.svelte'
   import { AppVersion } from '../../modules/app-version/app-version'
 
   import AwardsPreviewList from '../awards/components/awards-preview-list.svelte'
   import { enabledBetaFeatures, Prefs } from '../preferences/Preferences'
   import { showImportModal } from '../import-export/ImporterStore'
-  import { MailOutline, MailUnreadOutline } from '../../components/icon/nicons'
   import { deleteEverything } from './settings-functions'
   // import Logo from '../../components/logo/logo.svelte'
   import { showToast } from '../../components/toast/ToastStore'
@@ -57,18 +54,32 @@
   import ChatboxOutline from '../../n-icons/ChatboxOutline.svelte'
   import Badge from '../../components/badge/badge.svelte'
   import { openTemplateManager } from '../templates/templates-svelte-helpers'
+  // import { openAnalytics } from '../templates/templates-svelte-helpers'
+  // import { openAfterNomie } from '../templates/templates-svelte-helpers'
   import { openPluginsModal } from '../plugins/PluginStore'
+  import { openPointersModal } from '../pointers/pointer-store'
   import PluginsMoreMenu from '../plugins/plugins-more-menu.svelte'
+  import IonIcon from '../../components/icon/ion-icon.svelte'
+  import ChevronUpOutline from '../../n-icons/ChevronUpOutline.svelte';
 
-  export const location = undefined
-  export const style = undefined
+  import ChevronDownOutline from '../../n-icons/ChevronDownOutline.svelte'
+  import { openLocationModal } from '../locations/LocationStore'
 
-  let st = 0
+  const location = undefined
+  const style = undefined
+
+  let st = $state(0)
+  let showplugins = $state(false)
   async function specialTap() {
     st = st + 1
     if (st > 9) {
       methods.unlockFeatures()
     }
+  }
+
+  const toggleshowplugins = () => {
+    if (showplugins) {showplugins = false}
+    else {showplugins = true}
   }
 
   let methods = {
@@ -103,8 +114,7 @@
     },
   }
 
-  // const setTimeout = setTimeout;
-  onMount(() => {
+  $effect(() => {
     Device.scrollToTop()
   })
 </script>
@@ -135,7 +145,7 @@
           <!-- {#if !hasChatInstalled} -->
           <a
             title="Find a bug? Want to provide feedback?"
-            href="https://airtable.com/shrY9p9UJjC1PMMbI"
+            href={`mailto:${config.support_email}?subject=Nomie ${AppVersion} `}
             class="font-semibold text-black dark:text-white text-sm flex items-center space-x-2"
             target="_blank"
           >
@@ -183,19 +193,58 @@
             </List>
 
             <!-- Sign-in and Register Block  -->
-
             <List solo className="mt-4">
-              <ListItem detail bottomLine={16} on:click={() => openPluginsModal()} title="Plugins">
+              <ListItem detail bottomLine={16} on:click={() => openPluginsModal()} title="Manage Plugins">
                 <span slot="left">🔌</span>
               </ListItem>
+              <ListItem clickable on:click={toggleshowplugins}>
+                <span slot="left">🔌</span>
+                <div slot="right">
+                  {#if showplugins}
+                    <span><IonIcon icon={ChevronUpOutline} size={16} /></span>
+                  {:else}
+                  <span><IonIcon icon={ChevronDownOutline} size={16} /></span>
+                  {/if}
+                </div>
+                <div class="font-semibold leading-tight">Show Plugins</div>
+                <div class="text-xs text-gray-500 line-clamp-2 leading-tight mt-1">Click to show or hide the installed Plugins</div>
+              </ListItem>
+              {#if showplugins}
               <PluginsMoreMenu />
+              {/if}
             </List>
+
+            <List solo className="mt-4">
+              <ListItem detail bottomLine={16} on:click={() => openLocationModal()} title="Locations">
+                <span slot="left">📍</span>
+              </ListItem>
+            </List>
+            
+            <List solo className="mt-4">
+              <ListItem detail bottomLine={16} on:click={() => openPointersModal()} title="Pointers">
+                <span slot="left">🏷</span>
+              </ListItem>
+              </List>
 
             <List solo className="mt-4">
               <ListItem detail bottomLine={16} on:click={() => openTemplateManager()} title="Templates">
                 <span slot="left">🏭</span>
               </ListItem>
             </List>
+
+            <!-- <List solo className="mt-4">
+              <ListItem detail bottomLine={16} on:click={() => openAnalytics()} title="Analytics">
+                <span slot="left">🧊</span>
+              </ListItem>
+            </List> -->
+
+            <!-- <List solo className="mt-4">
+              <ListItem detail bottomLine={16} on:click={() => openAfterNomie()} title="AfterNomie">
+                <span slot="left">䷾</span>
+              </ListItem>
+            </List> -->
+
+            <SettingsAIList />
 
             <div id="data-marker" />
             <SettingsDataList
@@ -230,7 +279,7 @@
                 Version v{import.meta.env.PACKAGE_VERSION}
               </div>
               <div class="text-xs text-gray-800 dark:text-gray-500">
-                <strong>Happy Data</strong>, LLC &copy; Copyright 2014 - {dayjs().format('YYYY')}
+                <strong>DailyNomie</strong>; Copyright 2014 - {dayjs().format('YYYY')}
               </div>
             </button>
           </div>

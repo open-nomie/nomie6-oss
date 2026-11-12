@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -5,12 +7,10 @@
   import IonIcon from '../icon/ion-icon.svelte'
   import { CalendarOutline, ChevronBackOutline, ChevronForwardOutline } from '../icon/nicons'
 
-  export let isToday = true
-  export let hideCal = false
-  export let style = ''
-  export let className = ''
 
   const dispatch = createEventDispatcher()
+
+  const { isToday, hideCal, style, className } = $props()
 </script>
 
 <div class="flex items-center flex-grow-0 flex-shrink-0 next-prev-cal {className}" {style}>

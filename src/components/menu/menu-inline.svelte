@@ -1,5 +1,7 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@rgossiaux/svelte-headlessui'
+  import { slide, fade } from 'svelte/transition'
   import { AwardStore } from '../../domains/awards/AwardsStore'
   import { getAwardById } from '../../domains/awards/helpers/usage-awards'
   import { Interact } from '../../store/interact'
@@ -12,45 +14,36 @@
   import CheckmarkCircle from '../../n-icons/CheckmarkCircle.svelte'
 import Divider from '../divider/divider.svelte'
 
-  export let x: 'right' | 'left' = 'left'
-  export let y: 'top' | 'bottom' = 'top'
-  export let buttonClass: string = undefined
-  export let buttonStyle: string = ""
-  export let id: string
-  export let title: string = ""
-  export let compact: boolean = false;
+  const { x, y, buttonClass, buttonStyle, id, title, compact, menuButtons } = $props()
 
-  export let menuButtons: Array<PopMenuButton> = []
-  let accessorySize: number = compact ? 18 : 24;
-  let menu;
+  let accessorySize = $derived(compact ? 18 : 24)
+  let open = $state(false)
+  let activeIndex = $state(-1)
 </script>
 
-<Menu {id} bind:this={menu} class="id-{id} {compact ? 'compact' : ''} relative  menu-inline" let:open>
-  <MenuButton title={title} id="{id}-button" style={buttonStyle} class="{buttonClass} flex items-center justify-center {open ? 'isOpen' : ''}"
-    ><slot /></MenuButton
+<div {id} class="id-{id} {compact ? 'compact' : ''} relative menu-inline">
+  <button
+    title={title}
+    id="{id}-button"
+    style={buttonStyle}
+    class="{buttonClass} flex items-center justify-center {open ? 'isOpen' : ''}"
+    on:click={() => (open = !open)}
   >
+    <slot />
+  </button>
 
-  <Transition
-    enter="transition-all ease-out duration-200"
-    enterFrom="transform opacity- 0 scale-0"
-    enterTo="transform opacity-100 scale-100 shadow-2xl"
-    leave="transition-all ease-in duration-200 h-0"
-    leaveFrom="transform opacity-100 scale-100"
-    leaveTo="transform opacity-0 scale-0"
-  >
-    <MenuBlocker />
-    <MenuItems
-      class="n-menu glass translate-all duration-200 {open
-        ? 'isOpen'
-        : 'isClosed'} y-{y} x-{x} z-50  absolute w-60 shadow-2xl"
+  {#if open}
+    <MenuBlocker on:click={() => (open = false)} />
+    <div
+      class="n-menu glass translate-all duration-200 isOpen y-{y} x-{x} z-50 absolute w-60 shadow-2xl"
+      transition:fade={{ duration: 200 }}
     >
       {#each menuButtons as button, index}
         {#if button.divider}
           <div class="h-2 -mt-px bg-gray-200 dark:bg-gray-800"></div>
         {/if}
-        <MenuItem
+        <div
           class="menu-item {id}-{index} {button.disabled ? 'disabled' : ''}"
-          let:active
           on:click={async () => {
             if (button.disabled) {
               // do nothing
@@ -60,18 +53,22 @@ import Divider from '../divider/divider.svelte'
               )
             } else {
               button.click()
-            
+              open = false
             }
           }}
+          on:mouseenter={() => (activeIndex = index)}
+          on:mouseleave={() => (activeIndex = -1)}
+          role="menuitem"
         >
           {#if button.component}
             <svelte:component closeEvent={()=>{
               button.click()
+              open = false
             }} this={button.component} />
           {:else}
           <button
             disabled={button.disabled}
-            class="pop-button {active ? 'focused' : ''} nbtn-left pop-button-{index} {button.awardRequired
+            class="pop-button {activeIndex === index ? 'focused' : ''} nbtn-left pop-button-{index} {button.awardRequired
               ? $AwardStore.awards.find((a) => a.id == button.awardRequired)
                 ? 'unlocked'
                 : 'locked'
@@ -103,15 +100,15 @@ import Divider from '../divider/divider.svelte'
             </div>
           </button>
           {/if}
-        </MenuItem>
+        </div>
         {#if index < menuButtons.length - 1}
         <Divider left={16} />
         {/if}
 
       {/each}
-    </MenuItems>
-  </Transition>
-</Menu>
+    </div>
+  {/if}
+</div>
 
 <style global lang="postcss">
   .menu-inline {
@@ -137,10 +134,12 @@ import Divider from '../divider/divider.svelte'
   }
 
   .menu-inline .n-menu.y-top {
-    /* @apply top-8; */
+    top: auto;
+    bottom: calc(100% + 8px);
   }
   .menu-inline .n-menu.y-bottom {
-    @apply bottom-0;
+    bottom: auto;
+    top: calc(100% + 8px);
   }
   .menu-inline .menu-icon-button {
     @apply rounded-full flex items-center justify-center;

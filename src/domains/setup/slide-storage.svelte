@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Container from '../../components/container/container.svelte'
 
@@ -6,21 +8,19 @@
 
   import { Prefs } from '../preferences/Preferences'
 
-  import { StorageEngines, StorageTypes } from '../storage/storage'
+  import { StorageEngines, type StorageTypes } from '../storage/storage'
 
   const engines = StorageEngines
-  let selected: StorageTypes = 'local'
-  selected = $Prefs.storageType
-  let showAdvanced: boolean = false
+  let selected: StorageTypes = $state($Prefs.storageType)
+  let showAdvanced: boolean = $state(false)
 
-  let buttons: Array<PopMenuButton> = []
-  $: {
-    buttons = engines
+  let buttons = $derived.by(() => {
+    return engines
       .map((engine) => {
         return {
           title: engine.name,
           id: engine.id,
-          disabled: ['firebase', 's3'].indexOf(engine.id) > -1 && !$Prefs.betaFeatures,
+          disabled: ['firebase', 's3', 'nomie-server'].indexOf(engine.id) > -1 && !$Prefs.betaFeatures,
           description: `${engine.description}  ${engine.price}`,
           checked: `${selected}` == `${engine.id}`,
           click() {
@@ -37,8 +37,7 @@
           return e.id !== 'pouchdb'
         }
       })
-    buttons = buttons
-  }
+  })
 </script>
 
 <Container className="filler  flex items-center lg:justify-center flex-col pt-3 px-5 slide-storage ">

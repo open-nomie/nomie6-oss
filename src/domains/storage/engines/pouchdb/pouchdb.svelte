@@ -1,9 +1,12 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import ListItem from '../../../../components/list-item/list-item.svelte'
   import Input from '../../../../components/input/input.svelte'
   import NSpinner from '../../../../components/spinner/spinner.svelte'
   import ToggleSwitch from '../../../../components/toggle-switch/toggle-switch.svelte'
+
 
   import { Lang } from '../../../../store/lang'
   import { Interact } from '../../../../store/interact'
@@ -16,12 +19,12 @@
 
   import PouchDB from 'pouchdb'
 
-  let pouchEngine // Holder for the pouchEngine
-  let connecting = false
+  let pouchEngine = $state(undefined) // Holder for the pouchEngine
+  let connecting = $state(false)
 
-  let isOpen = false
+  let isOpen = $state(false)
 
-  let state: any = {
+  let state = $state<any>({
     engine: null,
     isValidSyncURL: false,
     form: {
@@ -33,7 +36,8 @@
     success: false,
     syncing: false,
     canSync: false,
-  }
+    syncEnabled: false,
+  })
 
   const methods = {
     // Initialize Pouch DB
@@ -68,12 +72,14 @@
     },
     startSync() {
       state.syncing = true
+      state.syncEnabled = true
       state.remote.syncEnabled = true
       pouchEngine.saveRemote(state.remote)
       pouchEngine.startSync()
     },
     stopSync() {
       state.syncing = false
+      state.syncEnabled = false
       pouchEngine.stopSync()
       state.remote.syncEnabled = false
     },
@@ -107,7 +113,6 @@
           setTimeout(() => {
             methods.startSync()
             state.syncing = true
-            state.remote.syncEnabled = true
           }, 120)
         }
         connecting = false
@@ -151,31 +156,39 @@
   }
 
   // Watch Form and Connection String
-  let connectionString = null
+  let connectionString = $state<any>(null)
 
-  let lastHost = null
-  $: if (state.form.host && state.form.host !== lastHost) {
-    lastHost = state.form.host
-    connectionString = methods.getConnectionURL(true)
-  }
+  let lastHost = $state(null)
+  $effect(() => {
+    if (state.form.host && state.form.host !== lastHost) {
+      lastHost = state.form.host
+      connectionString = methods.getConnectionURL(true)
+    }
+  })
 
-  let lastDatabase = null
-  $: if (state.form.database && state.form.database !== lastDatabase) {
-    lastDatabase = state.form.database
-    connectionString = methods.getConnectionURL(true)
-  }
+  let lastDatabase = $state(null)
+  $effect(() => {
+    if (state.form.database && state.form.database !== lastDatabase) {
+      lastDatabase = state.form.database
+      connectionString = methods.getConnectionURL(true)
+    }
+  })
 
-  let lastUsername = null
-  $: if (state.form.username && state.form.username !== lastUsername) {
-    lastUsername = state.form.username
-    connectionString = methods.getConnectionURL(true)
-  }
+  let lastUsername = $state(null)
+  $effect(() => {
+    if (state.form.username && state.form.username !== lastUsername) {
+      lastUsername = state.form.username
+      connectionString = methods.getConnectionURL(true)
+    }
+  })
 
-  let lastPassword = null
-  $: if (state.form.password && state.form.password !== lastPassword) {
-    lastPassword = state.form.password
-    connectionString = methods.getConnectionURL(true)
-  }
+  let lastPassword = $state(null)
+  $effect(() => {
+    if (state.form.password && state.form.password !== lastPassword) {
+      lastPassword = state.form.password
+      connectionString = methods.getConnectionURL(true)
+    }
+  })
 
   onMount(async () => {
     // Get Pouch ENgine
@@ -183,6 +196,7 @@
     // Get Remote Settings
     //@ts-ignore
     state.remote = pouchEngine.getRemote()
+    state.syncEnabled = state.remote.syncEnabled
     // Wait for it to be ready
     pouchEngine.onReady(() => {
       // Wait for syncer to turn on
@@ -205,11 +219,11 @@
           isOpen = !isOpen
         }}
       >
-        <div slot="left" class={!state.remote.syncEnabled ? 'opacity-20' : ''}>♻️</div>
+        <div slot="left" class={!state.syncEnabled ? 'opacity-20' : ''}>♻️</div>
         <div class="line-clamp-1 text-xs text-gray-500">{connectionString}</div>
         <div slot="right">
           <ToggleSwitch
-            bind:value={state.remote.syncEnabled}
+            bind:value={state.syncEnabled}
             on:change={(event) => {
               if (event.detail == false) {
                 methods.stopSync()

@@ -1,15 +1,10 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import Text from '../text/text.svelte'
 
-  export let style: string = ''
-  export let solo: boolean = false
-  export let transparent: boolean = false
-  export let className: string = ''
-  export let title: string = undefined
-  export let disabled: boolean = false
-  export let id: string = ''
-  export let outside: boolean = false
-  export let role: string | undefined = 'menu'
+
+  const { style, solo, transparent, className, title, disabled, id, outside, role } = $props()
 </script>
 
 {#if title && outside}
@@ -107,7 +102,6 @@
   .n-list.solo > .n-input-container.list-item:last-child {
     @apply rounded-b-2xl;
   }
-
 
   .n-list.solo.w-full {
     width:100%;

@@ -52,6 +52,7 @@ export class NLog {
   public trackers: Array<Token>
   public people: Array<Token>
   public context: Array<Token>
+  public pointers: Array<Token>
 
   constructor(starter: NomieLogType | any) {
     starter = starter || {}
@@ -254,6 +255,9 @@ export class NLog {
     items.context.forEach((contextTE: Token) => {
       trackables.push(tokenToTrackable(contextTE, allTrackables))
     })
+    items.pointers.forEach((pointerTE: Token) => {
+      trackables.push(tokenToTrackable(pointerTE, allTrackables))
+    })
     return trackables.filter((t) => t)
   }
 
@@ -265,6 +269,7 @@ export class NLog {
       endDate: dayjs(this.end),
       people: tokens.filter((te) => te.type == 'person'),
       context: tokens.filter((te) => te.type == 'context'),
+      pointers: tokens.filter((te) => te.type == 'pointer'),
       trackers: tokens.filter((te) => te.type == 'tracker'),
     })
   }

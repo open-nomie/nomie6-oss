@@ -1,15 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
 
-
-  export let label = undefined;
-  export let value = undefined;
-  // export let color = undefined;
-  export let emoji = undefined;
-  export let className = "light";
-  export let pad:boolean = false;
-  export let style:string = "";
-  export let ballStyle:string = ""
+  const { label = undefined, value = undefined, emoji = undefined, className = "light", pad = false, style = "", ballStyle = "" } = $props<{ label?: any; value?: any; emoji?: any; className?: string; pad?: boolean; style?: string; ballStyle?: string }>()
   const emit = createEventDispatcher();
 </script>
 

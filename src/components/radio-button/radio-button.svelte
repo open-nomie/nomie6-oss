@@ -1,7 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  export let checked: boolean = false
-  export let className: string = ''
-  export let sm: boolean = false
+
+
+  let { checked = $bindable(), className, sm } = $props()
 </script>
 
 <input type="checkbox" class:sm bind:checked class="n-radio {className}" />

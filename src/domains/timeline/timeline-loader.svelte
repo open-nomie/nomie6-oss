@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   /**
    * Timeline Loader
@@ -18,7 +20,7 @@
   import TimelineView from '../../domains/timeline/timeline-view.svelte'
   import { getDateFormats } from '../../domains/preferences/Preferences'
 
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte/internal'
+  import { createEventDispatcher, onMount } from 'svelte'
 
   import { wait } from '../../utils/tick/tick'
 
@@ -41,83 +43,88 @@
     context: false,
   }
 
-  export let filters: TimelineFilterProps = { ...baseFilters }
-  export let daysToLoad: number = 30
-  export let startingDate: Date = new Date()
+  let { filters = $bindable(baseFilters), daysToLoad = 30, startingDate = $bindable(new Date()) } = $props<{ filters?: TimelineFilterProps, daysToLoad?: number, startingDate?: Date }>()
 
   const maxEmptyCalls = 15 // Number of calls that come back empty before we stop looking
 
-  let logs: Array<NLog> = []
-  let date: Dayjs = dayjs(startingDate)
-  let lastDate: Dayjs = dayjs(startingDate)
+  let logs: Array<NLog> = $state([])
+  let date: Dayjs = $state(dayjs(startingDate))
+  let lastDate: Dayjs = $state(dayjs(startingDate))
 
-  let loading: boolean = true
-  let mounted: boolean
+  let loading: boolean = $state(true)
+  let mounted: boolean = $state(true)
 
   const emit = createEventDispatcher()
 
-  onMount(() => {
-    mounted = true
-  })
-  onDestroy(() => {
-    mounted = false
+  let lastStartingDate: Date = $state(new Date())
+  $effect(() => {
+    if (startingDate && startingDate.toDateString() !== lastStartingDate.toDateString()) {
+      lastStartingDate = startingDate
+      logs = []
+      date = dayjs(startingDate)
+      lastDate = dayjs(startingDate)
+      emptyCalls = 0
+      loadLogs()
+    }
   })
 
-  let lastStartingDate: Date = new Date()
-  $: if (startingDate && startingDate.toDateString() !== lastStartingDate.toDateString()) {
-    
-    lastStartingDate = startingDate
-    logs = []
-    date = dayjs(startingDate)
-    lastDate = dayjs(startingDate)
-    emptyCalls = 0
-    loadLogs()
-  }
-
-  // let displayDate = dayjs(date)
   const dateFormats = getDateFormats()
-  // const emit = createEventDispatcher()
 
-  let emptyCalls = 0 // Current number of empty Calls
+  let emptyCalls: number = $state(0)
 
-  // Determine if we're at the end.
-  let atEnd: boolean = false
-  $: atEnd = emptyCalls >= maxEmptyCalls
+  /**
+   * A plain timeline stops after too many empty windows in a row.
+   * A search keeps going back until it reaches the first entry, so older matches are found.
+   */
+  const searchReachedStart = (): boolean => Boolean(firstKnownDate) && lastDate.isBefore(firstKnownDate)
+
+  let atEnd = $derived(filters.search ? searchReachedStart() : emptyCalls >= maxEmptyCalls)
 
   /**
    * It's a recursive function that loads logs from the database.
    */
   const sequentialLogLoad = async (): Promise<void> => {
-    // Go back days
-    lastDate = date.subtract(daysToLoad, 'day')
+    try {
+      // Go back days
+      lastDate = date.subtract(daysToLoad, 'day')
 
-    // Query Log
-    const query: IQueryOptions = {
-      end: date,
-      start: lastDate,
-    }
-    if (filters.search) {
-      
-      query.search = filters.search
-      query.fuzzy = true
-    }
-    const queryLogs = await LedgerStore.query(query)
+      // Query Log
+      const query: IQueryOptions = {
+        end: date,
+        start: lastDate,
+      }
+      if (filters.search) {
 
-    // If Query is empty - increase emptyCall Count
-    if (queryLogs.length === 0) {
-      emptyCalls = emptyCalls + 1
-    }
+        query.search = filters.search
+        query.fuzzy = true
+      }
+      const queryLogs = await LedgerStore.query(query)
 
-    // Merge Logs together and sort / filter
-    logs = [...queryLogs, ...logs.filter((l) => !queryLogs.find((lg) => lg._id === l._id))].sort((a, b) => {
-      return a.end > b.end ? -1 : 1
-    })
+      // Count empty windows in a row. A window with results resets the count,
+      // otherwise sparse results (like a tag used now and then) hit the end too early.
+      if (queryLogs.length === 0) {
+        emptyCalls = emptyCalls + 1
+      } else {
+        emptyCalls = 0
+      }
 
-    if (logs.length == 0 && emptyCalls <= maxEmptyCalls) {
-      date = dayjs(lastDate)
-      await sequentialLogLoad()
+      // Merge Logs together and sort / filter
+      logs = [...queryLogs, ...logs.filter((l) => !queryLogs.find((lg) => lg._id === l._id))].sort((a, b) => {
+        return a.end > b.end ? -1 : 1
+      })
+
+      const keepLooking = filters.search ? !searchReachedStart() : emptyCalls <= maxEmptyCalls
+      // Keep going past empty windows: the list does not grow for them, so it would not ask again
+      if (queryLogs.length === 0 && keepLooking) {
+        date = dayjs(lastDate)
+        await sequentialLogLoad()
+      }
+    } catch (error) {
+      console.error('Timeline query error:', error)
+      loading = false
     }
   }
+
 
   /**
    * Get Logs
@@ -134,7 +141,7 @@
     }
 
     // Do we have too many empty Calls?
-    if (emptyCalls <= maxEmptyCalls) {
+    if (filters.search ? !searchReachedStart() : emptyCalls <= maxEmptyCalls) {
       await sequentialLogLoad()
     }
     loading = false
@@ -146,7 +153,7 @@
    * @param caller
    */
   const loadMore = async (caller?: string): Promise<Array<NLog>> => {
-    if (emptyCalls < maxEmptyCalls) {
+    if (filters.search ? !searchReachedStart() : emptyCalls < maxEmptyCalls) {
       date = dayjs(lastDate)
       return loadLogs(false, caller || 'loadMore')
     }
@@ -190,32 +197,45 @@
   let onLogSaved: Function
   let onLogUpdate: Function
   let onLogsDeleted: Function
-  let firstKnownDate: Dayjs
+  let firstKnownDate = $state<Dayjs>(undefined)
 
   onMount(async () => {
     // Device.scrollToTop()
     firstKnownDate = await LedgerStore.getFirstDate()
-    clearAndLoad()
+    await clearAndLoad()
+  })
+
+  $effect(() => {
     onLogUpdate = LedgerStore.hook('onLogUpdate', async (log) => {
       await wait(600)
       loadLogs(true, 'onLogUpdate')
     })
 
+    return () => {
+      if (onLogUpdate) onLogUpdate()
+    }
+  })
+
+  $effect(() => {
     onLogSaved = LedgerStore.hook('onLogSaved', async (log) => {
       await wait(600)
-      loadLogs(true, 'onLogSaved')
+      await clearAndLoad()
     })
 
+    return () => {
+      if (onLogSaved) onLogSaved()
+    }
+  })
+
+  $effect(() => {
     onLogsDeleted = LedgerStore.hook('onLogsDeleted', async (logs) => {
       await wait(200)
       await clearAndLoad()
     })
-  })
-  onDestroy(() => {
-    // Unsubscribe
-    onLogSaved()
-    onLogUpdate()
-    onLogsDeleted()
+
+    return () => {
+      if (onLogsDeleted) onLogsDeleted()
+    }
   })
 </script>
 
@@ -225,7 +245,7 @@
     </Container>
   {/if} -->
 {#if mounted}
-  
+
   {#if logs.length}
     <TimelineView
       {logs}

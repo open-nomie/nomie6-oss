@@ -4,7 +4,7 @@ import ScoreNote from '../../modules/scoring/score-note'
 import appConfig from '../../config/appConfig'
 import type { PositivityType } from '../../config/appConfig'
 import { openDropMenu } from '../../components/menu/useDropmenu'
-import { openPopMenu, PopMenuButton } from '../../components/pop-menu/usePopmenu'
+import { openPopMenu, type PopMenuButton } from '../../components/pop-menu/usePopmenu'
 
 export interface IPositivityResults {
   positive: number

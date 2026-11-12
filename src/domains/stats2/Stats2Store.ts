@@ -163,6 +163,7 @@ export const initStatsStore = async (trackable: Trackable, options: OpenStatsOpt
 export const getDateRange = (endDate: Date, timespan: Stats2TimeSpanType): { start: Dayjs; end: Dayjs } => {
   const end = dayjs(endDate)
   let start: Dayjs
+  
   if (timespan === 'd') {
     start = end.subtract(1, 'day')
   } else if (timespan === 'w') {

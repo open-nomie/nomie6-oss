@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
@@ -13,21 +15,15 @@
     badge?: string
     notify?: boolean
     hide?: boolean
+    disabled?: boolean
     click?: Function
   }
 
-  export let buttons: Array<ButtonGroupButtonType> = []
-  export let size = 'sm'
-  export let labelClass = ''
-  export let inverse = false
-  export let compact: boolean = false
-  export let className = ''
-  export let style = ''
-  export let id = ''
-  export let scrollable = false
-  export let value: any = undefined
+
 
   const dispatch = createEventDispatcher()
+
+  let { buttons, size, labelClass, inverse, compact, className, style, id, scrollable, value = $bindable() } = $props()
 </script>
 
 <div
@@ -38,16 +34,18 @@
   class:compact
   {style}
 >
-  {#if buttons.length}
+  {#if buttons && buttons.length}
     {#each buttons as button, index}
       {#if button.hide !== false}
         <button
           type="menu"
           title={button.label}
+          disabled={button.disabled}
           class="btn-group-btn btn-{index} {button.active || (value && value == button.value)
             ? 'bg-primary-gradient active'
-            : 'text-solid-1'}"
+            : 'text-solid-1'} {button.disabled ? 'opacity-50 cursor-not-allowed' : ''}"
           on:click={() => {
+            if (button.disabled) return
             if (button.click) button.click()
             if (!button.click && button.value) {
               value = button.value

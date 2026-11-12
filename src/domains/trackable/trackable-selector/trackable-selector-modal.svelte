@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import TrackableAvatar from '../../../components/avatar/trackable-avatar.svelte'
   import BackdropModal from '../../../components/backdrop/backdrop-modal.svelte'
@@ -19,46 +21,46 @@
   import { toTrackableArray } from '../trackable-utils'
   import type { TrackableTypes } from '../Trackable.class'
   import { Trackable } from '../Trackable.class'
+  import type {ITrackerType} from '../../../modules/tracker/TrackerClass'
 
   import { TrackableStore } from '../TrackableStore'
   import type { TrackableSelectorProps } from './TrackableSelectorStore'
 
-  export let id: string
-  export let payload: TrackableSelectorProps
+  const { id, payload } = $props<{ id: string, payload: TrackableSelectorProps }>()
 
-  let selected: Array<Trackable> = []
-  let searchTerm: string | undefined = undefined
-  let cleanSearchTerm: string | undefined = undefined
+  let selected: Array<Trackable> = $state([])
+  let searchTerm: string | undefined = $state(undefined)
+  let cleanSearchTerm: string | undefined = $state(undefined)
 
-  let known: Array<Trackable>
-  let unknownTrackables: Array<Trackable> = []
-  let type: TrackableTypes
-
-  let headerGroups: any = {}
+  let known: Array<Trackable> = $state([])
+  let unknownTrackables: Array<Trackable> = $state([])
+  let type: TrackableTypes = $state(undefined)
+  let subtype: ITrackerType = $state(undefined)
 
   const getHeaderKey = (label) => {
     return label.substring(0, 1).toUpperCase()
   }
-  const headerKeyExists = (label) => {
-    const key = getHeaderKey(label)
-    const exists = headerGroups.hasOwnProperty(key)
-    headerGroups[key] = true
-    return exists
-  }
 
-  $: if (searchTerm) {
-    headerGroups = {}
-  } else {
-    headerGroups = {}
-  }
+  let groupedTrackables: Array<[string, Array<Trackable>]> = $state([])
 
-  $: if (payload) {
-    headerGroups = {}
-    type = payload.type
-    known = toTrackableArray($TrackableStore.trackables).sort((a, b) => {
-      return a.label.toLowerCase() > b.label.toLowerCase() ? 1 : -1
-    })
-  }
+  $effect(() => {
+    if (payload) {
+      type = payload.type
+      subtype = payload.subtype
+      let tempknown = toTrackableArray($TrackableStore.trackables).sort((a, b) => {
+        return a.label.toLowerCase() > b.label.toLowerCase() ? 1 : -1
+      })
+      if (subtype) {
+        known = tempknown.filter(function (el) {
+          if (el.tracker) {
+            return el.tracker.type === subtype
+          }
+        })
+      } else {
+        known = tempknown
+      }
+    }
+  })
 
   /**
    * Close Modal
@@ -90,19 +92,20 @@
   const onSearchTerm = (term: string): void => {
     if (term && term.length > 0) {
       searchTerm = term.toLowerCase()
-      cleanSearchTerm = searchTerm.replace(/(\@|\+|\#)/g, '')
+      cleanSearchTerm = searchTerm.replace(/(\@|\+|\#|\^)/g, '')
       unknownTrackables = [
         getUnknownTrackable('tracker'),
         getUnknownTrackable('person'),
         getUnknownTrackable('context'),
+        getUnknownTrackable('pointer'),
       ]
     } else {
       searchTerm = undefined
       cleanSearchTerm = undefined
     }
   }
-  $: cleanedTerm = cleanTerm(searchTerm);
-  $: filtered = known.filter((t) => {
+  let cleanedTerm = $derived(cleanTerm(searchTerm))
+  let filtered = $derived(known.filter((t) => {
     if (cleanedTerm && payload.type) {
       return JSON.stringify(t).toLowerCase().search(cleanedTerm) > 1 && t.type === payload.type
     } else if (payload.type) {
@@ -111,6 +114,20 @@
       return JSON.stringify(t).toLowerCase().search(cleanedTerm) > 1
     }
     return t
+  }))
+
+  $effect(() => {
+    if (filtered) {
+      const groups = new Map<string, Array<Trackable>>()
+      filtered.forEach((t) => {
+        const key = getHeaderKey(t.label)
+        if (!groups.has(key)) {
+          groups.set(key, [])
+        }
+        groups.get(key).push(t)
+      })
+      groupedTrackables = Array.from(groups.entries())
+    }
   })
 
   /**
@@ -137,6 +154,11 @@
       return new Trackable({
         type: 'context',
         context: cleanSearchTerm,
+      })
+    } else if (type === 'pointer') {
+      return new Trackable({
+        type: 'pointer',
+        pointer: cleanSearchTerm,
       })
     } else {
       return new Trackable({
@@ -185,40 +207,29 @@
           <option value="tracker">{Lang.t('general.trackers', 'Trackers')}</option>
           <option value="person">{Lang.t('general.people')}</option>
           <option value="context">{Lang.t('general.context')}</option>
+          <option value="pointer">{Lang.t('general.pointer', 'Pointers')}</option>
         </select>
       </SearchBar>
     </Toolbar>
   </header>
 
   <section class="trackable-list relative">
-    {#each filtered.filter((t) => t.tag) as trackable, index (trackable.tag)}
-      {#if !headerKeyExists(trackable.label)}
-        <header class="sticky top-0 z-50  text-gray-900 dark:text-gray-100 font-bold px-4 py-2 glass">
-          {getHeaderKey(trackable.label)}
-        </header>
-      {/if}
-      <ListItem bottomLine={70} clickable on:click={() => toggleTrackable(trackable)}>
-        <TrackableAvatar slot="left" size={42} {trackable} />
-        <div>
-          <h1 class="line-clamp-1">{trackable.label}</h1>
-          <div class="flex items-center space-x-2">
-            <div class="text-sm text-gray-500 line-clamp-1">{trackable.tag}</div>
+    {#each groupedTrackables as [headerKey, trackables] (headerKey)}
+      <header class="sticky top-0 z-50 text-gray-900 dark:text-gray-100 font-bold px-4 py-2 glass">
+        {headerKey}
+      </header>
+      {#each trackables.filter((t) => t.tag) as trackable (trackable.tag)}
+        <ListItem bottomLine={70} clickable on:click={() => toggleTrackable(trackable)}>
+          <TrackableAvatar slot="left" size={42} {trackable} />
+          <div>
+            <h1 class="line-clamp-1">{trackable.label}</h1>
+            <div class="flex items-center space-x-2">
+              <div class="text-sm text-gray-500 line-clamp-1">{trackable.tag}</div>
+            </div>
           </div>
-        </div>
-        <RadioButton slot="right" className="pointer-events-none" checked={selected.indexOf(trackable) > -1} />
-      </ListItem>
-      <!-- <button
-        class="{selected.indexOf(trackable) > -1
-          ? 'bg-primary-500 bg-opacity-20'
-          : ''} relative flex w-full text-left items-center py-2 px-4 space-x-4 justify-between z-20"
-        on:click={() => toggleTrackable(trackable)}
-      >
-        <TrackableAvatar size={42} {trackable} />
-        <h2 class="text-black dark:text-white text-sm md:text-base leading-tight filler">{trackable.label}</h2>
-        <div class="text-sm text-gray-500">{trackable.tag}</div>
-        <RadioButton className="pointer-events-none" checked={selected.indexOf(trackable) > -1} />
-      </button>
-      <Divider left={70} /> -->
+          <RadioButton slot="right" className="pointer-events-none" checked={selected.indexOf(trackable) > -1} />
+        </ListItem>
+      {/each}
     {/each}
     {#if filtered.length === 0}
       <div class="px-4 text-center text-gray-500 py-4">No Known Trackers</div>
@@ -232,6 +243,8 @@
             <h2 class="ntitle filler">As tracker: #{cleanSearchTerm}</h2>
           {:else if trackable.type === 'context'}
             <h2 class="ntitle filler">As context: +{cleanSearchTerm}</h2>
+            {:else if trackable.type === 'pointer'}
+            <h2 class="ntitle filler">As pointer: ^{cleanSearchTerm}</h2>
           {:else if trackable.type === 'person'}
             <h2 class="ntitle filler">As person: @{cleanSearchTerm}</h2>
           {/if}

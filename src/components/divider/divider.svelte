@@ -1,21 +1,9 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-  import { onMount } from 'svelte'
+  const { className = '', center = false, inset = false, pad = false, style = '', hideLine = false, left = undefined } = $props<{ className?: string; center?: boolean; inset?: boolean; pad?: boolean; style?: string; hideLine?: boolean; left?: number }>()
 
-  export let className = ''
-  export let center = false
-  export let inset = false
-  export let pad = false
-  export let style = ''
-  export let hideLine: boolean = false
-  export let left: number | undefined = undefined
-
-  let hasContent: boolean = false
-
-  onMount(() => {
-    if (arguments[1].$$slots) {
-      hasContent = true
-    }
-  })
+  let hasContent = $derived(Object.keys($$slots).length > 0)
 </script>
 
 <div
